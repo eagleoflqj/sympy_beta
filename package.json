@@ -1,0 +1,30 @@
+{
+  "name": "sympy_beta",
+  "version": "0.1.0",
+  "gammaVersion": "1.0.0",
+  "author": "Qijia Liu <liumeo@pku.edu.cn> (http://github.com/eagleoflqj)",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "dev": "node scripts/build_wheel.js . && vite",
+    "lint": "eslint --ext .js,.vue --fix src",
+    "build": "vite build && node scripts/build_wheel.js dist",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.26",
+    "vue-mathjax-next": "0.0.4",
+    "vue-router": "^4.0.12"
+  },
+  "devDependencies": {
+    "@vicons/fa": "^0.11.0",
+    "@vitejs/plugin-vue": "^1.10.2",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-vue": "^8.2.0",
+    "naive-ui": "^2.23.0",
+    "vite": "^2.7.3"
+  }
+}

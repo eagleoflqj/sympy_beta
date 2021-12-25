@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+.idea
+
+# node
+node_modules
+dist
+dist-ssr
+*.local
+package-lock.json
+
+# python
+*.pyc
+*.whl
+*.egg-info
+.coverage
+build
