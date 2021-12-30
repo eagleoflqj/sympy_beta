@@ -3,7 +3,6 @@ import collections
 from contextlib import contextmanager
 
 import sympy
-from sympy import latex
 
 
 def Rule(name, props=""):
@@ -57,11 +56,11 @@ class JSONPrinter:
         return {'text': text}
 
     def format_math(self, math):
-        return {'inline': latex(math)}
+        return {'inline': sympy.latex(math)}
 
     def format_math_display(self, math):
         if not isinstance(math, str):
-            math = latex(math)
+            math = sympy.latex(math)
         return {'block': math}
 
     @contextmanager

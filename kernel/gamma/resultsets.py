@@ -599,8 +599,7 @@ def eval_integral(evaluator, components, parameters=None):
     return sympy.integrate(components['integrand'], *components['limits'])
 
 def eval_integral_manual(evaluator, components, parameters=None):
-    return sympy.integrals.manualintegrate(components['integrand'],
-                                           components['variable'])
+    return sympy.integrals.manualintegrate.manualintegrate(components['integrand'], components['variable'])
 
 def eval_diffsteps(evaluator, components, parameters=None):
     function = components.get('function', evaluator.get('input_evaluated'))
@@ -685,12 +684,12 @@ all_cards = {
 
     'integral_manual': ResultCard(
         "Integral",
-        "sympy.integrals.manualintegrate(%s, {_var})",
+        "sympy.integrals.manualintegrate.manualintegrate(%s, {_var})",
         sympy.Integral),
 
     'integral_manual_fake': FakeResultCard(
         "Integral",
-        "sympy.integrals.manualintegrate(%s, {_var})",
+        "sympy.integrals.manualintegrate.manualintegrate(%s, {_var})",
         lambda i, var: sympy.Integral(i, *var),
         eval_method=eval_integral_manual,
         format_input_function=format_integral

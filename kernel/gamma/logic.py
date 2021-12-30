@@ -292,7 +292,6 @@ class SymPyGamma(object):
                     })
                 except (SyntaxError, ValueError) as e:
                     logging.error(e)
-                    pass
 
             if is_function:
                 learn_more = find_learn_more_set(arguments[0])

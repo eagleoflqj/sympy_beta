@@ -81,7 +81,6 @@ def constant_rule(derivative):
 def mul_rule(derivative):
     expr, symbol = derivative
     terms = expr.args
-    is_div = 1 / sympy.Wild("denominator")
 
     coeff, f = expr.as_independent(symbol)
 

@@ -47,7 +47,7 @@ self.onmessage = async (event) => {
   await pyodideReadyPromise
   const { id, func, args } = event.data
   try {
-    f = self.pyodide.globals.get(func)
+    const f = self.pyodide.globals.get(func)
     temp_result = f(...args)
     if (pyodide.isPyProxy(temp_result)) {
       const result = temp_result.toJs({ dict_converter: Object.fromEntries })
