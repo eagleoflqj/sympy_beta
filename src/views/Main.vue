@@ -39,7 +39,10 @@ function randomExample () {
     <p>
       … and more: see
       the
-      <a href="https://docs.sympy.org">documentation</a> to learn
+      <a
+        href="https://docs.sympy.org"
+        target="_blank"
+      >documentation</a> to learn
       about the full range of SymPy's capabilities.
     </p>
   </div>

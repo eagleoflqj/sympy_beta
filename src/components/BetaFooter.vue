@@ -31,7 +31,7 @@ onMounted(async () => {
       <a
         href="https://github.com/eagleoflqj/sympy_beta/"
         target="_blank"
-      >SymPy Beta on Github</a>.
+      >SymPy Beta on GitHub</a>.
     </p>
   </div>
 </template>

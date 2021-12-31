@@ -90,14 +90,16 @@ class IntegralPrinter(JSONPrinter):
             self.append(self.format_text("The integral of a constant is the constant "
                                          "times the variable of integration:"))
             self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.constant, rule.symbol),
-                                                          _manualintegrate(rule))))
+                                                          _manualintegrate(rule),
+                                                          evaluate=False)))
 
     def print_ConstantTimes(self, rule):
         with self.new_step():
             self.append(self.format_text("The integral of a constant times a function "
                                          "is the constant times the integral of the function:"))
             self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          rule.constant * sympy.Integral(rule.other, rule.symbol))))
+                                                          rule.constant * sympy.Integral(rule.other, rule.symbol),
+                                                          evaluate=False)))
 
             with self.new_level():
                 self.print_rule(rule.substep)
@@ -114,7 +116,8 @@ class IntegralPrinter(JSONPrinter):
                         self.format_math(sympy.Ne(sympy.Symbol('n'), -1)),
                         self.format_text(":"))
             self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          _manualintegrate(rule))))
+                                                          _manualintegrate(rule),
+                                                          evaluate=False)))
 
     def print_Add(self, rule):
         with self.new_step():
@@ -130,9 +133,9 @@ class IntegralPrinter(JSONPrinter):
             # commutative always puts the symbol at the end when printed
             dx = sympy.Symbol('d' + rule.symbol.name, commutative=0)
             self.append(self.format_text("Let "),
-                        self.format_math(sympy.Eq(u, rule.u_func)))
+                        self.format_math(sympy.Eq(u, rule.u_func, evaluate=False)))
             self.append(self.format_text("Then let "),
-                        self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx)),
+                        self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx, evaluate=False)),
                         self.format_text(" and substitute "),
                         self.format_math(rule.constant * du),
                         self.format_text(":"))
@@ -158,11 +161,11 @@ class IntegralPrinter(JSONPrinter):
             self.append(self.format_math_display(r"\int u \operatorname{d}v = uv - \int v \operatorname{d}u"))
 
             self.append(self.format_text("Let "),
-                        self.format_math(sympy.Eq(u, rule.u)),
+                        self.format_math(sympy.Eq(u, rule.u, evaluate=False)),
                         self.format_text(" and let "),
-                        self.format_math(sympy.Eq(dv, rule.dv * dx)))
+                        self.format_math(sympy.Eq(dv, rule.dv * dx, evaluate=False)))
             self.append(self.format_text("Then "),
-                        self.format_math(sympy.Eq(du, rule.u.diff(rule.symbol) * dx)))
+                        self.format_math(sympy.Eq(du, rule.u.diff(rule.symbol) * dx, evaluate=False)))
 
             self.append(self.format_text("To find "),
                         self.format_math(v),
@@ -191,9 +194,9 @@ class IntegralPrinter(JSONPrinter):
                                     self.format_math(current_integrand),
                                     self.format_text(":"))
                         self.append(self.format_text("Let "),
-                                    self.format_math(sympy.Eq(u, rl.u)),
+                                    self.format_math(sympy.Eq(u, rl.u, evaluate=False)),
                                     self.format_text(" and let "),
-                                    self.format_math(sympy.Eq(dv, rl.dv * dx)))
+                                    self.format_math(sympy.Eq(dv, rl.dv * dx, evaluate=False)))
 
                         v_f, du_f = _manualintegrate(rl.v_step), rl.u.diff(rule.symbol)
 
@@ -203,16 +206,19 @@ class IntegralPrinter(JSONPrinter):
                         self.append(self.format_text("Then "),
                                     self.format_math(
                                         sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                 total_result - sign * sympy.Integral(current_integrand, rule.symbol))))
+                                                 total_result - sign * sympy.Integral(current_integrand, rule.symbol),
+                                                 evaluate=False)))
                         sign *= -1
                 with self.new_step():
                     self.append(self.format_text("Notice that the integrand has repeated itself, so "
                                                  "move it to one side:"))
-                    self.append(self.format_math_display(sympy.Eq(
-                        (1 - rule.coefficient) * sympy.Integral(rule.context, rule.symbol), total_result)))
+                    self.append(self.format_math_display(
+                        sympy.Eq((1 - rule.coefficient) * sympy.Integral(rule.context, rule.symbol), total_result,
+                                 evaluate=False)))
                     self.append(self.format_text("Therefore,"))
                     self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                                  _manualintegrate(rule))))
+                                                                  _manualintegrate(rule),
+                                                                  evaluate=False)))
 
 
     def print_Trig(self, rule):
@@ -228,7 +234,8 @@ class IntegralPrinter(JSONPrinter):
                 self.append(self.format_text(text))
 
             self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          _manualintegrate(rule))))
+                                                          _manualintegrate(rule),
+                                                          evaluate=False)))
 
     def print_Exp(self, rule):
         with self.new_step():
@@ -238,7 +245,8 @@ class IntegralPrinter(JSONPrinter):
                 self.append(self.format_text("The integral of an exponential function is itself"
                                              " divided by the natural logarithm of the base."))
             self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          _manualintegrate(rule))))
+                                                          _manualintegrate(rule),
+                                                          evaluate=False)))
 
     def print_Log(self, rule):
         with self.new_step():
@@ -257,7 +265,7 @@ class IntegralPrinter(JSONPrinter):
     def print_Rewrite(self, rule):
         with self.new_step():
             self.append(self.format_text("Rewrite the integrand:"))
-            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten)))
+            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten, evaluate=False)))
             self.print_rule(rule.substep)
 
     def print_DontKnow(self, rule):

@@ -362,10 +362,11 @@ class DiffPrinter(JSONPrinter):
                         buf.append(fnames[i])
                 ruleform.append(reduce(lambda a, b: a*b, buf))
             self.append(self.format_math_display(
-                sympy.Eq(sympy.Derivative(reduce(lambda a, b: a*b, fnames), rule.symbol), sum(ruleform))))
+                sympy.Eq(sympy.Derivative(reduce(lambda a, b: a*b, fnames), rule.symbol), sum(ruleform),
+                         evaluate=False)))
 
             for fname, deriv, term, substep in zip(fnames, derivatives, rule.terms, rule.substeps):
-                self.append(self.format_math(sympy.Eq(fname, term)),
+                self.append(self.format_math(sympy.Eq(fname, term, evaluate=False)),
                             self.format_text("; to find "),
                             self.format_math(deriv),
                             self.format_text(":"))
@@ -383,12 +384,12 @@ class DiffPrinter(JSONPrinter):
             qrule_left = sympy.Derivative(ff / gg, rule.symbol)
             qrule_right = sympy.ratsimp(sympy.diff(sympy.Function("f")(x) /
                                                    sympy.Function("g")(x)))
-            qrule = sympy.Eq(qrule_left, qrule_right)
+            qrule = sympy.Eq(qrule_left, qrule_right, evaluate=False)
             self.append(self.format_text("Apply the quotient rule, which is:"))
             self.append(self.format_math_display(qrule))
-            self.append(self.format_math(sympy.Eq(ff, f)),
+            self.append(self.format_math(sympy.Eq(ff, f, evaluate=False)),
                         self.format_text(" and "),
-                        self.format_math(sympy.Eq(gg, g)))
+                        self.format_math(sympy.Eq(gg, g, evaluate=False)))
             self.append(self.format_text("To find "),
                         self.format_math(ff.diff(rule.symbol)),
                         self.format_text(":"))
@@ -405,7 +406,7 @@ class DiffPrinter(JSONPrinter):
     def print_Chain(self, rule):
         with self.new_step(), self.new_u_vars() as (u, du):
             self.append(self.format_text("Let "),
-                        self.format_math(sympy.Eq(u, rule.inner)))
+                        self.format_math(sympy.Eq(u, rule.inner, evaluate=False)))
             self.print_rule(replace_u_var(rule.substep, rule.u_var, u))
         with self.new_step():
             self.append(self.format_text("Then, apply the chain rule. Multiply by "),
@@ -429,7 +430,8 @@ class DiffPrinter(JSONPrinter):
                 self.append(self.format_text("The derivative of secant is secant times tangent:"))
             elif isinstance(rule.f, sympy.csc):
                 self.append(self.format_text("The derivative of cosecant is negative cosecant times cotangent:"))
-            self.append(self.format_math_display(sympy.Eq(sympy.Derivative(rule.f, rule.symbol), diff(rule))))
+            self.append(self.format_math_display(sympy.Eq(sympy.Derivative(rule.f, rule.symbol), diff(rule),
+                                                          evaluate=False)))
 
     def print_Exp(self, rule):
         with self.new_step():
@@ -438,7 +440,8 @@ class DiffPrinter(JSONPrinter):
                             self.format_math(sympy.exp(rule.symbol)),
                             self.format_text(" is itself."))
             else:
-                self.append(self.format_math(sympy.Eq(sympy.Derivative(rule.f, rule.symbol), diff(rule))))
+                self.append(self.format_math(sympy.Eq(sympy.Derivative(rule.f, rule.symbol), diff(rule),
+                                                      evaluate=False)))
 
     def print_Log(self, rule):
         with self.new_step():
@@ -451,7 +454,7 @@ class DiffPrinter(JSONPrinter):
     def print_Rewrite(self, rule):
         with self.new_step():
             self.append(self.format_text("Rewrite the function to be differentiated:"))
-            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten)))
+            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten, evaluate=False)))
             self.print_rule(rule.substep)
 
     def print_Function(self, rule):

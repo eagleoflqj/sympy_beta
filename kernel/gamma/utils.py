@@ -220,10 +220,10 @@ def format_plot(node, visitor):
 
 @LatexVisitor.formats_function('rsolve')
 def format_rsolve(node, visitor):
-    recurrence = sympy.latex(sympy.Eq(visitor.evaluator.eval_node(node.args[0]), 0))
+    recurrence = sympy.latex(sympy.Eq(visitor.evaluator.eval_node(node.args[0]), 0, evaluate=False))
     if len(node.args) == 3:
         conds = visitor.evaluator.eval_node(node.args[2])
-        initconds = '\\\\\n'.join('&' + sympy.latex(sympy.Eq(eqn, val)) for eqn, val in conds.items())
+        initconds = '\\\\\n'.join('&' + sympy.latex(sympy.Eq(eqn, val, evaluate=False)) for eqn, val in conds.items())
         text = r'&\mathrm{Solve~the~recurrence~}' + recurrence + r'\\'
         condstext = r'&\mathrm{with~initial~conditions}\\'
         return r'\begin{align}' + text + condstext + initconds + r'\end{align}'
@@ -241,7 +241,7 @@ def format_diophantine(node, visitor):
     symbols = None
     if isinstance(expression, sympy.Basic):
         symbols = expression.free_symbols
-    equation = sympy.latex(sympy.Eq(expression, 0))
+    equation = sympy.latex(sympy.Eq(expression, 0, evaluate=False))
 
     result = r'\mathrm{Solve~the~diophantine~equation~}' + equation
     if symbols:
