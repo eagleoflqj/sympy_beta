@@ -22,11 +22,9 @@ const menuValue = computed(() => {
 </script>
 
 <template>
-  <div class="menu">
-    <n-menu
-      mode="horizontal"
-      :value="menuValue"
-      :options="menuOptions"
-    />
-  </div>
+  <n-menu
+    mode="horizontal"
+    :value="menuValue"
+    :options="menuOptions"
+  />
 </template>

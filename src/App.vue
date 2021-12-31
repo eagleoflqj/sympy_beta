@@ -1,5 +1,5 @@
 <script setup>
-import { NNotificationProvider } from 'naive-ui'
+import { NNotificationProvider, NLayout, NLayoutHeader } from 'naive-ui'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
@@ -9,9 +9,22 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
   <n-notification-provider>
     <runtime-loader />
   </n-notification-provider>
-  <beta-header />
-  <router-view />
-  <beta-footer />
+  <n-layout position="absolute">
+    <n-layout-header
+      style="height: 42px"
+      bordered
+    >
+      <beta-header />
+    </n-layout-header>
+    <n-layout
+      position="absolute"
+      :native-scrollbar="false"
+      style="top: 42px; background-color: #eee"
+    >
+      <router-view />
+      <beta-footer />
+    </n-layout>
+  </n-layout>
 </template>
 
 <style>
@@ -20,7 +33,6 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
 
 body {
   font-family: "Open Sans", sans-serif;
-  background-color: #eee;
 }
 
 ul,
@@ -95,12 +107,6 @@ h1 a img {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   text-align: left;
-}
-
-.cell_output {
-  color: black;
-  padding: 0.25em 0;
-  font-family: "Droid Sans Mono", monospace;
 }
 
 .cell_output .cell_pre_output {
@@ -313,14 +319,6 @@ td.false {
 
 /* Phones/mobile devices */
 @media screen and (max-device-width: 767px) {
-  .menu {
-    padding: 0.25em 0.5em;
-  }
-
-  .menu a {
-    font-size: 1.25em;
-  }
-
   .result_card {
     -webkit-box-shadow: none;
     box-shadow: none;
