@@ -10,7 +10,7 @@ const router = useRouter()
 function randomExample () {
   const examples = []
   for (const category of categorys) {
-    for (const subCategory of category.subCategorys) {
+    for (const subCategory of category.sub_categorys) {
       for (const example of subCategory.examples) {
         examples.push(example.expression)
       }
