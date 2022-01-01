@@ -29,27 +29,25 @@ function chooseVariable (variable) {
 </script>
 
 <template>
-  <beta-search />
-  <div class="result">
-    <n-space
-      size="large"
-      vertical
-    >
-      <beta-card
-        v-for="cell, index in result"
-        :key="'card' + expr + index"
-        :cell="cell"
-        :input="expr"
-        :choose-variable="chooseVariable"
-      />
-      <div class="foot">
-        See what
-        <a
-          class="wolfram"
-          :href="'https://www.wolframalpha.com/input/?i=' + encodeURIComponent(expr)"
-          target="_blank"
-        >Wolfram|Alpha</a> says.
-      </div>
-    </n-space>
-  </div>
+  <n-space
+    size="large"
+    vertical
+  >
+    <beta-search />
+    <beta-card
+      v-for="cell, index in result"
+      :key="'card' + expr + index"
+      :cell="cell"
+      :input="expr"
+      :choose-variable="chooseVariable"
+    />
+    <div class="foot">
+      See what
+      <a
+        class="wolfram"
+        :href="'https://www.wolframalpha.com/input/?i=' + encodeURIComponent(expr)"
+        target="_blank"
+      >Wolfram|Alpha</a> says.
+    </div>
+  </n-space>
 </template>

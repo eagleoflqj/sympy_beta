@@ -71,22 +71,6 @@ h1 a img {
   vertical-align: bottom;
 }
 
-/* Result cards */
-
-.result_card {
-  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
-}
-
-.result_card.result_card_error {
-  border: 2px solid #f33;
-  opacity: 0.7;
-}
-
-.result_card.result_card_error .cell_output_plain {
-  white-space: pre;
-  text-align: left;
-}
-
 .fullscreen {
   position: fixed;
   left: 0;
@@ -95,11 +79,6 @@ h1 a img {
   bottom: 0;
   z-index: 1000;
   overflow: auto;
-}
-
-/* Highlight position of a syntax error */
-.result_card_error .cell_output_plain span:first-child {
-  border-right: 1px solid #f33;
 }
 
 .cell_input {
@@ -127,23 +106,6 @@ h1 a img {
 
 .cell_output ul {
   list-style-type: none;
-}
-
-.result_card .card_options {
-  font-size: 1em;
-  font-family: "Open Sans", sans-serif;
-  text-align: left;
-  padding-top: 5px;
-}
-
-.result_card .card_options h2 {
-  font-size: 1em;
-  margin: 0.5em 0;
-  padding: 0;
-}
-
-.result_card .card_options label {
-  margin-left: 0.25em;
 }
 
 .card_actions {
