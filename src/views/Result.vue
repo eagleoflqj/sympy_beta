@@ -33,7 +33,7 @@ function chooseVariable (variable) {
     size="large"
     vertical
   >
-    <beta-search />
+    <beta-search :expr="expr" />
     <beta-card
       v-for="cell, index in result"
       :key="'card' + expr + index"

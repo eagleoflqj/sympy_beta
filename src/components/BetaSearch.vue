@@ -1,7 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, toRaw, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { NInputGroup, NInput, NButton } from 'naive-ui'
+
+const props = defineProps({
+  expr: {
+    type: String,
+    default: () => ''
+  }
+})
 
 const input = ref()
 const router = useRouter()
@@ -10,6 +17,10 @@ function submit () {
     router.push({ name: 'Result', params: { expr: input.value } })
   }
 }
+
+onMounted(() => {
+  input.value = toRaw(props).expr
+})
 </script>
 
 <template>
