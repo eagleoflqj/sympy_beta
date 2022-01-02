@@ -278,8 +278,8 @@ Plot2D.prototype._generateScales = function () {
       y: d3.scale.linear()
     }
   }
-  this.scales.x.domain([-10, 10]).range([10, this.width() - 10])
-  this.scales.y.domain(this.calculateYRange()).range([this.height() - 10, 10])
+  this.scales.x.domain([-10, 10]).range([0, this.width()])
+  this.scales.y.domain(this.calculateYRange()).range([this.height(), 0])
 }
 
 Plot2D.prototype._calculateExtent = function () {
@@ -329,11 +329,11 @@ Plot2D.prototype.calculateYRange = function () {
 }
 
 Plot2D.prototype.width = function () {
-  return Math.round(this.container.offsetWidth - 22)
+  return Math.round(this.container.offsetWidth)
 }
 
 Plot2D.prototype.height = function () {
-  return Math.round(this.container.offsetHeight - 22)
+  return Math.round(this.container.offsetHeight)
 }
 
 Plot2D.prototype.show = function () {
@@ -428,8 +428,8 @@ Plot2D.prototype.highlight = function (index, highlight) {
 }
 
 Plot2D.prototype.resize = function (options) {
-  this.scales.x.range([10, this.width() - 10])
-  this.scales.y.range([this.height() - 10, 10])
+  this.scales.x.range([0, this.width()])
+  this.scales.y.range([this.height(), 0])
   this._backend.resize(options)
   this.update()
 }

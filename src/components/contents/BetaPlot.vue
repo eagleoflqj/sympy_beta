@@ -15,14 +15,10 @@ onMounted(setupPlots)
 
 const container = ref(null)
 let plot = null
-let originalWidth = 0
-let originalHeight = 0
 
 function reset () {
   plot.reset()
   resizeContainer({
-    width: originalWidth,
-    height: originalHeight,
     reset: true
   })
 }
@@ -38,6 +34,9 @@ function squareViewport () {
 function resizeContainer (options) {
   if (options.reset) {
     plot.reset()
+    container.value.style.width = '60%'
+    container.value.style.height = Math.round(plot.width() * 3 / 4) + 'px'
+    return
   }
   container.value.style.width = options.width + 'px'
   container.value.style.height = options.height + 'px'
@@ -63,9 +62,6 @@ function setupPlots () {
   plot = callback.getPlot(container.value)
   plot.show()
 
-  originalWidth = plot.width()
-  originalHeight = plot.height()
-
   const observer = new MutationObserver(function () {
     plot.resize()
   })
@@ -80,64 +76,57 @@ function setupPlots () {
     ref="container"
     class="plot"
   />
-  <div class="card_options">
-    <p class="help">
-      Drag to pan, (shift-)double-click to zoom, drag corner to resize
-    </p>
-    <n-space vertical>
-      <n-checkbox-group
-        v-model:value="plotOption"
-        @update:value="changePlotOption"
+  <p class="help">
+    Drag to pan, (shift-)double-click to zoom, drag corner to resize
+  </p>
+  <n-space vertical>
+    <n-checkbox-group
+      v-model:value="plotOption"
+      @update:value="changePlotOption"
+    >
+      <n-checkbox
+        v-for="opt in ['grid', 'axes', 'points', 'path']"
+        :value="opt"
+        :label="opt"
+      />
+    </n-checkbox-group>
+    <n-space>
+      <n-button
+        type="primary"
+        @click="reset"
       >
-        <n-checkbox
-          v-for="opt in ['grid', 'axes', 'points', 'path']"
-          :value="opt"
-          :label="opt"
-        />
-      </n-checkbox-group>
-      <n-space>
-        <n-button
-          type="primary"
-          @click="reset"
-        >
-          Reset
-        </n-button>
-        <n-button
-          type="primary"
-          @click="squareViewport"
-        >
-          Square Viewport
-        </n-button>
-        <n-button
-          type="primary"
-          @click="callback.toggleFullscreen"
-        >
-          Fullscreen
-        </n-button>
-        <n-button
-          type="primary"
-          @click="exportSVG"
-        >
-          Export SVG
-        </n-button>
-      </n-space>
+        Reset
+      </n-button>
+      <n-button
+        type="primary"
+        @click="squareViewport"
+      >
+        Square Viewport
+      </n-button>
+      <n-button
+        type="primary"
+        @click="callback.toggleFullscreen"
+      >
+        Fullscreen
+      </n-button>
+      <n-button
+        type="primary"
+        @click="exportSVG"
+      >
+        Export SVG
+      </n-button>
     </n-space>
-  </div>
+  </n-space>
 </template>
 
 <style>
 .plot {
-  width: 400px;
-  height: 270px;
+  width: 60%;
+  aspect-ratio: 4/3;
+  max-width: 80%;
   margin: 0 auto;
-  border: 1px solid #ccc;
-  padding: 10px;
   overflow: hidden;
   resize: both;
-}
-
-.plot:hover {
-  border: 1px solid #000;
 }
 
 .plot .graphs {
