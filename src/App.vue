@@ -81,13 +81,6 @@ h1 a img {
   overflow: auto;
 }
 
-.cell_input {
-  color: black;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  text-align: left;
-}
-
 .cell_output .cell_pre_output {
   text-align: left;
 }

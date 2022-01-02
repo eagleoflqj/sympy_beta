@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, toRaw } from 'vue'
-import { NButton, NSpace, NSpin, NCard } from 'naive-ui'
+import { NButton, NSpace, NSpin, NCard, NCode } from 'naive-ui'
 import { Eye, EyeSlash } from '@vicons/fa'
 import { evcd } from '@/js/workerAPI.js'
 import { Plot2D } from '@/js/plot.js'
@@ -142,9 +142,12 @@ async function seeSteps () {
     @keyup.esc="toggleFullscreen"
   >
     <div v-if="cell.input">
-      <template v-if="typeof cell.input === 'string'">
-        {{ cell.input }}
-      </template>
+      <n-code
+        v-if="typeof cell.input === 'string'"
+        :code="cell.input"
+        language="python"
+        inline
+      />
       <template v-else>
         plot([
         <template v-for="f, index in cell.input">

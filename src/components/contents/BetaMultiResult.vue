@@ -1,4 +1,5 @@
 <script setup>
+import { NCode } from 'naive-ui'
 import BetaContainer from '@/components/BetaContainer.vue'
 
 defineProps({
@@ -12,9 +13,11 @@ defineProps({
 <template>
   <ul>
     <li v-for="result in card.results">
-      <div class="cell_input">
-        {{ result.input }}
-      </div>
+      <n-code
+        :code="result.input"
+        language="python"
+        inline
+      />
       <beta-container :card="result.output" />
     </li>
   </ul>
