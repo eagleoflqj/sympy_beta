@@ -24,7 +24,7 @@ onMounted(async () => {
     </p>
     <p>
       &copy; 2013-2020 SymPy Development Team
-      <br>&copy; 2021 Qijia Liu
+      <br>&copy; 2021-2022 Qijia Liu
     </p>
     <p>
       This project is Free and Open Source (AGPLv3+):
