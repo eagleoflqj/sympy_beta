@@ -1,7 +1,7 @@
 <script setup>
 import { ref, toRaw, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { NInputGroup, NInput, NButton } from 'naive-ui'
+import { NInputGroup, NInput, NButton, NSpace } from 'naive-ui'
 
 const props = defineProps({
   expr: {
@@ -24,7 +24,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="input">
+  <n-space
+    class="input"
+    vertical
+  >
     <h1>
       <router-link :to="'/'">
         <img
@@ -36,7 +39,7 @@ onMounted(() => {
         SymPy Beta
       </router-link>
     </h1>
-    <n-input-group style="margin-top: 20px; width: 580px">
+    <n-input-group style="width: calc(100vw - 24px); max-width: 584px; margin: auto">
       <n-input
         v-model:value="input"
         type="text"
@@ -51,5 +54,5 @@ onMounted(() => {
         =
       </n-button>
     </n-input-group>
-  </div>
+  </n-space>
 </template>
