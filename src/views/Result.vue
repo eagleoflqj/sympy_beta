@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import { NSpace } from 'naive-ui'
+import { NSpace, NSpin } from 'naive-ui'
 import { ev } from '@/js/workerAPI.js'
 import BetaSearch from '@/components/BetaSearch.vue'
 import BetaCard from '@/components/BetaCard.vue'
@@ -34,6 +34,12 @@ function chooseVariable (variable) {
     vertical
   >
     <beta-search :expr="expr" />
+    <div
+      v-if="result.length === 0"
+      style="text-align: center"
+    >
+      <n-spin />
+    </div>
     <beta-card
       v-for="cell, index in result"
       :key="'card' + expr + index"
