@@ -29,3 +29,13 @@ defineProps({
     </tbody>
   </table>
 </template>
+
+<style>
+td.true {
+  background-color: #3bb878;
+}
+
+td.false {
+  background-color: #f7977a;
+}
+</style>

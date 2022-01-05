@@ -81,10 +81,6 @@ h1 a img {
   overflow: auto;
 }
 
-.cell_output .cell_pre_output {
-  text-align: left;
-}
-
 .cell_output table {
   border-collapse: collapse;
   border: 1px solid #000;
@@ -121,48 +117,6 @@ h1 a img {
 .input input[type="text"] {
   font-family: "Droid Sans Mono", monospace;
   text-align: left;
-}
-
-#mobile-keyboard {
-  display: none;
-}
-
-#mobile-keyboard button {
-  color: #fff;
-  border: 0;
-  display: inline-block;
-  border-left: 1px solid #3b5526;
-  background-color: #96c56f;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0%, #96c56f),
-    color-stop(100%, #81b953)
-  );
-  background-image: -webkit-linear-gradient(top, #96c56f, #81b953);
-  background-image: -moz-linear-gradient(top, #96c56f, #81b953);
-  background-image: -ms-linear-gradient(top, #96c56f, #81b953);
-  background-image: -o-linear-gradient(top, #96c56f, #81b953);
-  background-image: linear-gradient(top, #96c56f, #81b953);
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#96C56F, endColorstr=#81B953);
-}
-
-#mobile-keyboard button:hover {
-  background-color: #7bb64b;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0%, #7bb64b),
-    color-stop(100%, #689a3f)
-  );
-  background-image: -webkit-linear-gradient(top, #7bb64b, #689a3f);
-  background-image: -moz-linear-gradient(top, #7bb64b, #689a3f);
-  background-image: -ms-linear-gradient(top, #7bb64b, #689a3f);
-  background-image: -o-linear-gradient(top, #7bb64b, #689a3f);
-  background-image: linear-gradient(top, #7bb64b, #689a3f);
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7bb64b, endColorstr=#689a3f);
 }
 
 .foot {
@@ -258,20 +212,6 @@ p {
   content: "+";
 }
 
-/* Truth table */
-
-.cell_output[data-card-name="truth_table"] td {
-  padding: 0;
-}
-
-td.true {
-  background-color: #3bb878;
-}
-
-td.false {
-  background-color: #f7977a;
-}
-
 /* Phones/mobile devices */
 @media screen and (max-device-width: 767px) {
   .result_card {
@@ -314,10 +254,6 @@ td.false {
   #footer {
     width: 100%;
     margin: 10px auto;
-  }
-
-  .cell_output[data-card-name="graph"] {
-    overflow-x: hidden;
   }
 
   .graph {

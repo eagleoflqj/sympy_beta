@@ -170,12 +170,10 @@ async function seeSteps () {
     </div>
 
     <div class="cell_output">
-      <div
+      <vue-mathjax
         v-if="cell.pre_output"
-        class="cell_pre_output"
-      >
-        <vue-mathjax :formula="'$' + cell.pre_output + ' = $'" />
-      </div>
+        :formula="'$' + cell.pre_output + ' = $'"
+      />
       <template v-if="cell.output">
         <beta-container :card="cell.output" />
         <div v-if="cell.num_variables > 1">
@@ -207,10 +205,14 @@ async function seeSteps () {
           :card="cardResult"
           :callback="{ getPlot, toggleFullscreen }"
         />
-        <n-spin
+        <div
           v-else
-          size="large"
-        />
+          style="text-align: center"
+        >
+          <n-spin
+            size="large"
+          />
+        </div>
       </template>
       <template v-else-if="cell.exception_info">
         <!-- {% if cell.exception_info.input_start %}
