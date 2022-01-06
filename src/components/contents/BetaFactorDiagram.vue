@@ -17,19 +17,13 @@ onMounted(() => (new FactorDiagram(card.primes, container.value)).draw())
 </script>
 
 <template>
-  <div class="factorization-diagram">
+  <div
+    style="text-align: center"
+  >
     <svg ref="container" />
   </div>
+  <a
+    href="https://mathlesstraveled.com/2012/10/05/factorization-diagrams/"
+    target="_blank"
+  >About this diagram</a>
 </template>
-
-<style>
-/* Factorization diagrams */
-
-.factorization-diagram p {
-  text-align: left;
-  font-family: "Open Sans", sans-serif;
-  font-size: smaller;
-  margin: 0;
-  padding: 0;
-}
-</style>

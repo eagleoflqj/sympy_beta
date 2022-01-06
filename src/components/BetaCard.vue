@@ -242,15 +242,6 @@ async function seeSteps () {
       name="See Steps"
       :callback="seeSteps"
     />
-    <template
-      v-if="cardResult.type === 'FactorDiagram'"
-      #footer
-    >
-      <a
-        href="https://mathlesstraveled.com/2012/10/05/factorization-diagrams/"
-        target="_blank"
-      >About this diagram</a>
-    </template>
   </n-card>
   <beta-card
     v-if="step !== null"
