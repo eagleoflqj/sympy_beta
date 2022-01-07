@@ -1,5 +1,5 @@
 <script setup>
-import { NNotificationProvider, NLayout, NLayoutHeader } from 'naive-ui'
+import { NNotificationProvider, NLayout, NLayoutHeader, NBackTop } from 'naive-ui'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
@@ -23,6 +23,7 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
     >
       <router-view />
       <beta-footer />
+      <n-back-top />
     </n-layout>
   </n-layout>
 </template>
