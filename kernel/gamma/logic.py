@@ -3,8 +3,7 @@ from typing import Optional, Union
 import logging
 
 from .utils import Eval, latexify, arguments, removeSymPy, \
-    custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS, \
-    close_matches
+    custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
 from .resultsets import find_result_set, get_card, format_by_type, \
     is_function_handled, find_learn_more_set
 import sympy
@@ -72,23 +71,12 @@ class SymPyGamma(object):
 
         if result:
             parsed, arguments, evaluator, evaluated = result
-
-            cards = []
-
-            close_match = close_matches(s, sympy.__dict__)
-            if close_match:
-                cards.append({
-                    "ambiguity": close_match,
-                    "description": ""
-                })
-
             try:
-                cards.extend(self.prepare_cards(parsed, arguments, evaluator, evaluated, variable))
+                cards = self.prepare_cards(parsed, arguments, evaluator, evaluated, variable)
+                return cards
             except ValueError as e:
                 logging.exception(f"Exception:\n{e}\n")
                 return self.handle_error(s, e)
-
-            return cards
 
     def handle_error(self, s, e):
         if isinstance(e, SyntaxError):
