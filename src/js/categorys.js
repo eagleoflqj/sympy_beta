@@ -110,7 +110,7 @@ const categorys = [
           { name: null, expression: '1006!' },
           { name: null, expression: 'factorint(12321)' },
           { name: 'Calculate the 42<sup>nd</sup> prime', expression: 'prime(42)', html: true },
-          { name: 'Calculate \\( \\varphi(x) \\), the Euler totient function', expression: 'totient(42)' },
+          { name: 'Calculate ϕ(x), the Euler totient function', expression: 'totient(42)' },
           { name: null, expression: 'isprime(12321)' },
           { name: 'First prime greater than 42', expression: 'nextprime(42)' }
         ]
