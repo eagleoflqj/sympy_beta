@@ -21,7 +21,7 @@ OTHER_SYMPY_FUNCTIONS = ('sqrt',)
 Arguments = collections.namedtuple('Arguments', 'function args kwargs')
 
 
-class Eval(object):
+class Eval:
     def __init__(self, namespace={}):
         self._namespace = namespace
 

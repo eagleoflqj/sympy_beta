@@ -1,5 +1,5 @@
 import traceback
-from typing import Optional
+from typing import Optional, Union
 import logging
 
 from .utils import Eval, latexify, arguments, removeSymPy, \
@@ -19,10 +19,13 @@ from sympy.solvers.diophantine import diophantine
 """
 
 
-# patch sympy latex as sympy.latex('') == '\\mathtt{\\text{}}'
-def latex(expr):
+def latex(expr: Union[sympy.Basic, str, int]) -> str:
+    # sympy.latex('') == '\\mathtt{\\text{}}'
     if expr == '':
         return ''
+    if isinstance(expr, sympy.Basic):
+        # solveset(sin(x)) click More Digits
+        expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))
     return sympy.latex(expr)
 
 
