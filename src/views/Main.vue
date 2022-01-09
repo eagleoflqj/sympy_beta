@@ -23,8 +23,20 @@ function randomExample () {
 
 <template>
   <beta-search />
-  <div class="col example">
-    <h2>Examples</h2>
+  <div
+    style="width: calc(100vw - 24px);
+  max-width: 600px;
+  margin: auto;"
+  >
+    <h2
+      style="
+  text-align: center;
+  font-size: 1.25em;
+  font-weight: normal;
+"
+    >
+      Examples
+    </h2>
     <n-button
       type="primary"
       @click="randomExample"
@@ -32,8 +44,7 @@ function randomExample () {
       Random Example
     </n-button>
     <beta-collapse
-      v-for="category, index in categorys"
-      :key="'collapse' + index"
+      v-for="category in categorys"
       :category="category"
     />
     <p>

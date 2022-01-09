@@ -45,16 +45,10 @@ label {
   padding: 0;
 }
 
-pre {
-  font-family: "Droid Sans Mono", monospace;
-}
-
 h1 {
   font-family: "Gentium Basic", serif;
   font-weight: normal;
-  color: #fff;
   margin: 0;
-  line-height: 50px;
 }
 
 h1 a:link,
@@ -127,61 +121,8 @@ h1 a img {
 
 /* Main page columns (saved and example queries) */
 
-.main {
-  line-height: 1.15em;
-}
-
-.main p {
-  margin: 0;
-  padding: 0;
-}
-
-.col h2 {
-  text-align: center;
-  font-size: 1.25em;
-  font-weight: normal;
-}
-
-.col ul {
+ul {
   list-style-type: none;
-}
-
-.col.recent li {
-  margin: 0.5em 0;
-  border-bottom: 1px solid #777;
-}
-
-.col.recent a:link,
-.col.recent a:visited,
-.col.recent a:hover,
-.col.recent a:active {
-  text-decoration: none;
-  color: #3b5526;
-  width: 70%;
-  display: inline-block;
-  font-family: "Droid Sans Mono", monospace;
-}
-
-.col.recent a.remove {
-  width: auto;
-  float: right;
-  display: none;
-}
-
-.col.recent li:hover a.remove {
-  display: block;
-}
-
-.col button a:link,
-.col button a:visited,
-.col button a:hover,
-.col button a:active {
-  color: #fff;
-  text-decoration: none;
-}
-
-#clear-all-recent {
-  font-size: 90%;
 }
 
 /* General styling */
@@ -223,26 +164,8 @@ p {
     margin: 3px;
   }
 
-  .col {
-    width: auto;
-    margin: 10px 10px;
-    font-size: 125%;
-  }
-
-  .col.recent a.remove {
-    display: inline-block;
-  }
-
-  .col.example .example-group li {
+  .example-group li {
     margin: 0.25em 0;
-  }
-
-  .col.example .example-group li > span {
-    padding-top: 0.25em;
-  }
-
-  .col.example .example-group li > span:after {
-    content: ":";
   }
 
   .example-group {
@@ -267,16 +190,6 @@ p {
   .graph:hover {
     border: 0;
   }
-
-  .menu_right {
-    display: inline;
-  }
-
-  #mobile-keyboard button {
-    width: 2em;
-    font-size: 1.25em;
-    margin: 0;
-  }
 }
 
 /* Tablets and base for desktops */
@@ -286,87 +199,9 @@ p {
     width: 600px;
     margin: 10px auto;
   }
-
-  .main {
-    width: 740px;
-    margin: 10px auto;
-  }
-
-  .col {
-    width: 360px;
-  }
-
-  .col.example {
-    width: 720px;
-  }
-
-  .col.recent + .col.example {
-    width: 360px;
-  }
-
-  .col.recent {
-    float: left;
-    height: 100%;
-  }
-
-  .col.recent a.remove {
-    display: inline-block;
-  }
-
-  .col.example {
-    margin: auto;
-  }
-
-  .col.recent ~ .col.example {
-    float: right;
-    height: 100%;
-  }
-
-  .col.example div.example-group li {
-    margin: 0.25em 0;
-  }
-
-  .col.example .example-group li > span:after {
-    content: ":";
-  }
-
-  .menu_right {
-    float: right;
-    display: block;
-  }
-
-  #mobile-keyboard button {
-    width: 3em;
-    font-size: 1.5em;
-  }
 }
 
 @media screen and (min-device-width: 1280px) {
-  .main {
-    width: 800px;
-    margin: 10px auto;
-  }
-
-  .col {
-    width: 390px;
-  }
-
-  .col.example {
-    width: 600px;
-  }
-
-  .col.recent + .col.example {
-    width: 390px;
-  }
-
-  .col.example .example-group li {
-    margin: 0;
-  }
-
-  .col.recent a.remove {
-    display: none;
-  }
-
   .fullscreen .steps {
     margin: 2em auto;
     width: 700px;
