@@ -6,7 +6,7 @@ import { ev } from '@/js/workerAPI.js'
 import BetaSearch from '@/components/BetaSearch.vue'
 import BetaCard from '@/components/BetaCard.vue'
 
-const route = reactive(useRoute())
+const route = useRoute()
 const expr = ref('')
 const variableRef = ref(null)
 const result = reactive([])
@@ -33,7 +33,7 @@ function chooseVariable (variable) {
     size="large"
     vertical
   >
-    <beta-search :expr="expr" />
+    <beta-search />
     <div
       v-if="result.length === 0"
       style="text-align: center"

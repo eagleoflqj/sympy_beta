@@ -1,14 +1,7 @@
 <script setup>
-import { ref, toRaw, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { NInputGroup, NInput, NButton, NSpace } from 'naive-ui'
-
-const props = defineProps({
-  expr: {
-    type: String,
-    default: () => ''
-  }
-})
 
 const input = ref()
 const router = useRouter()
@@ -18,8 +11,12 @@ function submit () {
   }
 }
 
-onMounted(() => {
-  input.value = toRaw(props).expr
+const route = useRoute()
+watchEffect(() => {
+  if (typeof route.params.expr === 'undefined') {
+    return
+  }
+  input.value = route.params.expr
 })
 </script>
 
