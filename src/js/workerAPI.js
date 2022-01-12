@@ -32,6 +32,7 @@ const wrapper = (() => {
 
 const ev = wrapper('ev')
 const evcd = wrapper('evcd')
+const getPyodideVersion = wrapper('getPyodideVersion')
 const getSymPyVersion = wrapper('getSymPyVersion')
 
-export { ev, evcd, register, getSymPyVersion }
+export { ev, evcd, register, getPyodideVersion, getSymPyVersion }

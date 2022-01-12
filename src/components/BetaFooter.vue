@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { NSpin } from 'naive-ui'
-import { getSymPyVersion } from '@/js/workerAPI.js'
+import { getPyodideVersion, getSymPyVersion } from '@/js/workerAPI.js'
 
+const pyodideVersion = ref(null)
 const sympyVersion = ref(null)
 
 onMounted(async () => {
+  pyodideVersion.value = await getPyodideVersion()
   sympyVersion.value = await getSymPyVersion()
 })
 </script>
@@ -13,6 +15,15 @@ onMounted(async () => {
 <template>
   <div id="footer">
     <p>
+      Pyodide version
+      <template v-if="pyodideVersion">
+        {{ pyodideVersion }}
+      </template>
+      <n-spin
+        v-else
+        size="small"
+      />
+      ·
       SymPy version
       <template v-if="sympyVersion">
         {{ sympyVersion }}

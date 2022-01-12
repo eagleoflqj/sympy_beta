@@ -1,6 +1,6 @@
 // blocker: Firefox https://stackoverflow.com/questions/44118600/web-workers-how-to-import-modules
 // import { pyodideURL, gammaVersion } from '/package.json'
-const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.18.1/full/'
+const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.19.0/full/'
 const gammaVersion = '1.0.0'
 
 importScripts(`${pyodideURL}pyodide.js`)
@@ -47,6 +47,10 @@ self.onmessage = async (event) => {
   await pyodideReadyPromise
   const { id, func, args } = event.data
   try {
+    if (func === 'getPyodideVersion') {
+      self.postMessage({ id, result: self.pyodide.version })
+      return
+    }
     const f = self.pyodide.globals.get(func)
     const temp_result = f(...args)
     if (pyodide.isPyProxy(temp_result)) {
