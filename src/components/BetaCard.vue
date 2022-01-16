@@ -147,6 +147,7 @@ async function seeSteps () {
         :code="cell.input"
         language="python"
         inline
+        style="word-break: break-all"
       />
       <template v-else>
         plot([
