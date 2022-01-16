@@ -216,11 +216,7 @@ def is_product(input_evaluated):
 # Functions to convert input and extract variable used
 
 def default_variable(arguments, evaluated):
-    try:
-        variables = list(evaluated.atoms(sympy.Symbol))
-    except:
-        variables = []
-
+    variables = list(evaluated.free_symbols) if isinstance(evaluated, sympy.Basic) else []
     return {
         'variables': variables,
         'variable': variables[0] if variables else None,
@@ -930,10 +926,9 @@ function_map = {
     'help': (extract_first, ('function_docs',)),
     'plot': (extract_plot, ('plot',)),
     'rsolve': (None, ()),
-    'product': (None, ()),  # suppress automatic Result card
 }
 
-predicates = [
+exclusive_predicates = [
     (is_integer, None, ('digits', 'factorization', 'factorizationDiagram')),
     (is_complex, None, ('absolute_value', 'polar_angle', 'conjugate')),
     (is_rational, None, ('float_approximation',)),
@@ -945,8 +940,6 @@ predicates = [
     (is_logic, None, ('satisfiable', 'truth_table')),
     (is_sum, None, ('doit',)),
     (is_product, None, ('doit',)),
-    (is_sum, None, ()),
-    (is_product, None, ()),
     (is_not_constant_basic, None, ('plot', 'roots', 'diff', 'integral_alternate', 'series'))
 ]
 
@@ -959,7 +952,7 @@ learn_more_sets = {
 
 def is_function_handled(function_name: str) -> bool:
     """Do any of the result sets handle this specific function?"""
-    return function_name == "simplify" or function_name in function_map
+    return function_name in ("simplify", "product") or function_name in function_map
 
 
 def find_result_set(function_name: str, input_evaluated):
@@ -981,16 +974,13 @@ def find_result_set(function_name: str, input_evaluated):
             result_converter = converter
         return result_converter, list(result_cards)
 
-    result = []
-    for predicate, converter, result_cards in predicates:
+    for predicate, converter, result_cards in exclusive_predicates:
         if predicate(input_evaluated):
             if converter:
                 result_converter = converter
-            if not result_cards:
-                break
-            result.extend(result_cards)
+            return result_converter, list(result_cards)
 
-    return result_converter, result
+    return result_converter, []
 
 def find_learn_more_set(function_name):
     urls = learn_more_sets.get(function_name)
