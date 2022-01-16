@@ -905,10 +905,6 @@ all_cards['integral_alternate_fake'] = MultiResultCard(
 )
 
 """
-Syntax:
-
-(predicate, extract_components, result_cards)
-
 predicate: str or func
   If a string, names a function that uses this set of result cards.
   If a function, the function, given the evaluated input, returns True if
@@ -920,34 +916,38 @@ extract_components: None or func
   a components dictionary. For instance, for an integral, this function
   might extract the limits, integrand, and variable.
 
-result_cards: None or list
-  If None, do not show any result cards for this function beyond the
+result_cards: tuple
+  If empty, do not show any result cards for this function beyond the
   automatically generated 'Result' and 'Simplification' cards (if they are
   applicable).
-  If a list, specifies a list of result cards to display.
+  If not empty, specifies a list of result cards to display.
 """
-result_sets = [
-    ('integrate', extract_integral, ['integral_alternate_fake', 'intsteps']),
-    ('diff', extract_derivative, ['diff', 'diffsteps']),
-    ('factorint', extract_first, ['factorization', 'factorizationDiagram']),
-    ('help', extract_first, ['function_docs']),
-    ('plot', extract_plot, ['plot']),
-    ('rsolve', None, None),
-    ('product', None, []),  # suppress automatic Result card
-    (is_integer, None, ['digits', 'factorization', 'factorizationDiagram']),
-    (is_complex, None, ['absolute_value', 'polar_angle', 'conjugate']),
-    (is_rational, None, ['float_approximation']),
-    (is_float, None, ['fractional_approximation']),
-    (is_approximatable_constant, None, ['root_to_polynomial']),
-    (is_uncalled_function, None, ['function_docs']),
-    (is_trig, None, ['trig_alternate']),
-    (is_matrix, None, ['matrix_inverse', 'matrix_eigenvals', 'matrix_eigenvectors']),
-    (is_logic, None, ['satisfiable', 'truth_table']),
-    (is_sum, None, ['doit']),
-    (is_product, None, ['doit']),
-    (is_sum, None, None),
-    (is_product, None, None),
-    (is_not_constant_basic, None, ['plot', 'roots', 'diff', 'integral_alternate', 'series'])
+
+function_map = {
+    'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
+    'diff': (extract_derivative, ('diff', 'diffsteps')),
+    'factorint': (extract_first, ('factorization', 'factorizationDiagram')),
+    'help': (extract_first, ('function_docs',)),
+    'plot': (extract_plot, ('plot',)),
+    'rsolve': (None, ()),
+    'product': (None, ()),  # suppress automatic Result card
+}
+
+predicates = [
+    (is_integer, None, ('digits', 'factorization', 'factorizationDiagram')),
+    (is_complex, None, ('absolute_value', 'polar_angle', 'conjugate')),
+    (is_rational, None, ('float_approximation',)),
+    (is_float, None, ('fractional_approximation',)),
+    (is_approximatable_constant, None, ('root_to_polynomial',)),
+    (is_uncalled_function, None, ('function_docs',)),
+    (is_trig, None, ('trig_alternate',)),
+    (is_matrix, None, ('matrix_inverse', 'matrix_eigenvals', 'matrix_eigenvectors')),
+    (is_logic, None, ('satisfiable', 'truth_table')),
+    (is_sum, None, ('doit',)),
+    (is_product, None, ('doit',)),
+    (is_sum, None, ()),
+    (is_product, None, ()),
+    (is_not_constant_basic, None, ('plot', 'roots', 'diff', 'integral_alternate', 'series'))
 ]
 
 learn_more_sets = {
@@ -956,13 +956,13 @@ learn_more_sets = {
                'https://docs.sympy.org/latest/modules/solvers/solvers.html#recurrence-equtions']
 }
 
-def is_function_handled(function_name):
-    """Do any of the result sets handle this specific function?"""
-    if function_name == "simplify":
-        return True
-    return any(name == function_name for (name, _, cards) in result_sets if cards is not None)
 
-def find_result_set(function_name, input_evaluated):
+def is_function_handled(function_name: str) -> bool:
+    """Do any of the result sets handle this specific function?"""
+    return function_name == "simplify" or function_name in function_map
+
+
+def find_result_set(function_name: str, input_evaluated):
     """
     Finds a set of result cards based on function name and evaluated input.
 
@@ -973,26 +973,22 @@ def find_result_set(function_name, input_evaluated):
       This function will always extract the variables.
     - List of result cards.
     """
-    result = []
     result_converter = default_variable
 
-    for predicate, converter, result_cards in result_sets:
-        if predicate == function_name:
+    converter, result_cards = function_map.get(function_name, (None, None))
+    if result_cards is not None:
+        if converter:
+            result_converter = converter
+        return result_converter, list(result_cards)
+
+    result = []
+    for predicate, converter, result_cards in predicates:
+        if predicate(input_evaluated):
             if converter:
                 result_converter = converter
-            if result_cards is None:
-                return result_converter, result
-            for card in result_cards:
-                if card not in result:
-                    result.append(card)
-        elif callable(predicate) and predicate(input_evaluated):
-            if converter:
-                result_converter = converter
-            if result_cards is None:
-                return result_converter, result
-            for card in result_cards:
-                if card not in result:
-                    result.append(card)
+            if not result_cards:
+                break
+            result.extend(result_cards)
 
     return result_converter, result
 
