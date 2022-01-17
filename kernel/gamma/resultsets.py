@@ -941,9 +941,11 @@ exclusive_predicates = [
 ]
 
 learn_more_sets = {
-    'rsolve': ['https://en.wikipedia.org/wiki/Recurrence_relation',
-               'https://mathworld.wolfram.com/RecurrenceEquation.html',
-               'https://docs.sympy.org/latest/modules/solvers/solvers.html#recurrence-equtions']
+    'rsolve': [
+        'https://en.wikipedia.org/wiki/Recurrence_relation',
+        'https://mathworld.wolfram.com/RecurrenceEquation.html',
+        'https://docs.sympy.org/latest/modules/solvers/solvers.html#module-sympy.solvers.recurr'
+    ]
 }
 
 
@@ -979,7 +981,11 @@ def find_result_set(function_name: str, input_evaluated):
 
     return result_converter, []
 
-def find_learn_more_set(function_name):
+def find_learn_more_set(function_name: str):
     urls = learn_more_sets.get(function_name)
-    if urls:
-        return '<div class="document"><ul>{}</ul></div>'.format('\n'.join('<li><a href="{0}">{0}</a></li>'.format(url) for url in urls))
+    if urls is None:
+        return None
+    return {
+        'type': 'Reference',
+        'links': urls
+    }
