@@ -148,9 +148,6 @@ def is_derivative(input_evaluated):
 def is_integral(input_evaluated):
     return isinstance(input_evaluated, sympy.Integral)
 
-def is_integer(input_evaluated):
-    return isinstance(input_evaluated, sympy.Integer)
-
 def is_rational(input_evaluated):
     return isinstance(input_evaluated, sympy.Rational) and not input_evaluated.is_Integer
 
@@ -920,6 +917,7 @@ result_cards: tuple
 """
 
 function_map = {
+    'Integer': (None, ('digits', 'factorization', 'factorizationDiagram')),
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
     'diff': (extract_derivative, ('diff', 'diffsteps')),
     'factorint': (extract_first, ('factorization', 'factorizationDiagram')),
@@ -929,7 +927,6 @@ function_map = {
 }
 
 exclusive_predicates = [
-    (is_integer, None, ('digits', 'factorization', 'factorizationDiagram')),
     (is_complex, None, ('absolute_value', 'polar_angle', 'conjugate')),
     (is_rational, None, ('float_approximation',)),
     (is_float, None, ('fractional_approximation',)),
