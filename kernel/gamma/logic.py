@@ -170,7 +170,7 @@ class SymPyGamma(object):
         return parsed, arguments(parsed, evaluator), evaluator, evaluated
 
     def get_cards(self, arguments, evaluator, evaluated):
-        first_func_name = arguments[0]
+        first_func_name = type(evaluated).__name__
         # is the top-level function call to a function such as factorint or
         # simplify?
         # is the top-level function being called?
@@ -185,7 +185,7 @@ class SymPyGamma(object):
             not first_func_name in OTHER_SYMPY_FUNCTIONS)
 
         if is_applied:
-            convert_input, cards = find_result_set(arguments[0], evaluated)
+            convert_input, cards = find_result_set(first_func_name, evaluated)
         else:
             convert_input, cards = find_result_set(None, evaluated)
 
