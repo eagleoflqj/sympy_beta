@@ -927,17 +927,20 @@ function_map = {
 }
 
 exclusive_predicates = [
-    (is_complex, None, ('absolute_value', 'polar_angle', 'conjugate')),
-    (is_rational, None, ('float_approximation',)),
-    (is_float, None, ('fractional_approximation',)),
-    (is_approximatable_constant, None, ('root_to_polynomial',)),
-    (is_uncalled_function, None, ('function_docs',)),
-    (is_trig, None, ('trig_alternate',)),
-    (is_matrix, None, ('matrix_inverse', 'matrix_eigenvals', 'matrix_eigenvectors')),
-    (is_logic, None, ('satisfiable', 'truth_table')),
-    (is_sum, None, ('doit',)),
-    (is_product, None, ('doit',)),
-    (is_not_constant_basic, None, ('plot', 'roots', 'diff', 'integral_alternate', 'series'))
+    (is_complex, ('absolute_value', 'polar_angle', 'conjugate')),
+    (is_rational, ('float_approximation',)),
+    (is_float, ('fractional_approximation',)),
+    (is_approximatable_constant, ('root_to_polynomial',)),
+    (is_uncalled_function, ('function_docs',)),
+    (is_matrix, ('matrix_inverse', 'matrix_eigenvals', 'matrix_eigenvectors')),
+    (is_logic, ('satisfiable', 'truth_table')),
+    (is_sum, ('doit',)),
+    (is_product, ('doit',)),
+]
+
+inclusive_predicates = [
+    (is_trig, ('trig_alternate',)),
+    (is_not_constant_basic, ('plot', 'roots', 'diff', 'integral_alternate', 'series'))
 ]
 
 learn_more_sets = {
@@ -973,13 +976,16 @@ def find_result_set(function_name: str, input_evaluated):
             result_converter = converter
         return result_converter, list(result_cards)
 
-    for predicate, converter, result_cards in exclusive_predicates:
+    for predicate, result_cards in exclusive_predicates:
         if predicate(input_evaluated):
-            if converter:
-                result_converter = converter
             return result_converter, list(result_cards)
 
-    return result_converter, []
+    result = []
+    for predicate, result_cards in inclusive_predicates:
+        if predicate(input_evaluated):
+            result.extend(result_cards)
+
+    return result_converter, result
 
 def find_learn_more_set(function_name: str):
     urls = learn_more_sets.get(function_name)
