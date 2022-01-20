@@ -252,7 +252,7 @@ def extract_integral(top_node, evaluated):
 def extract_derivative(top_node, evaluated):
     args = [eval_node(arg) for arg in top_node.args]
     expr, variables = args[0], args[1:]
-    free_variables = list(sorted(expr.free_symbols, key=lambda x: x.name))
+    free_variables = sorted(expr.free_symbols, key=str)
 
     if len(args) > 1:
         free_variables.remove(args[1])
@@ -325,9 +325,10 @@ def formats_function(name):
         return func
     return _formats_function
 
+
 @formats_function('diophantine')
 def format_diophantine(result, node, formatter):
-    variables = list(sorted(str(s) for s in node.args[0].atoms(sympy.Symbol)))
+    variables = sorted(str(s) for s in eval_node(node.args[0]).atoms(sympy.Symbol))
     if isinstance(result, set):
         return format_nested_list_title(*variables)(result, formatter)
     else:
@@ -650,7 +651,7 @@ def eval_function_docs(components, parameters=None):
 
 def eval_truth_table(components, parameters=None):
     expr = components["input_evaluated"]
-    variables = list(sorted(expr.atoms(sympy.Symbol), key=str))
+    variables = sorted(expr.atoms(sympy.Symbol), key=str)
 
     result = []
     for combination in itertools.product([True, False], repeat=len(variables)):

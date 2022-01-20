@@ -20,4 +20,4 @@ jobs:
           pip install -r requirements.txt
       - name: Run integration tests
         run: |
-          pytest -n auto test
+          pytest --cov=gamma -n auto test

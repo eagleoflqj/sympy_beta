@@ -167,7 +167,7 @@ def format_diophantine(node):
     expression = eval_node(node.args[0])
     symbols = None
     if isinstance(expression, sympy.Basic):
-        symbols = expression.free_symbols
+        symbols = sorted(expression.free_symbols, key=str)
     equation = sympy.latex(sympy.Eq(expression, 0, evaluate=False))
 
     result = r'\mathrm{Solve~the~diophantine~equation~}' + equation
