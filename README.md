@@ -19,8 +19,7 @@ Then open http://localhost:3000
 ```sh
 npm i
 npm run build
-cd dist
-python -m http.server
+python -m http.server -d dist
 ```
 Then open http://localhost:8000
 # License
