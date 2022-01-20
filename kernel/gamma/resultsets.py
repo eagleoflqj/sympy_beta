@@ -3,11 +3,13 @@ import itertools
 import sympy
 from sympy.core.symbol import Symbol
 import docutils.core
-from . import diffsteps
-from . import intsteps
+
+from gamma.evaluator import eval_node, namespace
+import gamma.diffsteps
+import gamma.intsteps
 
 
-class ResultCard(object):
+class ResultCard:
     """
     Operations to generate a result card.
 
@@ -25,7 +27,7 @@ class ResultCard(object):
         self.result_statement = result_statement
         self.pre_output_function = pre_output_function
 
-    def eval(self, evaluator, components, parameters=None):
+    def eval(self, components, parameters=None):
         if parameters is None:
             parameters = {}
         else:
@@ -39,11 +41,8 @@ class ResultCard(object):
         variable = components['variable']
 
         line = self.result_statement.format(_var=variable, **parameters)
-        line = line % 'input_evaluated'
-        result = evaluator.eval(line, use_none_for_exceptions=True,
-                                repr_expression=False)
-
-        return result
+        line = line % components['input_evaluated']
+        return sympy.parse_expr(line, global_dict=namespace)
 
     def format_input(self, input_repr, components, **parameters):
         if parameters is None:
@@ -90,21 +89,21 @@ class FakeResultCard(ResultCard):
         super(FakeResultCard, self).__init__(*args, **kwargs)
         assert 'eval_method' in kwargs
 
-    def eval(self, evaluator, components, parameters=None):
+    def eval(self, components, parameters=None):
         if parameters is None:
             parameters = {}
-        return self.card_info['eval_method'](evaluator, components, parameters)
+        return self.card_info['eval_method'](components, parameters)
 
 
 class MultiResultCard(ResultCard):
     """Tries multiple statements and displays the first that works."""
 
     def __init__(self, title, *cards):
-        super(MultiResultCard, self).__init__(title, '', lambda *args: '')
+        super().__init__(title, '', lambda *args: '')
         self.cards = cards
         self.cards_used = []
 
-    def eval(self, evaluator, components, parameters):
+    def eval(self, components, parameters):
         self.cards_used = []
         results = []
 
@@ -112,7 +111,7 @@ class MultiResultCard(ResultCard):
         # in particular a way to store variable, cards used
         for card in self.cards:
             try:
-                result = card.eval(evaluator, components, parameters)
+                result = card.eval(components, parameters)
             except ValueError:
                 continue
             if result != None:
@@ -120,7 +119,6 @@ class MultiResultCard(ResultCard):
                     self.cards_used.append(card)
                     results.append((card, result))
         if results:
-            self.input_repr = evaluator.get("input_evaluated")
             self.components = components
             return results
         return "None"
@@ -134,7 +132,7 @@ class MultiResultCard(ResultCard):
         return {
             'type': 'MultiResult',
             'results': [{
-                'input': card.format_input(self.input_repr, self.components),
+                'input': card.format_input(self.components["input_evaluated"], self.components),
                 'output': card.format_output(result, formatter)
             } for card, result in output]
         }
@@ -212,7 +210,7 @@ def is_product(input_evaluated):
 
 # Functions to convert input and extract variable used
 
-def default_variable(arguments, evaluated):
+def default_variable(top_node, evaluated):
     variables = list(evaluated.free_symbols) if isinstance(evaluated, sympy.Basic) else []
     return {
         'variables': variables,
@@ -220,17 +218,20 @@ def default_variable(arguments, evaluated):
         'input_evaluated': evaluated
     }
 
-def extract_first(arguments, evaluated):
-    result = default_variable(arguments, evaluated)
-    result['input_evaluated'] = arguments[1][0]
+
+def extract_first(top_node, evaluated):
+    result = default_variable(top_node, evaluated)
+    result['input_evaluated'] = eval_node(top_node.args[0])
     return result
 
-def extract_integral(arguments, evaluated):
-    limits = arguments[1][1:]
+
+def extract_integral(top_node, evaluated):
+    args = [eval_node(arg) for arg in top_node.args]
+    expr, limits = args[0], args[1:]
     variables = []
 
     if not limits:
-        variables = [arguments[1][0].atoms(sympy.Symbol).pop()]
+        variables = [expr.free_symbols.pop()]
         limits = variables
     else:
         for limit in limits:
@@ -240,41 +241,46 @@ def extract_integral(arguments, evaluated):
                 variables.append(limit)
 
     return {
-        'integrand': arguments[1][0],
+        'input_evaluated': evaluated,
+        'integrand': expr,
         'variables': variables,
         'variable': variables[0],
         'limits': limits
     }
 
-def extract_derivative(arguments, evaluated):
-    variables = list(sorted(arguments[1][0].atoms(sympy.Symbol), key=lambda x: x.name))
 
-    variable = arguments[1][1:]
-    if variable:
-        variables.remove(variable[0])
-        variables.insert(0, variable[0])
+def extract_derivative(top_node, evaluated):
+    args = [eval_node(arg) for arg in top_node.args]
+    expr, variables = args[0], args[1:]
+    free_variables = list(sorted(expr.free_symbols, key=lambda x: x.name))
+
+    if len(args) > 1:
+        free_variables.remove(args[1])
+        free_variables.insert(0, args[1])
 
     return {
-        'function': arguments[1][0],
-        'variables': variables,
-        'variable': variables[0],
-        'input_evaluated': arguments[1][0]
+        'function': expr,
+        'variables': free_variables,
+        'variable': free_variables[0],
+        'input_evaluated': expr
     }
 
-def extract_plot(arguments, evaluated):
+
+def extract_plot(top_node, evaluated):
     result = {}
-    if arguments.args:
-        if isinstance(arguments.args[0], sympy.Basic):
-            result['variables'] = list(arguments.args[0].atoms(sympy.Symbol))
+    if top_node.args:
+        args = [eval_node(arg) for arg in top_node.args]
+        if isinstance(args[0], sympy.Basic):
+            result['variables'] = list(args[0].atoms(sympy.Symbol))
             result['variable'] = result['variables'][0]
-            result['input_evaluated'] = [arguments.args[0]]
+            result['input_evaluated'] = [args[0]]
 
             if len(result['variables']) != 1:
                 raise ValueError("Cannot plot function of multiple variables")
         else:
             variables = set()
             try:
-                for func in arguments.args[0]:
+                for func in args[0]:
                     variables.update(func.atoms(sympy.Symbol))
             except TypeError:
                 raise ValueError("plot() accepts either one function, a list of functions, or keyword arguments")
@@ -286,26 +292,27 @@ def extract_plot(arguments, evaluated):
                 variables.append(sympy.Symbol('x'))
             result['variables'] = variables
             result['variable'] = variables[0]
-            result['input_evaluated'] = arguments.args[0]
-    elif arguments.kwargs:
+            result['input_evaluated'] = args[0]
+    elif top_node.keywords:
+        kwargs = {keyword.arg: eval_node(keyword.value) for keyword in top_node.keywords}
         result['variables'] = [sympy.Symbol('x')]
         result['variable'] = sympy.Symbol('x')
 
         parametrics = 1
         functions = {}
-        for f in arguments.kwargs:
+        for f in kwargs:
             if f.startswith('x'):
                 y_key = 'y' + f[1:]
-                if y_key in arguments.kwargs:
+                if y_key in kwargs:
                     # Parametric
-                    x = arguments.kwargs[f]
-                    y = arguments.kwargs[y_key]
+                    x = kwargs[f]
+                    y = kwargs[y_key]
                     functions['p' + str(parametrics)] = (x, y)
                     parametrics += 1
             else:
-                if f.startswith('y') and ('x' + f[1:]) in arguments.kwargs:
+                if f.startswith('y') and ('x' + f[1:]) in kwargs:
                     continue
-                functions[f] = arguments.kwargs[f]
+                functions[f] = kwargs[f]
         result['input_evaluated'] = functions
     return result
 
@@ -319,21 +326,20 @@ def formats_function(name):
     return _formats_function
 
 @formats_function('diophantine')
-def format_diophantine(result, arguments, formatter):
-    variables = list(sorted(str(s) for s in arguments.args[0].atoms(sympy.Symbol)))
+def format_diophantine(result, node, formatter):
+    variables = list(sorted(str(s) for s in node.args[0].atoms(sympy.Symbol)))
     if isinstance(result, set):
         return format_nested_list_title(*variables)(result, formatter)
     else:
         return format_nested_list_title(*variables)([result], formatter)
 
-def format_by_type(result, arguments=None, formatter=None, function_name=None):
+
+def format_by_type(result, function_name, node, formatter):
     """
     Format something based on its type and on the input to Gamma.
     """
-    if arguments and not function_name:
-        function_name = arguments[0]
     if function_name in _function_formatters:
-        return _function_formatters[function_name](result, arguments, formatter)
+        return _function_formatters[function_name](result, node, formatter)
     elif function_name in all_cards and 'format_output_function' in all_cards[function_name].card_info:
         return all_cards[function_name].format_output(result, formatter)
     elif isinstance(result, (list, tuple)):
@@ -472,7 +478,8 @@ GRAPH_TYPES = {
               lambda x, y: float(y * sympy.sin(x))]
 }
 
-def determine_graph_type(key):
+
+def determine_graph_type(key: str) -> str:
     if key.startswith('r'):
         return 'polar'
     elif key.startswith('p'):
@@ -480,7 +487,8 @@ def determine_graph_type(key):
     else:
         return 'xy'
 
-def eval_plot(evaluator, components, parameters=None):
+
+def eval_plot(components, parameters=None):
     if parameters is None:
         parameters = {}
 
@@ -488,7 +496,7 @@ def eval_plot(evaluator, components, parameters=None):
     pmin, pmax = parameters.get('tmin', 0), parameters.get('tmax', 2 * sympy.pi)
     tmin, tmax = parameters.get('tmin', 0), parameters.get('tmax', 10)
     from sympy.plotting.plot import LineOver1DRangeSeries, Parametric2DLineSeries
-    functions = evaluator.get("input_evaluated")
+    functions = components["input_evaluated"]
     if isinstance(functions, sympy.Basic):
         functions = [(functions, 'xy')]
     elif isinstance(functions, list):
@@ -566,19 +574,19 @@ def eval_plot(evaluator, components, parameters=None):
         'graphs': graphs
     }
 
-def eval_factorization(evaluator, components, parameters=None):
-    number = evaluator.get("input_evaluated")
 
+def eval_factorization(components, parameters=None):
+    number = components["input_evaluated"]
     if number == 0:
         raise ValueError("Can't factor 0")
-
     factors = sympy.ntheory.factorint(number, limit=100)
     return {factor: exp for factor, exp in factors.items() if factor <= 100}
 
-def eval_factorization_diagram(evaluator, components, parameters=None):
+
+def eval_factorization_diagram(components, parameters=None):
     # Raises ValueError (stops card from appearing) if the factors are too
     # large so that the diagram will look nice
-    number = int(evaluator.eval("input_evaluated"))
+    number = int(components["input_evaluated"])
     if number > 256:
         raise ValueError("Number too large")
     elif number == 0:
@@ -588,21 +596,24 @@ def eval_factorization_diagram(evaluator, components, parameters=None):
         raise ValueError("Number too large")
     return factors
 
-def eval_integral(evaluator, components, parameters=None):
+
+def eval_integral(components, parameters=None):
     return sympy.integrate(components['integrand'], *components['limits'])
 
-def eval_integral_manual(evaluator, components, parameters=None):
+
+def eval_integral_manual(components, parameters=None):
     return sympy.integrals.manualintegrate.manualintegrate(components['integrand'], components['variable'])
 
-def eval_diffsteps(evaluator, components, parameters=None):
-    function = components.get('function', evaluator.get('input_evaluated'))
 
-    return diffsteps.print_json_steps(function, components['variable'])
+def eval_diffsteps(components, parameters=None):
+    function = components.get('function', components['input_evaluated'])
+    return gamma.diffsteps.print_json_steps(function, components['variable'])
 
-def eval_intsteps(evaluator, components, parameters=None):
-    integrand = components.get('integrand', evaluator.get('input_evaluated'))
 
-    return intsteps.print_json_steps(integrand, components['variable'])
+def eval_intsteps(components, parameters=None):
+    integrand = components.get('integrand', components['input_evaluated'])
+    return gamma.intsteps.print_json_steps(integrand, components['variable'])
+
 
 # https://www.python.org/dev/peps/pep-0257/
 def trim(docstring):
@@ -630,13 +641,15 @@ def trim(docstring):
     # Return a single string:
     return '\n'.join(trimmed)
 
-def eval_function_docs(evaluator, components, parameters=None):
-    docstring = trim(evaluator.get("input_evaluated").__doc__)
+
+def eval_function_docs(components, parameters=None):
+    docstring = trim(components["input_evaluated"].__doc__)
     return docutils.core.publish_parts(docstring, writer_name='html4css1',
                                        settings_overrides={'_disable_config': True})['html_body']
 
-def eval_truth_table(evaluator, components, parameters=None):
-    expr = evaluator.get("input_evaluated")
+
+def eval_truth_table(components, parameters=None):
+    expr = components["input_evaluated"]
     variables = list(sorted(expr.atoms(sympy.Symbol), key=str))
 
     result = []
@@ -645,11 +658,11 @@ def eval_truth_table(evaluator, components, parameters=None):
     return variables, result
 
 
-def eval_approximator(evaluator, components, parameters=None):
+def eval_approximator(components, parameters=None):
     if parameters is None:
         raise ValueError
     digits = parameters.get('digits', 10)
-    return (evaluator.get('input_evaluated'), digits)
+    return components['input_evaluated'], digits
 
 # Result cards
 
@@ -677,12 +690,12 @@ all_cards = {
 
     'integral_manual': ResultCard(
         "Integral",
-        "sympy.integrals.manualintegrate.manualintegrate(%s, {_var})",
+        "manualintegrate(%s, {_var})",
         sympy.Integral),
 
     'integral_manual_fake': FakeResultCard(
         "Integral",
-        "sympy.integrals.manualintegrate.manualintegrate(%s, {_var})",
+        "manualintegrate(%s, {_var})",
         lambda i, var: sympy.Integral(i, *var),
         eval_method=eval_integral_manual,
         format_input_function=format_integral
@@ -875,7 +888,7 @@ all_cards = {
 }
 
 def get_card(name):
-    return all_cards.get(name, None)
+    return all_cards[name]
 
 all_cards['trig_alternate'] = MultiResultCard(
     "Alternate forms",

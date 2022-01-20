@@ -1,83 +1,12 @@
-import collections
-import traceback
-import sys
 import ast
 import re
-from io import StringIO
-import sympy
 
+import sympy
 from sympy.core.relational import Relational
 
-
-from sympy.parsing.sympy_parser import (
-    implicit_multiplication, split_symbols, NAME,
-    function_exponentiation, implicit_application
-)
+from gamma.evaluator import eval_node
 
 OTHER_SYMPY_FUNCTIONS = ('sqrt',)
-
-Arguments = collections.namedtuple('Arguments', 'function args kwargs')
-
-
-class Eval:
-    def __init__(self, namespace={}):
-        self._namespace = namespace
-
-    def get(self, name):
-        return self._namespace.get(name)
-
-    def set(self, name, value):
-        self._namespace[name] = value
-
-    def eval_node(self, node):
-        tree = ast.fix_missing_locations(ast.Expression(node))
-        return eval(compile(tree, '<string>', 'eval'), self._namespace)
-
-    def eval(self, x, use_none_for_exceptions=False, repr_expression=True):
-        globals = self._namespace
-        try:
-            x = x.strip()
-            x = x.replace("\r", "")
-            y = x.split('\n')
-            if len(y) == 0:
-                return ''
-            s = '\n'.join(y[:-1]) + '\n'
-            t = y[-1]
-            try:
-                z = compile(t + '\n', '', 'eval')
-            except SyntaxError:
-                s += '\n' + t
-                z = None
-
-            try:
-                old_stdout = sys.stdout
-                sys.stdout = StringIO()
-                eval(compile(s, '', 'exec'), globals, globals)
-
-                if not z is None:
-                    r = eval(z, globals)
-
-                    if repr_expression:
-                        r = repr(r)
-                else:
-                    r = ''
-
-                if repr_expression:
-                    sys.stdout.seek(0)
-                    r = sys.stdout.read() + r
-            finally:
-                sys.stdout = old_stdout
-            return r
-        except:
-            if use_none_for_exceptions:
-                return
-            etype, value, tb = sys.exc_info()
-            # If we decide in the future to remove the first frame fromt he
-            # traceback (since it links to our code, so it could be confusing
-            # to the user), it's easy to do:
-            #tb = tb.tb_next
-            s = "".join(traceback.format_exception(etype, value, tb))
-            return s
 
 
 class LatexVisitor(ast.NodeVisitor):
@@ -97,7 +26,7 @@ class LatexVisitor(ast.NodeVisitor):
         if not formatter:
             return None
 
-        return formatter(node, self)
+        return formatter(node)
 
     def visit_Call(self, node):
         buffer = []
@@ -106,7 +35,7 @@ class LatexVisitor(ast.NodeVisitor):
         # Only apply to lowercase names (i.e. functions, not classes)
         if fname in self.__class__.EXCEPTIONS:
             node.func.id = self.__class__.EXCEPTIONS[fname].__name__
-            self.latex = sympy.latex(self.evaluator.eval_node(node))
+            self.latex = sympy.latex(eval_node(node))
         else:
             result = self.format(fname, node)
             if result:
@@ -117,23 +46,23 @@ class LatexVisitor(ast.NodeVisitor):
 
                 latexes = []
                 for arg in node.args:
-                    if isinstance(arg, ast.Call) and getattr(arg.func, 'id', None) and arg.func.id[0].lower() == arg.func.id[0]:
+                    if isinstance(arg, ast.Call) and getattr(arg.func, 'id', None) and arg.func.id[0].islower():
                         latexes.append(self.visit_Call(arg))
                     else:
-                        latexes.append(sympy.latex(self.evaluator.eval_node(arg)))
+                        latexes.append(sympy.latex(eval_node(arg)))
 
                 buffer.append(', '.join(latexes))
                 buffer.append(')')
 
                 self.latex = ''.join(buffer)
             else:
-                self.latex = sympy.latex(self.evaluator.eval_node(node))
+                self.latex = sympy.latex(eval_node(node))
         return self.latex
 
 
 @LatexVisitor.formats_function('solve')
-def format_solve(node, visitor):
-    expr = visitor.evaluator.eval_node(node.args[0])
+def format_solve(node):
+    expr = eval_node(node.args[0])
     buffer = [r'\mathrm{solve}\;', sympy.latex(expr)]
 
     if not isinstance(expr, Relational):
@@ -142,7 +71,7 @@ def format_solve(node, visitor):
     if len(node.args) > 1:
         buffer.append(r'\;\mathrm{for}\;')
     for arg in node.args[1:]:
-        buffer.append(sympy.latex(visitor.evaluator.eval_node(arg)))
+        buffer.append(sympy.latex(eval_node(arg)))
         buffer.append(r',\, ')
     if len(node.args) > 1:
         buffer.pop()
@@ -151,15 +80,15 @@ def format_solve(node, visitor):
 
 
 @LatexVisitor.formats_function('limit')
-def format_limit(node, visitor):
+def format_limit(node):
     if len(node.args) >= 3:
         return sympy.latex(
-            sympy.Limit(*[visitor.evaluator.eval_node(arg) for arg in node.args]))
+            sympy.Limit(*[eval_node(arg) for arg in node.args]))
 
 
 @LatexVisitor.formats_function('prime')
-def format_prime(node, visitor):
-    number = sympy.latex(visitor.evaluator.eval_node(node.args[0]))
+def format_prime(node):
+    number = sympy.latex(eval_node(node.args[0]))
     return ''.join([number,
                     r'^\mathrm{',
                     ordinal(int(number)),
@@ -167,33 +96,33 @@ def format_prime(node, visitor):
 
 
 @LatexVisitor.formats_function('isprime')
-def format_isprime(node, visitor):
-    number = sympy.latex(visitor.evaluator.eval_node(node.args[0]))
+def format_isprime(node):
+    number = sympy.latex(eval_node(node.args[0]))
     return ''.join([r'\mathrm{Is~}', number, r'\mathrm{~prime?}'])
 
 
 @LatexVisitor.formats_function('nextprime')
-def format_nextprime(node, visitor):
-    number = sympy.latex(visitor.evaluator.eval_node(node.args[0]))
+def format_nextprime(node):
+    number = sympy.latex(eval_node(node.args[0]))
     return r'\mathrm{Least~prime~greater~than~}' + number
 
 
 @LatexVisitor.formats_function('factorint')
-def format_factorint(node, visitor):
-    number = sympy.latex(visitor.evaluator.eval_node(node.args[0]))
+def format_factorint(node):
+    number = sympy.latex(eval_node(node.args[0]))
     return r'\mathrm{Prime~factorization~of~}' + number
 
 
 @LatexVisitor.formats_function('factor')
-def format_factor(node, visitor):
-    expression = sympy.latex(visitor.evaluator.eval_node(node.args[0]))
+def format_factor(node):
+    expression = sympy.latex(eval_node(node.args[0]))
     return r'\mathrm{Factorization~of~}' + expression
 
 
 @LatexVisitor.formats_function('solve_poly_system')
-def format_factorint(node, visitor):
-    equations = visitor.evaluator.eval_node(node.args[0])
-    variables = tuple(map(visitor.evaluator.eval_node, node.args[1:]))
+def format_factorint(node):
+    equations = eval_node(node.args[0])
+    variables = tuple(map(eval_node, node.args[1:]))
 
     if len(variables) == 1:
         variables = variables[0]
@@ -205,22 +134,22 @@ def format_factorint(node, visitor):
 
 
 @LatexVisitor.formats_function('plot')
-def format_plot(node, visitor):
+def format_plot(node):
     if node.args:
-        function = sympy.latex(visitor.evaluator.eval_node(node.args[0]))
+        function = sympy.latex(eval_node(node.args[0]))
     else:
         keywords = {}
         for keyword in node.keywords:
-            keywords[keyword.arg] = visitor.evaluator.eval_node(keyword.value)
+            keywords[keyword.arg] = eval_node(keyword.value)
         function = sympy.latex(keywords)
     return r'\mathrm{Plot~}' + function
 
 
 @LatexVisitor.formats_function('rsolve')
-def format_rsolve(node, visitor):
-    recurrence = sympy.latex(sympy.Eq(visitor.evaluator.eval_node(node.args[0]), 0, evaluate=False))
+def format_rsolve(node):
+    recurrence = sympy.latex(sympy.Eq(eval_node(node.args[0]), 0, evaluate=False))
     if len(node.args) == 3:
-        conds = visitor.evaluator.eval_node(node.args[2])
+        conds = eval_node(node.args[2])
         initconds = '\\\\\n'.join('&' + sympy.latex(sympy.Eq(eqn, val, evaluate=False)) for eqn, val in conds.items())
         text = r'&\mathrm{Solve~the~recurrence~}' + recurrence + r'\\'
         condstext = r'&\mathrm{with~initial~conditions}\\'
@@ -234,8 +163,8 @@ diophantine_template = (r"\begin{{align}}&{}\\&\mathrm{{where~}}"
 
 
 @LatexVisitor.formats_function('diophantine')
-def format_diophantine(node, visitor):
-    expression = visitor.evaluator.eval_node(node.args[0])
+def format_diophantine(node):
+    expression = eval_node(node.args[0])
     symbols = None
     if isinstance(expression, sympy.Basic):
         symbols = expression.free_symbols
@@ -249,37 +178,20 @@ def format_diophantine(node, visitor):
 
 @LatexVisitor.formats_function('summation')
 @LatexVisitor.formats_function('product')
-def format_diophantine(node, visitor):
+def format_diophantine(node):
     if node.func.id == 'summation':
         klass = sympy.Sum
     else:
         klass = sympy.Product
-    return sympy.latex(klass(*list(map(visitor.evaluator.eval_node, node.args))))
+    return sympy.latex(klass(*list(map(eval_node, node.args))))
 
 
 @LatexVisitor.formats_function('help')
-def format_help(node, visitor):
+def format_help(node):
     if node.args:
-        function = visitor.evaluator.eval_node(node.args[0])
+        function = eval_node(node.args[0])
         return r'\mathrm{Show~documentation~for~}' + function.__name__
     return r'\mathrm{Show~documentation~(requires~1~argument)}'
-
-
-class TopCallVisitor(ast.NodeVisitor):
-    def __init__(self):
-        super(TopCallVisitor, self).__init__()
-        self.call = None
-
-    def visit_Call(self, node):
-        self.call = node
-
-    def visit_Name(self, node):
-        if not self.call:
-            self.call = node
-
-    def visit_NameConstant(self, node):
-        if not self.call:
-            self.call = node
 
 
 # From https://stackoverflow.com/a/739301/262727
@@ -291,42 +203,10 @@ def ordinal(n):
 
 
 # TODO: modularize all of this
-def latexify(string, evaluator):
+def latexify(string):
     a = LatexVisitor()
-    a.evaluator = evaluator
     a.visit(ast.parse(string))
     return a.latex
-
-
-def arguments(string_or_node, evaluator):
-    node = None
-    if not isinstance(string_or_node, ast.Call):
-        a = TopCallVisitor()
-        a.visit(ast.parse(string_or_node))
-
-        if hasattr(a, 'call'):
-            node = a.call
-    else:
-        node = string_or_node
-
-    if node:
-        if isinstance(node, ast.Call):
-            name = getattr(node.func, 'id', None)  # when is it undefined?
-            args, kwargs = None, None
-            if node.args:
-                args = list(map(evaluator.eval_node, node.args))
-
-            kwargs = node.keywords
-            if kwargs:
-                kwargs = {kwarg.arg: evaluator.eval_node(kwarg.value) for kwarg in kwargs}
-
-            return Arguments(name, args, kwargs)
-        elif isinstance(node, ast.Name):
-            return Arguments(node.id, [], {})
-
-        elif isinstance(node, ast.NameConstant):
-            return Arguments(node.value, [], {})
-    return None
 
 
 re_calls = re.compile(r'(Integer|Symbol|Float|Rational)\s*\([\'\"]?([a-zA-Z0-9\.]+)[\'\"]?\s*\)')
@@ -341,60 +221,3 @@ def removeSymPy(string):
         return re_calls.sub(re_calls_sub, string).replace(" ", "")
     except IndexError:
         return string
-
-
-def custom_implicit_transformation(result, local_dict, global_dict):
-    """Allows a slightly relaxed syntax.
-
-    - Parentheses for single-argument method calls are optional.
-
-    - Multiplication is implicit.
-
-    - Symbol names can be split (i.e. spaces are not needed between
-      symbols).
-
-    - Functions can be exponentiated.
-
-    Example:
-
-    >>> from sympy.parsing.sympy_parser import (parse_expr,
-    ... standard_transformations, implicit_multiplication_application)
-    >>> parse_expr("10sin**2 x**2 + 3xyz + tan theta",
-    ... transformations=(standard_transformations +
-    ... (implicit_multiplication_application,)))
-    3*x*y*z + 10*sin(x**2)**2 + tan(theta)
-
-    """
-    for step in (split_symbols, implicit_application, function_exponentiation):
-        result = step(result, local_dict, global_dict)
-
-    return result
-
-
-SYNONYMS = {
-    u'derivative': 'diff',
-    u'derive': 'diff',
-    u'integral': 'integrate',
-    u'antiderivative': 'integrate',
-    u'factorize': 'factor',
-    u'graph': 'plot',
-    u'draw': 'plot'
-}
-
-
-def synonyms(tokens, local_dict, global_dict):
-    """Make some names synonyms for others.
-
-    This is done at the token level so that the "stringified" output that
-    Gamma displays shows the correct function name. Must be applied before
-    auto_symbol.
-    """
-
-    result = []
-    for token in tokens:
-        if token[0] == NAME:
-            if token[1] in SYNONYMS:
-                result.append((NAME, SYNONYMS[token[1]]))
-                continue
-        result.append(token)
-    return result

@@ -1,21 +1,16 @@
+import ast
 import traceback
 from typing import Optional, Union
 import logging
 
-from .utils import Eval, latexify, arguments, removeSymPy, \
-    custom_implicit_transformation, synonyms, OTHER_SYMPY_FUNCTIONS
-from .resultsets import find_result_set, get_card, format_by_type, \
-    is_function_handled, find_learn_more_set
 import sympy
 from sympy.core.function import FunctionClass
-from sympy.parsing.sympy_parser import stringify_expr, eval_expr, \
-    standard_transformations, convert_xor, TokenError
+from sympy.parsing.sympy_parser import TokenError
 
-PREEXEC = """
-from sympy import *
-import sympy
-from sympy.solvers.diophantine import diophantine
-"""
+from gamma.utils import latexify, removeSymPy, OTHER_SYMPY_FUNCTIONS
+from gamma.evaluator import eval_input, namespace
+from gamma.resultsets import find_result_set, get_card, format_by_type, \
+    is_function_handled, find_learn_more_set
 
 
 def latex(expr: Union[sympy.Basic, str, int]) -> str:
@@ -55,11 +50,11 @@ def mathjax_latex(*args, digits=15):
     return result
 
 
-class SymPyGamma(object):
+class SymPyGamma:
 
     def eval(self, s: str, variable: Optional[str] = None):
         try:
-            result = self.eval_input(s)
+            result = eval_input(s)
         except TokenError:
             return [
                 {"title": "Input", "input": s},
@@ -70,9 +65,9 @@ class SymPyGamma(object):
             return self.handle_error(s, e)
 
         if result:
-            parsed, arguments, evaluator, evaluated = result
+            parsed, top_node, evaluated = result
             try:
-                cards = self.prepare_cards(parsed, arguments, evaluator, evaluated, variable)
+                cards = self.prepare_cards(parsed, top_node, evaluated, variable)
                 return cards
             except ValueError as e:
                 logging.exception(f"Exception:\n{e}\n")
@@ -105,11 +100,13 @@ class SymPyGamma(object):
                 {"title": "Error", "input": s, "error": trace}
             ]
 
-    def disambiguate(self, arguments):
-        if arguments[0] == 'factor':
-            if arguments.args and isinstance(arguments.args[0], sympy.Number):
+    @staticmethod
+    def disambiguate(top_node):
+        if isinstance(top_node, ast.Call) and isinstance(top_node.func, ast.Name) and top_node.func.id == 'factor' and top_node.args:
+            arg = top_node.args[0]
+            if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name) and arg.func.id == 'Integer':
                 return {
-                    'ambiguity': 'factorint({})'.format(arguments.args[0]),
+                    'ambiguity': 'factorint({})'.format(arg.args[0].value),
                     'description': [{'type': 'Expression', 'value': 'factor'},
                                     {'type': 'Text', 'value': ' factors polynomials, while '},
                                     {'type': 'Expression', 'value': 'factorint'},
@@ -117,102 +114,42 @@ class SymPyGamma(object):
                 }
         return None
 
-    def eval_input(self, s):
-        namespace = {}
-        exec(PREEXEC, {}, namespace)
+    def get_cards(self, top_node, evaluated):
+        is_applied = isinstance(top_node, ast.Call)
+        top_func_name = top_node.func.id if is_applied and isinstance(top_node.func, ast.Name) else ''
 
-        def plot(f=None, **kwargs):
-            """Plot functions. Not the same as SymPy's plot.
-
-            This plot function is specific to Gamma. It has the following syntax::
-
-                plot([x^2, x^3, ...])
-
-            or::
-
-                plot(y=x,y1=x^2,r=sin(theta),r1=cos(theta))
-
-            ``plot`` accepts either a list of single-variable expressions to
-            plot or keyword arguments indicating expressions to plot. If
-            keyword arguments are used, the plot will be polar if the keyword
-            argument starts with ``r`` and will be an xy graph otherwise.
-
-            Note that Gamma will cut off plot values above and below a
-            certain value, and that it will **not** warn the user if so.
-
-            """
-            pass
-        namespace.update({
-            'plot': plot,  # prevent textplot from printing stuff
-            'help': lambda f: f
-        })
-
-        evaluator = Eval(namespace)
-        # change to True to spare the user from exceptions:
-        if not len(s):
-            return None
-
-        transformations = []
-        transformations.append(synonyms)
-        transformations.extend(standard_transformations)
-        transformations.extend((convert_xor, custom_implicit_transformation))
-        parsed = stringify_expr(s, {}, namespace, transformations)
-        logging.info(f"Parsed as: {parsed}")
-        try:
-            evaluated = eval_expr(parsed, {}, namespace)
-        except SyntaxError as e:
-            logging.exception(e)
-            raise
-        except Exception as e:
-            raise ValueError(str(e))
-        namespace['input_evaluated'] = evaluated
-
-        return parsed, arguments(parsed, evaluator), evaluator, evaluated
-
-    def get_cards(self, arguments, evaluator, evaluated):
-        first_func_name = type(evaluated).__name__
-        # is the top-level function call to a function such as factorint or
-        # simplify?
-        # is the top-level function being called?
-        is_applied = arguments.args or arguments.kwargs
-
-        first_func = evaluator.get(first_func_name)
+        first_func = namespace.get(top_func_name)
         is_function = (
             first_func and
             not isinstance(first_func, FunctionClass) and
             not isinstance(first_func, sympy.Atom) and
-            first_func_name and first_func_name[0].islower() and
-            not first_func_name in OTHER_SYMPY_FUNCTIONS)
+            top_func_name and top_func_name[0].islower() and
+            not top_func_name in OTHER_SYMPY_FUNCTIONS)
 
-        if is_applied:
-            convert_input, cards = find_result_set(first_func_name, evaluated)
-        else:
-            convert_input, cards = find_result_set(None, evaluated)
+        convert_input, cards = find_result_set(top_func_name, evaluated)
 
-        components = convert_input(arguments, evaluated)
+        components = convert_input(top_node, evaluated)
         if 'input_evaluated' in components:
             evaluated = components['input_evaluated']
 
-        evaluator.set('input_evaluated', evaluated)
+        return components, cards, evaluated, top_func_name if (is_function and is_applied) else ''
 
-        return components, cards, evaluated, (is_function and is_applied)
-
-    def prepare_cards(self, parsed, arguments, evaluator, evaluated, variable: Optional[str] = None):
-        components, cards, evaluated, is_function = self.get_cards(arguments, evaluator, evaluated)
+    def prepare_cards(self, parsed, top_node, evaluated, variable: Optional[str] = None):
+        components, cards, evaluated, top_func_name = self.get_cards(top_node, evaluated)
         if variable is not None:
             components['variable'] = sympy.Symbol(variable)
 
-        if is_function:
+        if top_func_name:
             latex_input = {
                 'type': 'Tex',
-                'tex': latexify(parsed, evaluator)
+                'tex': latexify(parsed)
             }
         else:
             latex_input = mathjax_latex(evaluated)
 
         result = []
 
-        ambiguity = self.disambiguate(arguments)
+        ambiguity = self.disambiguate(top_node)
         if ambiguity is not None:
             result.append(ambiguity)
 
@@ -232,35 +169,28 @@ class SymPyGamma(object):
 
         # If no result cards were found, but the top-level call is to a
         # function, then add a special result card to show the result
-        if not cards and not components['variable'] and is_function:
+        if not cards and not components['variable'] and top_func_name:
             result.append({
                 'title': 'Result',
                 'input': removeSymPy(parsed),
-                'output': format_by_type(evaluated, arguments, mathjax_latex)
+                'output': format_by_type(evaluated, top_func_name, top_node, mathjax_latex)
             })
         else:
             var = components['variable']
 
             # If the expression is something like 'lcm(2x, 3x)', display the
             # result of the function before the rest of the cards
-            if is_function and not is_function_handled(arguments[0]):
+            if top_func_name and not is_function_handled(top_func_name):
                 result.append(
                     {"title": "Result", "input": "",
-                     "output": format_by_type(evaluated, arguments, mathjax_latex)})
+                     "output": format_by_type(evaluated, top_func_name, top_node, mathjax_latex)})
 
-            line = "simplify(input_evaluated)"
-            simplified = evaluator.eval(line,
-                                        use_none_for_exceptions=True,
-                                        repr_expression=False)
-            if (simplified != None and
-                simplified != evaluated and
-                arguments.args and
-                len(arguments.args) > 0 and
-                simplified != arguments.args[0]):
+            simplified = sympy.simplify(evaluated) if isinstance(evaluated, sympy.Basic) else None
+            if simplified is not None and simplified != evaluated:
                 result.append(
                     {"title": "Simplification", "input": repr(simplified),
                      "output": mathjax_latex(simplified)})
-            elif arguments.function == 'simplify':
+            elif top_func_name == 'simplify':
                 result.append(
                     {"title": "Simplification", "input": "",
                      "output": mathjax_latex(evaluated)})
@@ -284,8 +214,8 @@ class SymPyGamma(object):
                 except (SyntaxError, ValueError) as e:
                     logging.error(e)
 
-            if is_function:
-                learn_more = find_learn_more_set(arguments[0])
+            if top_func_name:
+                learn_more = find_learn_more_set(top_func_name)
                 if learn_more:
                     result.append({
                         "title": "Learn More",
@@ -294,17 +224,11 @@ class SymPyGamma(object):
                     })
         return result
 
-    def eval_card(self, card_name, expression, variable, parameters):
+    def eval_card(self, card_name, expression, variable="None", parameters=None):
         card = get_card(card_name)
-
-        if not card:
-            raise KeyError
-
-        _, arguments, evaluator, evaluated = self.eval_input(expression)
+        _, top_node, evaluated = eval_input(expression)
         variable = sympy.Symbol(variable)
-        components, cards, evaluated, _ = self.get_cards(arguments, evaluator, evaluated)
+        components, _, evaluated, _ = self.get_cards(top_node, evaluated)
         components['variable'] = variable
-        evaluator.set(str(variable), variable)
-        result = card.eval(evaluator, components, parameters)
-
+        result = card.eval(components, parameters)
         return card.format_output(result, mathjax_latex)

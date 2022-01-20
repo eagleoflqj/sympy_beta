@@ -6,7 +6,7 @@ from sympy.integrals.manualintegrate import (
     AlternativeRule, DontKnowRule, RewriteRule, PiecewiseRule
 )
 
-from .stepprinter import replace_u_var, JSONPrinter
+from gamma.stepprinter import replace_u_var, JSONPrinter
 
 
 # Need this to break loops
