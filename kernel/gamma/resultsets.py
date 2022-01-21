@@ -930,8 +930,12 @@ result_cards: tuple
   If not empty, specifies a list of result cards to display.
 """
 
+Integer_result = (None, ('digits', 'factorization', 'factorizationDiagram'))
+
 function_map = {
-    'Integer': (None, ('digits', 'factorization', 'factorizationDiagram')),
+    'Integer': Integer_result,
+    'factorial': Integer_result,
+    'factorial2': Integer_result,
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
     'diff': (extract_derivative, ('diff', 'diffsteps')),
     'factorint': (extract_first, ('factorization', 'factorizationDiagram')),
