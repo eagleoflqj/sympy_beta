@@ -2,6 +2,7 @@
   "name": "sympy_beta",
   "version": "0.4.0",
   "gammaVersion": "1.0.0",
+  "homepage": "https://github.com/eagleoflqj/sympy_beta",
   "author": "Qijia Liu <liumeo@pku.edu.cn> (https://github.com/eagleoflqj)",
   "license": "AGPL-3.0-or-later",
   "scripts": {

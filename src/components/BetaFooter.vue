@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { NSpin } from 'naive-ui'
 import { getPyodideVersion, getSymPyVersion } from '@/js/workerAPI.js'
+import { homepage } from '@/../package.json'
 
 const pyodideVersion = ref(null)
 const sympyVersion = ref(null)
@@ -40,7 +41,7 @@ onMounted(async () => {
     <p>
       This project is Free and Open Source (AGPLv3+):
       <a
-        href="https://github.com/eagleoflqj/sympy_beta/"
+        :href="homepage"
         target="_blank"
       >SymPy Beta on GitHub</a>.
     </p>
