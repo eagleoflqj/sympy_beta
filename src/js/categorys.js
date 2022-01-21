@@ -145,9 +145,9 @@ const categorys = [
       {
         name: 'Summation',
         examples: [
-          { name: null, expression: 'Sum(k,(k,1,m))' },
-          { name: null, expression: 'Sum(x**k,(k,0,oo))' },
-          { name: null, expression: 'Product(k**2,(k,1,m))' },
+          { name: null, expression: 'Sum(k, (k, 1, m))' },
+          { name: null, expression: 'Sum(x**k, (k, 0, oo))' },
+          { name: null, expression: 'Product(k**2, (k, 1, m))' },
           { name: null, expression: 'summation(1/2**i, (i, 0, oo))' },
           { name: null, expression: 'product(i, (i, 1, k), (k, 1, n))' }
         ]
@@ -164,7 +164,7 @@ const categorys = [
           { name: 'Multiple plots', expression: 'plot([x, x^2, x^3, x^4])' },
           { name: 'Polar plots', expression: 'plot(r=1-sin(theta))' },
           { name: 'Parametric plots', expression: 'plot(x=cos(t), y=sin(t))' },
-          { name: 'Multiple plot types', expression: 'plot(y=x,y1=x^2,r=cos(theta),r1=sin(theta))' }
+          { name: 'Multiple plot types', expression: 'plot(y=x, y1=x^2, r=cos(theta), r1=sin(theta))' }
         ]
       }
     ]
