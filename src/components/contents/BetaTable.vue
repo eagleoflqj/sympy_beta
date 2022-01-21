@@ -1,4 +1,5 @@
 <script setup>
+import { NTable } from 'naive-ui'
 import BetaContainer from '@/components/BetaContainer.vue'
 
 defineProps({
@@ -10,7 +11,7 @@ defineProps({
 </script>
 
 <template>
-  <table>
+  <n-table style="width: 0; margin: auto">
     <thead>
       <tr>
         <th v-for="title in card.titles">
@@ -31,5 +32,5 @@ defineProps({
         </td>
       </tr>
     </tbody>
-  </table>
+  </n-table>
 </template>

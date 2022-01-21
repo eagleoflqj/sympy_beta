@@ -1,4 +1,6 @@
 <script setup>
+import { NTable, NText } from 'naive-ui'
+
 defineProps({
   card: {
     type: Object,
@@ -8,7 +10,11 @@ defineProps({
 </script>
 
 <template>
-  <table>
+  <n-table
+    :single-line="false"
+    striped
+    style="width: 0; margin: auto"
+  >
     <thead>
       <tr>
         <th v-for="title in card.titles">
@@ -18,24 +24,12 @@ defineProps({
     </thead>
     <tbody>
       <tr v-for="row in card.rows">
-        <td
-          v-for="cell in row.slice(0, -1)"
-          :class="cell.toLowerCase()"
-        >
-          {{ cell }}
+        <td v-for="cell in row">
+          <n-text :type="cell === 'True' ? 'success' : 'error'">
+            {{ cell }}
+          </n-text>
         </td>
-        <td>{{ row.at(-1) }}</td>
       </tr>
     </tbody>
-  </table>
+  </n-table>
 </template>
-
-<style>
-td.true {
-  background-color: #3bb878;
-}
-
-td.false {
-  background-color: #f7977a;
-}
-</style>

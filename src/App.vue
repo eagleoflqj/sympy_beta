@@ -76,18 +76,6 @@ h1 a img {
   overflow: auto;
 }
 
-.cell_output table {
-  border-collapse: collapse;
-  border: 1px solid #000;
-  margin: auto;
-}
-
-.cell_output td,
-.cell_output th {
-  border: 1px solid #000;
-  padding: 0.25em 0.5em;
-}
-
 .cell_output ul {
   list-style-type: none;
 }
