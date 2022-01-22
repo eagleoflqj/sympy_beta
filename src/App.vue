@@ -1,5 +1,5 @@
 <script setup>
-import { NNotificationProvider, NLayout, NLayoutHeader, NBackTop } from 'naive-ui'
+import { NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop } from 'naive-ui'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
@@ -9,22 +9,25 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
   <n-notification-provider>
     <runtime-loader />
   </n-notification-provider>
-  <n-layout position="absolute">
-    <n-layout-header
-      style="height: 42px"
-      bordered
-    >
-      <beta-header />
-    </n-layout-header>
-    <n-layout
-      position="absolute"
-      :native-scrollbar="false"
-      style="top: 42px; background-color: #eee"
-    >
+  <n-layout-header
+    style="height: 42px"
+    bordered
+  >
+    <beta-header />
+  </n-layout-header>
+  <n-layout
+    position="absolute"
+    :native-scrollbar="false"
+    style="top: 42px"
+    content-style="height: 100%; display: flex; flex-direction: column"
+  >
+    <n-layout-content style="flex: 1 0 auto; background-color: #eee;">
       <router-view />
+    </n-layout-content>
+    <n-back-top />
+    <n-layout-footer style="flex-shrink: 0">
       <beta-footer />
-      <n-back-top />
-    </n-layout>
+    </n-layout-footer>
   </n-layout>
 </template>
 

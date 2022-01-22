@@ -52,12 +52,12 @@ function chooseVariable (variable) {
       See what
       <a
         class="wolfram"
-        :href="'https://www.wolframalpha.com/input/?i=' + encodeURIComponent(expr)"
+        :href="`https://www.wolframalpha.com/input/?i=${encodeURIComponent(expr)}`"
         target="_blank"
       >Wolfram|Alpha</a> says.
       <p>
         This page needs improvement? <a
-          :href="`${homepage}/issues/new?title=Improvement suggestion&body=%23%23 Input%0A\`${expr}\`%0A%23%23 How can it be better?%0A`"
+          :href="`${homepage}/issues/new?title=Improvement suggestion&body=%23%23 Input%0A\`${encodeURIComponent(expr)}\`%0A%23%23 How can it be better?%0A`"
           target="_blank"
         >Submit an issue</a>!
       </p>
