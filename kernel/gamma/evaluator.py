@@ -60,13 +60,8 @@ def custom_implicit_transformation(result, local_dict, global_dict):
     return result
 
 
-PREEXEC = """
-import sympy
-from sympy import *
-from sympy.integrals.manualintegrate import manualintegrate
-"""
 namespace = {}
-exec(PREEXEC, {}, namespace)
+exec('from gamma.pre_exec import *', {}, namespace)
 
 
 def plot(f=None, **kwargs):

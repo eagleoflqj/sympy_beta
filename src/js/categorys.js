@@ -108,6 +108,7 @@ const categorys = [
         name: null,
         examples: [
           { name: null, expression: '1006!' },
+          { name: null, expression: '10!!' },
           { name: null, expression: 'factorint(12321)' },
           { name: 'Calculate the 42<sup>nd</sup> prime', expression: 'prime(42)', html: true },
           { name: 'Calculate ϕ(x), the Euler totient function', expression: 'totient(42)' },
