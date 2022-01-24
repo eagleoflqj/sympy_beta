@@ -1,0 +1,118 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import jQuery from 'jquery'
+import terminal from 'jquery.terminal'
+import 'jquery.terminal/css/jquery.terminal.min.css'
+import preExec from '@/../kernel/gamma/pre_exec.py?raw'
+
+terminal(jQuery)
+
+let term = null
+const ps1 = '>>> '
+const ps2 = '... '
+let unlock = null
+
+async function lock () {
+  let res
+  const ready = term.ready
+  term.ready = new Promise(resolve => (res = resolve))
+  await ready
+  return res
+}
+
+const shellWorker = new Worker('/shell.js')
+let shellReadyResolve = null
+const shellReadyPromise = new Promise((resolve, reject) => (shellReadyResolve = resolve))
+
+shellWorker.onmessage = msg => {
+  const { data } = msg
+  switch (data.type) {
+    case 'set_prompt':
+      term.set_prompt(data.arg ? ps2 : ps1)
+      break
+    case 'error':
+      term.error(data.arg)
+      break
+    case 'echo':
+      term.echo(...data.args)
+      break
+    case 'resume':
+      term.resume()
+      unlock()
+      break
+    case 'complete':
+      completeResolve(data.arg)
+      completeResolve = null
+      break
+    case 'ready':
+      shellReadyResolve(data.arg)
+      break
+  }
+}
+
+async function interpreter (command) {
+  unlock = await lock()
+  shellWorker.postMessage({ type: 'exec', arg: command })
+  term.pause()
+}
+
+let completeResolve = null
+
+function complete (command) {
+  return new Promise((resolve, reject) => {
+    if (completeResolve !== null) {
+      reject(new Error())
+    }
+    completeResolve = resolve
+    shellWorker.postMessage({ type: 'complete', arg: command })
+  })
+}
+
+const container = ref(null)
+
+onMounted(async () => {
+  const banner = await shellReadyPromise
+  term = jQuery(container.value).terminal(interpreter, {
+    greetings: banner,
+    prompt: ps1,
+    completionEscape: false,
+    completion: (command, callback) => {
+      complete(command).then(callback).catch(() => {})
+    },
+    keymap: {
+      'CTRL+C': async () => {
+        shellWorker.postMessage({ type: 'clear' })
+        term.enter()
+        term.echo('KeyboardInterrupt')
+        term.set_command('')
+        term.set_prompt(ps1)
+      },
+      TAB: (event, original) => {
+        const command = term.before_cursor()
+        if (command.trim() === '') {
+          term.insert('\t')
+          return false
+        }
+        return original(event)
+      }
+    }
+  })
+  for (const command of preExec.split('\n').slice(0, -1)) {
+    term.exec(command)
+  }
+})
+</script>
+
+<template>
+  <div
+    ref="container"
+    style="height: 100%"
+  />
+</template>
+
+<style>
+.terminal {
+  --size: 1.5;
+  --color: rgba(255, 255, 255, 0.8);
+}
+</style>

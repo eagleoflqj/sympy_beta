@@ -13,6 +13,14 @@ const menuOptions = [
       }
     }, () => 'Main'),
     key: 'Main'
+  },
+  {
+    label: () => h(RouterLink, {
+      to: {
+        name: 'Terminal'
+      }
+    }, () => 'Pyodide Terminal'),
+    key: 'Terminal'
   }
 ]
 

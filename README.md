@@ -26,3 +26,4 @@ Then open http://localhost:8000
 AGPL 3.0 or later, with the exception of
 * kernel/gamma derived from SymPy Gamma, which remains 3-clause BSD License from SymPy Gamma
 * src/js/{factordiagram, plot}.js derived from SymPy Gamma, same above
+* public/shell.js and src/views/Terminal.vue derived from Pyodide, which remain MPL-2.0
