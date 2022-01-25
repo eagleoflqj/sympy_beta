@@ -25,7 +25,7 @@ const wrapper = (() => {
     id = (id + 1) % Number.MAX_SAFE_INTEGER
     return new Promise((resolve, reject) => {
       resolves[id] = resolve
-      pyodideWorker.postMessage({ id, func, args: args })
+      pyodideWorker.postMessage({ id, func, args })
     })
   }
 })()
