@@ -13,10 +13,7 @@ function submit () {
 
 const route = useRoute()
 watchEffect(() => {
-  if (typeof route.params.expr === 'undefined') {
-    return
-  }
-  input.value = route.params.expr
+  input.value = route.params.expr || ''
 })
 </script>
 

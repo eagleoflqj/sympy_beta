@@ -22,7 +22,11 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
     content-style="height: 100%; display: flex; flex-direction: column"
   >
     <n-layout-content style="flex: 1 0 auto; background-color: #eee;">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </n-layout-content>
     <n-back-top />
     <n-layout-footer style="flex-shrink: 0">
