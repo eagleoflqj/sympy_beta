@@ -86,7 +86,7 @@ self.onmessage = async event => {
       self.postMessage({ type: 'resume' })
       break
     case 'complete':
-      self.postMessage({ type: 'complete', arg: pyconsole.complete(command).toJs()[0] })
+      self.postMessage({ type: 'complete', arg: pyconsole.complete(data.arg).toJs()[0] })
       break
     case 'clear':
       clear_console()
