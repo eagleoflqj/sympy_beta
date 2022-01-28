@@ -3,6 +3,7 @@ import { register } from '@/js/workerAPI.js'
 import { useNotification } from 'naive-ui'
 
 const notification = useNotification()
+let loaded = false
 
 function notifyLoading () {
   let baseContent = 'Downloading Pyodide'
@@ -16,7 +17,7 @@ function notifyLoading () {
       const plusCount = () => {
         count = count % 3 + 1
         reactive.content = baseContent + ' ' + '.'.repeat(count)
-        setTimeout(plusCount, 500)
+        loaded || setTimeout(plusCount, 500)
       }
       setTimeout(plusCount, 500)
     }
@@ -52,6 +53,7 @@ register((id) => {
     case -3:
       loadingNotification.destroy()
       notifyLoaded()
+      loaded = true
       break
   }
 })
