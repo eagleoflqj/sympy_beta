@@ -1,8 +1,17 @@
 <script setup>
+import { ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import { NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop } from 'naive-ui'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
+
+const route = useRoute()
+const showFooter = ref(true)
+
+watchEffect(() => {
+  showFooter.value = route.name !== 'Terminal'
+})
 </script>
 
 <template>
@@ -21,7 +30,7 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
     style="top: 42px"
     content-style="height: 100%; display: flex; flex-direction: column"
   >
-    <n-layout-content style="flex: 1 0 auto; background-color: #eee;">
+    <n-layout-content :style="showFooter && {flex: '1 0 auto', backgroundColor: '#eee'}">
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
@@ -29,7 +38,10 @@ import RuntimeLoader from '@/components/RuntimeLoader.vue'
       </router-view>
     </n-layout-content>
     <n-back-top />
-    <n-layout-footer style="flex-shrink: 0">
+    <n-layout-footer
+      v-if="showFooter"
+      style="flex-shrink: 0"
+    >
       <beta-footer />
     </n-layout-footer>
   </n-layout>
