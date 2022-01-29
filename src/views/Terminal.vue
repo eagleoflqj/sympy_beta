@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { NSkeleton } from 'naive-ui'
 import jQuery from 'jquery'
 import terminal from 'jquery.terminal'
 import 'jquery.terminal/css/jquery.terminal.min.css'
@@ -23,6 +24,7 @@ async function lock () {
 const shellWorker = new Worker('/shell.js')
 let shellReadyResolve = null
 const shellReadyPromise = new Promise((resolve, reject) => (shellReadyResolve = resolve))
+const loaded = ref(false)
 
 shellWorker.onmessage = msg => {
   const { data } = msg
@@ -73,7 +75,7 @@ const container = ref(null)
 onMounted(async () => {
   const banner = await shellReadyPromise
   term = jQuery(container.value).terminal(interpreter, {
-    greetings: banner,
+    greetings: `Welcome to the Pyodide terminal emulator 🐍\n${banner}`,
     prompt: ps1,
     completionEscape: false,
     completion: (command, callback) => {
@@ -100,14 +102,37 @@ onMounted(async () => {
   for (const command of preExec.split('\n').slice(0, -1)) {
     term.exec(command)
   }
+  loaded.value = true
 })
 </script>
 
 <template>
   <div
     ref="container"
-    style="height: 100%"
-  />
+    style="height: 100%; padding: 10px"
+  >
+    <template v-if="!loaded">
+      <!-- eslint-disable vue/no-unused-vars -->
+      <n-skeleton
+        v-for="i in 43"
+        text
+        width="10.833px"
+      />
+      <br>
+      <n-skeleton
+        v-for="i in 62"
+        text
+        width="10.833px"
+      />
+      <br>
+      <n-skeleton
+        v-for="i in 70"
+        text
+        width="10.833px"
+      />
+      <!-- eslint-enable vue/no-unused-vars -->
+    </template>
+  </div>
 </template>
 
 <style>

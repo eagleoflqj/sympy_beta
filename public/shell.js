@@ -18,7 +18,6 @@ async function loadPyodideAndPackages() {
     from pyodide import to_js
     from pyodide.console import PyodideConsole, repr_shorten, BANNER
     import __main__
-    BANNER = "Welcome to the Pyodide terminal emulator 🐍\\n" + BANNER
     pyconsole = PyodideConsole(__main__.__dict__)
     import builtins
     async def await_fut(fut):
