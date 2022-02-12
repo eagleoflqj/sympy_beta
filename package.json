@@ -7,7 +7,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "node scripts/build_wheel.js . && vite",
-    "lint": "eslint --ext .js,.vue --fix src",
+    "lint": "eslint --ext .js,.vue --fix public scripts src",
     "build": "vite build && node scripts/build_wheel.js dist",
     "serve": "vite preview"
   },

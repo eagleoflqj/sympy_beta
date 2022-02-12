@@ -5,15 +5,15 @@ const gammaVersion = '1.0.0'
 
 importScripts(`${pyodideURL}pyodide.js`)
 
-async function loadPyodideAndPackages() {
+async function loadPyodideAndPackages () {
   self.pyodide = await loadPyodide({
-    indexURL: pyodideURL,
+    indexURL: pyodideURL
   })
   self.postMessage({ id: -1 })
-  await self.pyodide.loadPackage(["micropip", "docutils", "numpy", "sympy"])
+  await self.pyodide.loadPackage(['micropip', 'docutils', 'numpy', 'sympy'])
   self.postMessage({ id: -2 })
   const config = { gammaVersion }
-  pyodide.registerJsModule("config", config)
+  self.pyodide.registerJsModule('config', config)
   await self.pyodide.runPythonAsync(`
     import traceback
     from config import gammaVersion
@@ -41,7 +41,7 @@ async function loadPyodideAndPackages() {
   self.postMessage({ id: -3 })
 }
 
-let pyodideReadyPromise = loadPyodideAndPackages()
+const pyodideReadyPromise = loadPyodideAndPackages()
 
 self.onmessage = async (event) => {
   await pyodideReadyPromise
@@ -52,13 +52,13 @@ self.onmessage = async (event) => {
       return
     }
     const f = self.pyodide.globals.get(func)
-    const temp_result = f(...args)
-    if (pyodide.isPyProxy(temp_result)) {
-      const result = temp_result.toJs({ dict_converter: Object.fromEntries })
-      temp_result.destroy()
+    const tempResult = f(...args)
+    if (self.pyodide.isPyProxy(tempResult)) {
+      const result = tempResult.toJs({ dict_converter: Object.fromEntries })
+      tempResult.destroy()
       self.postMessage({ id, result })
     } else {
-      self.postMessage({ id, result: temp_result})
+      self.postMessage({ id, result: tempResult })
     }
   } catch (error) {
     self.postMessage({ error: error.message })

@@ -2,6 +2,7 @@ module.exports = {
     "env": {
         "browser": true,
         "es2021": true,
+        "worker": true,
         "vue/setup-compiler-macros": true
     },
     "extends": [
@@ -16,6 +17,7 @@ module.exports = {
         "vue"
     ],
     "globals": {
+        "loadPyodide": true,
         "d3": true
     },
     "rules": {
