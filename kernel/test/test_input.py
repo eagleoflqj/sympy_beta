@@ -84,6 +84,10 @@ cases = [
        'title': 'SymPy', 'variable': 'x', 'variables': ['x']},
       {'card': 'plot', 'input': ['r = 1 - sin(theta)'], 'parameters': ['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax'],
        'pre_output': '', 'title': 'Plot', 'variable': 'x'}]),
+    ('π',
+     [{'title': 'SymPy', 'input': 'π',
+       'output': {'type': 'Tex', 'tex': '\\pi', 'numeric': True,
+                  'expression': 'pi', 'approximation': '3.14159265358979'}}]),
 ]
 
 g = SymPyGamma()
