@@ -42,8 +42,7 @@ function chooseVariable (variable) {
       <n-spin />
     </div>
     <beta-card
-      v-for="cell, index in result"
-      :key="'card' + expr + index"
+      v-for="cell in result"
       :cell="cell"
       :input="expr"
       :choose-variable="chooseVariable"

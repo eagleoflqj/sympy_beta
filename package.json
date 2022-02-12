@@ -1,6 +1,6 @@
 {
   "name": "sympy_beta",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "gammaVersion": "1.0.0",
   "homepage": "https://github.com/eagleoflqj/sympy_beta",
   "author": "Qijia Liu <liumeo@pku.edu.cn> (https://github.com/eagleoflqj)",
@@ -13,20 +13,20 @@
   },
   "dependencies": {
     "jquery.terminal": "^2.31.1",
-    "vue": "^3.2.26",
+    "vue": "^3.2.31",
     "vue-mathjax-next": "0.0.4",
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
-    "@vicons/fa": "^0.11.0",
-    "@vitejs/plugin-vue": "^2.0.1",
-    "eslint": "^8.7.0",
+    "@vicons/fa": "^0.12.0",
+    "@vitejs/plugin-vue": "^2.2.0",
+    "eslint": "^8.9.0",
     "eslint-config-standard": "^17.0.0-0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-vue": "^8.3.0",
-    "naive-ui": "^2.24.1",
-    "vite": "^2.7.12"
+    "eslint-plugin-vue": "^8.4.1",
+    "naive-ui": "^2.25.2",
+    "vite": "^2.8.1"
   }
 }
