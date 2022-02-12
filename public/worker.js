@@ -6,12 +6,22 @@ const gammaVersion = '1.0.0'
 importScripts(`${pyodideURL}pyodide.js`)
 
 async function loadPyodideAndPackages () {
+  let errorMsg
   self.pyodide = await loadPyodide({
     indexURL: pyodideURL
   })
-  self.postMessage({ id: -1 })
-  await self.pyodide.loadPackage(['micropip', 'docutils', 'numpy', 'sympy'])
-  self.postMessage({ id: -2 })
+  self.postMessage({ stage: 'PYODIDE_DOWNLOADED' })
+  await self.pyodide.loadPackage(['micropip', 'docutils', 'numpy', 'sympy'],
+    console.log, msg => {
+      console.error(msg)
+      errorMsg = msg
+    }
+  )
+  if (errorMsg) {
+    self.postMessage({ errorMsg })
+    throw new Error()
+  }
+  self.postMessage({ stage: 'PKG_DOWNLOADED' })
   const config = { gammaVersion }
   self.pyodide.registerJsModule('config', config)
   await self.pyodide.runPythonAsync(`
@@ -38,7 +48,7 @@ async function loadPyodideAndPackages () {
                         'the last five traceback entries are: ' + trace)
             }
   `)
-  self.postMessage({ id: -3 })
+  self.postMessage({ stage: 'KERNEL_LOADED' })
 }
 
 const pyodideReadyPromise = loadPyodideAndPackages()

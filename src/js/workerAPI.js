@@ -2,20 +2,20 @@ const pyodideWorker = new Worker('/worker.js')
 
 const resolves = {}
 
-let stage = null
+let stageCallback
 
-const register = (arg) => {
-  stage = arg
+const register = arg => {
+  stageCallback = arg
 }
 
-pyodideWorker.onmessage = (msg) => {
-  const { id, result } = msg.data
-  if (id < 0) {
-    stage(id)
-  } else {
+pyodideWorker.onmessage = msg => {
+  const { id, result, stage, errorMsg } = msg.data
+  if (id !== undefined) {
     const resolve = resolves[id]
     delete resolves[id]
     resolve(result)
+  } else {
+    stageCallback({ stage, errorMsg })
   }
 }
 

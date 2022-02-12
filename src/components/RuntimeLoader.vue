@@ -40,21 +40,33 @@ function notifyLoaded () {
   })
 }
 
+function notifyError (errorMsg) {
+  notification.create({
+    type: 'error',
+    title: 'An error occurs',
+    content: `${errorMsg}\nPlease check your network and refresh.`,
+    closable: true
+  })
+}
+
 const loadingNotification = notifyLoading()
 
-register((id) => {
-  switch (id) {
-    case -1:
+register(({ stage, errorMsg }) => {
+  switch (stage) {
+    case 'PYODIDE_DOWNLOADED':
       loadingNotification.setContent('Downloading packages')
       break
-    case -2:
+    case 'PKG_DOWNLOADED':
       loadingNotification.setContent('Loading kernel')
       break
-    case -3:
+    case 'KERNEL_LOADED':
       loadingNotification.destroy()
       notifyLoaded()
       loaded = true
       break
+    default:
+      loadingNotification.destroy()
+      notifyError(errorMsg)
   }
 })
 </script>
