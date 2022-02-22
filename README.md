@@ -4,9 +4,14 @@
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/eagleoflqj/sympy_beta.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/eagleoflqj/sympy_beta/context:javascript)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/eagleoflqj/sympy_beta.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/eagleoflqj/sympy_beta/context:python)
 
+Try me at https://sympy-beta.vercel.app!
+
 SymPy Beta is a fork of [SymPy Gamma](https://github.com/sympy/sympy_gamma). The purpose of this project is to run a [SymPy](https://github.com/sympy/sympy)-powered, [Wolfram|Alpha](https://www.wolframalpha.com)-like answer engine totally in your browser, without backend computation.
 
+Originally,  
 SymPy Beta = SymPy Gamma + (Pyodide - GAE - django) + (Vue + NaiveUI - jQuery)
+
+Since 0.5.0, the Pyodide Shell is added (and jQuery is back for using jQuery Terminal)
 
 SymPy Beta is NOT an official SymPy project.
 # Debug

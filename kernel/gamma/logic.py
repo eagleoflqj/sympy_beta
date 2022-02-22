@@ -37,11 +37,9 @@ def mathjax_latex(*args, digits=15):
     }
     if len(args) == 1:
         obj = args[0]
-        if (isinstance(obj, sympy.Basic) and
-                not obj.free_symbols and not obj.is_Integer and
-                not obj.is_Float and
-                obj.is_finite is not False and
-                hasattr(obj, 'evalf')):
+        if isinstance(obj, sympy.Basic) and not obj.free_symbols \
+                and not obj.is_Integer and not obj.is_Float \
+                and obj.is_finite is not False and hasattr(obj, 'evalf'):
             result.update({
                 'numeric': True,
                 'expression': repr(obj),
@@ -102,7 +100,8 @@ class SymPyGamma:
 
     @staticmethod
     def disambiguate(top_node):
-        if isinstance(top_node, ast.Call) and isinstance(top_node.func, ast.Name) and top_node.func.id == 'factor' and top_node.args:
+        if isinstance(top_node, ast.Call) and isinstance(top_node.func, ast.Name) \
+                and top_node.func.id == 'factor' and top_node.args:
             arg = top_node.args[0]
             if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name) and arg.func.id == 'Integer':
                 return {
@@ -119,12 +118,9 @@ class SymPyGamma:
         top_func_name = top_node.func.id if is_applied and isinstance(top_node.func, ast.Name) else ''
 
         first_func = namespace.get(top_func_name)
-        is_function = (
-            first_func and
-            not isinstance(first_func, FunctionClass) and
-            not isinstance(first_func, sympy.Atom) and
-            top_func_name and top_func_name[0].islower() and
-            not top_func_name in OTHER_SYMPY_FUNCTIONS)
+        is_function = first_func and not isinstance(first_func, FunctionClass) \
+            and not isinstance(first_func, sympy.Atom) and top_func_name and top_func_name[0].islower() \
+            and top_func_name not in OTHER_SYMPY_FUNCTIONS
 
         convert_input, cards = find_result_set(top_func_name, evaluated)
 

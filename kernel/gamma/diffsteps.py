@@ -31,12 +31,15 @@ RewriteRule = Rule("RewriteRule", "rewritten substep")
 DerivativeInfo = collections.namedtuple('DerivativeInfo', 'expr symbol')
 
 evaluators = {}
+
+
 def evaluates(rule):
     def _evaluates(func):
         func.rule = rule
         evaluators[rule] = func
         return func
     return _evaluates
+
 
 def power_rule(derivative):
     expr, symbol = derivative.expr, derivative.symbol
@@ -69,14 +72,17 @@ def power_rule(derivative):
     else:
         return DontKnowRule(expr, symbol)
 
+
 def add_rule(derivative):
     expr, symbol = derivative.expr, derivative.symbol
     return AddRule([diff_steps(arg, symbol) for arg in expr.args],
                    expr, symbol)
 
+
 def constant_rule(derivative):
     expr, symbol = derivative.expr, derivative.symbol
     return ConstantRule(expr, expr, symbol)
+
 
 def mul_rule(derivative):
     expr, symbol = derivative
@@ -94,6 +100,7 @@ def mul_rule(derivative):
                        diff_steps(denominator, symbol), expr, symbol)
 
     return MulRule(terms, [diff_steps(g, symbol) for g in terms], expr, symbol)
+
 
 def trig_rule(derivative):
     expr, symbol = derivative
@@ -151,6 +158,7 @@ def exp_rule(derivative):
         return ChainRule(ExpRule(f, sympy.E, f, u),
                          exp, u, diff_steps(exp, symbol), expr, symbol)
 
+
 def log_rule(derivative):
     expr, symbol = derivative
     arg = expr.args[0]
@@ -161,6 +169,7 @@ def log_rule(derivative):
         u = sympy.Dummy()
         return ChainRule(LogRule(u, base, sympy.log(u, base), u), arg, u, diff_steps(arg, symbol), expr, symbol)
 
+
 def function_rule(derivative):
     expr, symbol = derivative
     arg = expr.args[0]   # XXX: only works for unary function
@@ -170,28 +179,34 @@ def function_rule(derivative):
         u = sympy.Dummy()
         return ChainRule(FunctionRule(expr.func(u), u), arg, u, diff_steps(arg, symbol), expr, symbol)
 
+
 @evaluates(ConstantRule)
 def eval_constant(*args):
     return 0
 
+
 @evaluates(ConstantTimesRule)
 def eval_constanttimes(constant, other, substep, expr, symbol):
     return constant * diff(substep)
+
 
 @evaluates(AddRule)
 def eval_add(substeps, expr, symbol):
     results = [diff(step) for step in substeps]
     return sum(results)
 
+
 @evaluates(DivRule)
 def eval_div(numer, denom, numerstep, denomstep, expr, symbol):
     d_numer = diff(numerstep)
     d_denom = diff(denomstep)
-    return (denom * d_numer - numer * d_denom) / (denom **2)
+    return (denom * d_numer - numer * d_denom) / (denom ** 2)
+
 
 @evaluates(ChainRule)
 def eval_chain(substep, inner, u_var, innerstep, expr, symbol):
     return diff(substep).subs(u_var, inner) * diff(innerstep)
+
 
 @evaluates(PowerRule)
 @evaluates(ExpRule)
@@ -220,6 +235,7 @@ def eval_default(*args):
     rule = func.func(*substitutions).diff(symbol)
     return rule.subs(mapping)
 
+
 @evaluates(MulRule)
 def eval_mul(terms, substeps, expr, symbol):
     diffs = list(map(diff, substeps))
@@ -233,17 +249,21 @@ def eval_mul(terms, substeps, expr, symbol):
         result += subresult
     return result
 
+
 @evaluates(TrigRule)
 def eval_default_trig(*args):
     return sympy.trigsimp(eval_default(*args))
+
 
 @evaluates(RewriteRule)
 def eval_rewrite(rewritten, substep, expr, symbol):
     return diff(substep)
 
+
 @evaluates(AlternativeRule)
 def eval_alternative(alternatives, expr, symbol):
     return diff(alternatives[1])
+
 
 def diff_steps(expr, symbol):
     deriv = DerivativeInfo(expr, symbol)
@@ -271,6 +291,7 @@ def diff_steps(expr, symbol):
         AppliedUndef: function_rule,
         'constant': constant_rule
     })(deriv)
+
 
 def diff(rule):
     try:
@@ -360,9 +381,9 @@ class DiffPrinter(JSONPrinter):
                         buf.append(derivatives[i])
                     else:
                         buf.append(fnames[i])
-                ruleform.append(reduce(lambda a, b: a*b, buf))
+                ruleform.append(reduce(lambda a, b: a * b, buf))
             self.append(self.format_math_display(
-                sympy.Eq(sympy.Derivative(reduce(lambda a, b: a*b, fnames), rule.symbol), sum(ruleform),
+                sympy.Eq(sympy.Derivative(reduce(lambda a, b: a * b, fnames), rule.symbol), sum(ruleform),
                          evaluate=False)))
 
             for fname, deriv, term, substep in zip(fnames, derivatives, rule.terms, rule.substeps):
@@ -382,8 +403,7 @@ class DiffPrinter(JSONPrinter):
             ff = sympy.Function("f")(x)
             gg = sympy.Function("g")(x)
             qrule_left = sympy.Derivative(ff / gg, rule.symbol)
-            qrule_right = sympy.ratsimp(sympy.diff(sympy.Function("f")(x) /
-                                                   sympy.Function("g")(x)))
+            qrule_right = sympy.ratsimp(sympy.diff(sympy.Function("f")(x) / sympy.Function("g")(x)))
             qrule = sympy.Eq(qrule_left, qrule_right, evaluate=False)
             self.append(self.format_text("Apply the quotient rule, which is:"))
             self.append(self.format_math_display(qrule))

@@ -1,7 +1,11 @@
+# prod
 docutils==0.18.1
 numpy==1.21.4
-pytest==6.2.5
-pytest-cov==3.0.0
-pytest-xdist==2.5.0
 sympy==1.9
 wheel==0.37.1
+
+# dev
+flake8
+pytest
+pytest-cov
+pytest-xdist

@@ -114,7 +114,7 @@ class MultiResultCard(ResultCard):
                 result = card.eval(components, parameters)
             except ValueError:
                 continue
-            if result != None:
+            if result is not None:
                 if not any(result == r[1] for r in results):
                     self.cards_used.append(card)
                     results.append((card, result))
@@ -143,32 +143,39 @@ class MultiResultCard(ResultCard):
 def is_derivative(input_evaluated):
     return isinstance(input_evaluated, sympy.Derivative)
 
+
 def is_integral(input_evaluated):
     return isinstance(input_evaluated, sympy.Integral)
+
 
 def is_rational(input_evaluated):
     return isinstance(input_evaluated, sympy.Rational) and not input_evaluated.is_Integer
 
+
 def is_float(input_evaluated):
     return isinstance(input_evaluated, sympy.Float)
+
 
 def is_numbersymbol(input_evaluated):
     return isinstance(input_evaluated, sympy.NumberSymbol)
 
+
 def is_constant(input_evaluated):
     # is_constant reduces trig identities (even with simplify=False?) so we
     # check free_symbols instead
-    return (hasattr(input_evaluated, 'free_symbols') and
-            not input_evaluated.free_symbols)
+    return hasattr(input_evaluated, 'free_symbols') \
+        and not input_evaluated.free_symbols
+
 
 def is_approximatable_constant(input_evaluated):
     # is_constant, but exclude Integer/Float/infinity
-    return (hasattr(input_evaluated, 'free_symbols') and
-            not input_evaluated.free_symbols and
-            hasattr(input_evaluated, 'is_Integer')
-            and input_evaluated.is_Integer and
-            not input_evaluated.is_Float and
-            input_evaluated.is_finite is not True)
+    return hasattr(input_evaluated, 'free_symbols') \
+        and not input_evaluated.free_symbols \
+        and hasattr(input_evaluated, 'is_Integer') \
+        and input_evaluated.is_Integer \
+        and not input_evaluated.is_Float \
+        and input_evaluated.is_finite is not True
+
 
 def is_complex(input_evaluated):
     try:
@@ -176,33 +183,34 @@ def is_complex(input_evaluated):
     except (AttributeError, TypeError):
         return False
 
+
 def is_trig(input_evaluated):
-    try:
-        if (isinstance(input_evaluated, sympy.Basic) and
-            any(input_evaluated.find(func)
-                for func in (sympy.sin, sympy.cos, sympy.tan,
-                             sympy.csc, sympy.sec, sympy.cot))):
-            return True
-    except AttributeError:
-        pass
-    return False
+    return isinstance(input_evaluated, sympy.Basic) \
+        and any(input_evaluated.find(func)
+                for func in (sympy.sin, sympy.cos, sympy.tan, sympy.csc, sympy.sec, sympy.cot))
+
 
 def is_not_constant_basic(input_evaluated):
-    return (not is_constant(input_evaluated) and
-            isinstance(input_evaluated, sympy.Basic) and
-            not is_logic(input_evaluated))
+    return not is_constant(input_evaluated) \
+        and isinstance(input_evaluated, sympy.Basic) \
+        and not is_logic(input_evaluated)
+
 
 def is_uncalled_function(input_evaluated):
     return hasattr(input_evaluated, '__call__') and not isinstance(input_evaluated, sympy.Basic)
 
+
 def is_matrix(input_evaluated):
     return isinstance(input_evaluated, sympy.Matrix)
+
 
 def is_logic(input_evaluated):
     return isinstance(input_evaluated, (sympy.And, sympy.Or, sympy.Not, sympy.Xor))
 
+
 def is_sum(input_evaluated):
     return isinstance(input_evaluated, sympy.Sum)
+
 
 def is_product(input_evaluated):
     return isinstance(input_evaluated, sympy.Product)
@@ -251,7 +259,7 @@ def extract_integral(top_node, evaluated):
 
 def extract_derivative(top_node, evaluated):
     args = [eval_node(arg) for arg in top_node.args]
-    expr, variables = args[0], args[1:]
+    expr = args[0]
     free_variables = sorted(expr.free_symbols, key=str)
 
     if len(args) > 1:
@@ -316,9 +324,11 @@ def extract_plot(top_node, evaluated):
         result['input_evaluated'] = functions
     return result
 
-# Formatting functions
 
+# Formatting functions
 _function_formatters = {}
+
+
 def formats_function(name):
     def _formats_function(func):
         _function_formatters[name] = func
@@ -368,6 +378,7 @@ def format_long_integer(line, integer, variable):
         return intstr[:20] + "..." + intstr[len(intstr) - 21:]
     return line % intstr
 
+
 def format_integral(line, result, components):
     if components['limits']:
         limits = ', '.join(map(repr, components['limits']))
@@ -376,9 +387,11 @@ def format_integral(line, result, components):
 
     return line.format(_var=limits) % components['integrand']
 
+
 def format_function_docs_input(line, function, components):
     function = getattr(components['input_evaluated'], '__name__', str(function))
     return line % function
+
 
 def format_dict_title(*title):
     def _format_dict(dictionary, formatter):
@@ -398,6 +411,7 @@ def format_dict_title(*title):
             return formatter(dictionary)
     return _format_dict
 
+
 def format_list(items, formatter):
     try:
         return {
@@ -406,6 +420,7 @@ def format_list(items, formatter):
         }
     except TypeError:  # not iterable, like None
         return formatter(items)
+
 
 def format_nested_list_title(*titles):
     def _format_nested_list_title(items, formatter):
@@ -420,6 +435,7 @@ def format_nested_list_title(*titles):
             return formatter(items)
     return _format_nested_list_title
 
+
 def format_series_fake_title(title, evaluated):
     if len(evaluated.args) >= 3:
         about = evaluated.args[2]
@@ -431,6 +447,7 @@ def format_series_fake_title(title, evaluated):
         up_to = 6
     return title.format(about, up_to)
 
+
 def format_truth_table(table, formatter):
     # table is (variables, [(bool, bool...)] representing combination of values
     # and result
@@ -440,9 +457,11 @@ def format_truth_table(table, formatter):
         'rows': [[str(v) for v in entry] for entry in table[1]]
     }
 
+
 def format_approximator(approximation, formatter):
     obj, digits = approximation
     return formatter(obj, digits=digits)
+
 
 def format_factorization_diagram(factors, formatter):
     primes = []
@@ -471,6 +490,7 @@ def format_plot_input(result_statement, input_repr, components):
             return [f'{y} = {x}' for y, x in functions.items()]
     else:
         return 'plot({})'.format(input_repr)
+
 
 GRAPH_TYPES = {
     'xy': [lambda x, y: x, lambda x, y: y],
@@ -665,9 +685,11 @@ def eval_approximator(components, parameters=None):
     digits = parameters.get('digits', 10)
     return components['input_evaluated'], digits
 
-# Result cards
 
-no_pre_output = lambda *args: ""
+# Result cards
+def no_pre_output(*args):
+    return ""
+
 
 all_cards = {
     'roots': ResultCard(
@@ -888,8 +910,10 @@ all_cards = {
     ),
 }
 
+
 def get_card(name):
     return all_cards[name]
+
 
 all_cards['trig_alternate'] = MultiResultCard(
     "Alternate forms",
@@ -1004,6 +1028,7 @@ def find_result_set(function_name: str, input_evaluated):
             result.extend(result_cards)
 
     return result_converter, result
+
 
 def find_learn_more_set(function_name: str):
     urls = learn_more_sets.get(function_name)

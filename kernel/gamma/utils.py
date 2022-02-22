@@ -120,7 +120,7 @@ def format_factor(node):
 
 
 @LatexVisitor.formats_function('solve_poly_system')
-def format_factorint(node):
+def format_solve_poly_system(node):
     equations = eval_node(node.args[0])
     variables = tuple(map(eval_node, node.args[1:]))
 
@@ -178,7 +178,7 @@ def format_diophantine(node):
 
 @LatexVisitor.formats_function('summation')
 @LatexVisitor.formats_function('product')
-def format_diophantine(node):
+def format_sum_product(node):
     if node.func.id == 'summation':
         klass = sympy.Sum
     else:

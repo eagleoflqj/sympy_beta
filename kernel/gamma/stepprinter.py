@@ -9,11 +9,15 @@ def Rule(name, props=""):
     # GOTCHA: namedtuple class name not considered!
     def __eq__(self, other):
         return self.__class__ == other.__class__ and tuple.__eq__(self, other)
-    __neq__ = lambda self, other: not __eq__(self, other)
+
+    def __neq__(self, other):
+        return not __eq__(self, other)
+
     cls = collections.namedtuple(name, props + " context symbol")
     cls.__eq__ = __eq__
     cls.__ne__ = __neq__
     return cls
+
 
 def functionnames(numterms):
     if numterms == 2:
@@ -22,6 +26,7 @@ def functionnames(numterms):
         return ["f", "g", "h"]
     else:
         return ["f_{}".format(i) for i in range(numterms)]
+
 
 def replace_u_var(rule, old_u, new_u):
     d = rule._asdict()

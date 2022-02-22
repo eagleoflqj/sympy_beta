@@ -12,6 +12,8 @@ from gamma.stepprinter import replace_u_var, JSONPrinter
 # Need this to break loops
 # TODO: add manualintegrate flag to integrate
 _evaluating = None
+
+
 @evaluates(DontKnowRule)
 def eval_dontknow(context, symbol):
     global _evaluating
@@ -35,6 +37,7 @@ def contains_dont_know(rule):
                 if any(contains_dont_know(i) for i in val):
                     return True
     return False
+
 
 def filter_unknown_alternatives(rule):
     if isinstance(rule, AlternativeRule):
@@ -219,7 +222,6 @@ class IntegralPrinter(JSONPrinter):
                     self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
                                                                   _manualintegrate(rule),
                                                                   evaluate=False)))
-
 
     def print_Trig(self, rule):
         with self.new_step():
