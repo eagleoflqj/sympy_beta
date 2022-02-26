@@ -1,7 +1,8 @@
 // blocker: Firefox https://stackoverflow.com/questions/44118600/web-workers-how-to-import-modules
-// import { pyodideURL, gammaVersion } from '/package.json'
+// import { pyodideURL, kernelVersion } from '/package.json'
 const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.19.0/full/'
-const gammaVersion = '1.0.0'
+const kernelName = 'sympy_beta_kernel'
+const kernelVersion = '1.0.0'
 
 importScripts(`${pyodideURL}pyodide.js`)
 
@@ -22,13 +23,13 @@ async function loadPyodideAndPackages () {
     throw new Error()
   }
   self.postMessage({ stage: 'PKG_DOWNLOADED' })
-  const config = { gammaVersion }
+  const config = { kernelName, kernelVersion }
   self.pyodide.registerJsModule('config', config)
   await self.pyodide.runPythonAsync(`
     import traceback
-    from config import gammaVersion
+    from config import kernelName, kernelVersion
     import micropip
-    await micropip.install(f'/gamma-{gammaVersion}-py3-none-any.whl')
+    await micropip.install(f'/{kernelName}-{kernelVersion}-py3-none-any.whl')
     from gamma.logic import SymPyGamma
     sympy_gamma = SymPyGamma()
     def getSymPyVersion():

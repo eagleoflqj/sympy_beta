@@ -1,9 +1,14 @@
 {
   "name": "sympy_beta",
   "version": "0.5.0",
-  "gammaVersion": "1.0.0",
+  "kernelName": "sympy_beta_kernel",
+  "kernelVersion": "1.0.0",
   "homepage": "https://github.com/eagleoflqj/sympy_beta",
-  "author": "Qijia Liu <liumeo@pku.edu.cn> (https://github.com/eagleoflqj)",
+  "author": {
+    "name": "Qijia Liu",
+    "email": "liumeo@pku.edu.cn",
+    "url": "https://github.com/eagleoflqj"
+  },
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "node scripts/build_wheel.js . && vite",
