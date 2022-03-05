@@ -1,19 +1,17 @@
+from __future__ import annotations
 import ast
 import traceback
-from typing import Optional, Union
-import logging
 
 import sympy
 from sympy.core.function import FunctionClass
-from sympy.parsing.sympy_parser import TokenError
 
 from gamma.utils import latexify, removeSymPy, OTHER_SYMPY_FUNCTIONS
 from gamma.evaluator import eval_input, namespace
-from gamma.resultsets import find_result_set, get_card, format_by_type, \
-    is_function_handled, find_learn_more_set
+from gamma.dispatch import find_result_set, is_function_handled
+from gamma.resultsets import get_card, format_by_type, find_learn_more_set
 
 
-def latex(expr: Union[sympy.Basic, str, int]) -> str:
+def latex(expr: sympy.Basic | str | int) -> str:
     # sympy.latex('') == '\\mathtt{\\text{}}'
     if expr == '':
         return ''
@@ -50,53 +48,20 @@ def mathjax_latex(*args, digits=15):
 
 class SymPyGamma:
 
-    def eval(self, s: str, variable: Optional[str] = None):
+    def eval(self, s: str, variable: str | None = None):
         try:
-            result = eval_input(s)
-        except TokenError:
-            return [
-                {"title": "Input", "input": s},
-                {"title": "Error", "input": s, "error": "Invalid input"}
-            ]
-        except Exception as e:
-            logging.exception(f"Exception eval failed:\n{e}\n")
-            return self.handle_error(s, e)
+            parsed, top_node, evaluated = eval_input(s)
+            cards = self.prepare_cards(parsed, top_node, evaluated, variable)
+            return cards
+        except Exception:
+            return self.handle_error(s)
 
-        if result:
-            parsed, top_node, evaluated = result
-            try:
-                cards = self.prepare_cards(parsed, top_node, evaluated, variable)
-                return cards
-            except ValueError as e:
-                logging.exception(f"Exception:\n{e}\n")
-                return self.handle_error(s, e)
-
-    def handle_error(self, s, e):
-        if isinstance(e, SyntaxError):
-            error = {
-                "msg": str(e),
-                "offset": e.offset
-            }
-            if e.text:
-                error["input_start"] = e.text[:e.offset]
-                error["input_end"] = e.text[e.offset:]
-            return [
-                {"title": "Input", "input": s},
-                {"title": "Error", "input": s, "exception_info": error}
-            ]
-        elif isinstance(e, ValueError):
-            return [
-                {"title": "Input", "input": s},
-                {"title": "Error", "input": s, "error": str(e)}
-            ]
-        else:
-            trace = traceback.format_exc()
-            trace = ("There was an error in Gamma.\n"
-                     "For reference, the stack trace is:\n\n" + trace)
-            return [
-                {"title": "Input", "input": s},
-                {"title": "Error", "input": s, "error": trace}
-            ]
+    @staticmethod
+    def handle_error(s: str):
+        trace = traceback.format_exc()
+        return [
+            {"title": "Error", "input": s, "error": trace}
+        ]
 
     @staticmethod
     def disambiguate(top_node):
@@ -130,7 +95,7 @@ class SymPyGamma:
 
         return components, cards, evaluated, top_func_name if (is_function and is_applied) else ''
 
-    def prepare_cards(self, parsed, top_node, evaluated, variable: Optional[str] = None):
+    def prepare_cards(self, parsed, top_node, evaluated, variable: str | None = None):
         components, cards, evaluated, top_func_name = self.get_cards(top_node, evaluated)
         if variable is not None:
             components['variable'] = sympy.Symbol(variable)
@@ -196,18 +161,15 @@ class SymPyGamma:
                 if not card:
                     continue
 
-                try:
-                    result.append({
-                        'card': card_name,
-                        'variable': repr(var),
-                        'title': card.format_title(evaluated),
-                        'input': card.format_input(repr(evaluated), components),
-                        'pre_output': latex(
-                            card.pre_output_function(evaluated, var)),
-                        'parameters': card.card_info.get('parameters', [])
-                    })
-                except (SyntaxError, ValueError) as e:
-                    logging.error(e)
+                result.append({
+                    'card': card_name,
+                    'variable': repr(var),
+                    'title': card.format_title(evaluated),
+                    'input': card.format_input(repr(evaluated), components),
+                    'pre_output': latex(
+                        card.pre_output_function(evaluated, var)),
+                    'parameters': card.card_info.get('parameters', [])
+                })
 
             if top_func_name:
                 learn_more = find_learn_more_set(top_func_name)
@@ -219,7 +181,7 @@ class SymPyGamma:
                     })
         return result
 
-    def eval_card(self, card_name, expression, variable="None", parameters=None):
+    def eval_card(self, card_name: str, expression: str, variable="None", parameters=None):
         card = get_card(card_name)
         _, top_node, evaluated = eval_input(expression)
         variable = sympy.Symbol(variable)
