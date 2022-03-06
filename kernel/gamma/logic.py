@@ -1,13 +1,15 @@
 from __future__ import annotations
 import ast
 import traceback
+from typing import Any
 
 import sympy
 from sympy.core.function import FunctionClass
+from sympy.parsing.sympy_parser import stringify_expr, eval_expr
 
 from gamma.utils import latexify, removeSymPy, OTHER_SYMPY_FUNCTIONS
-from gamma.evaluator import eval_input, namespace
-from gamma.dispatch import find_result_set, is_function_handled
+from gamma.evaluator import namespace, transformations
+from gamma.dispatch import find_result_set
 from gamma.resultsets import get_card, format_by_type, find_learn_more_set
 
 
@@ -21,7 +23,13 @@ def latex(expr: sympy.Basic | str | int) -> str:
     return sympy.latex(expr)
 
 
-def mathjax_latex(*args, digits=15):
+def is_approximatable_constant(input_evaluated):
+    # is_constant, but exclude Integer/Float/infinity
+    return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols \
+           and not input_evaluated.is_Integer and not input_evaluated.is_Float and input_evaluated.is_finite
+
+
+def mathjax_latex(*args, digits: int | None = 15):
     tex_code = []
     for obj in args:
         if hasattr(obj, 'as_latex'):
@@ -33,11 +41,9 @@ def mathjax_latex(*args, digits=15):
         'type': 'Tex',
         'tex': ''.join(tex_code)
     }
-    if len(args) == 1:
+    if digits is not None and len(args) == 1:
         obj = args[0]
-        if isinstance(obj, sympy.Basic) and not obj.free_symbols \
-                and not obj.is_Integer and not obj.is_Float \
-                and obj.is_finite is not False and hasattr(obj, 'evalf'):
+        if is_approximatable_constant(obj):
             result.update({
                 'numeric': True,
                 'expression': repr(obj),
@@ -47,27 +53,26 @@ def mathjax_latex(*args, digits=15):
 
 
 class SymPyGamma:
+    def __init__(self, expression: str, variable: str | None = None):
+        self.expression = expression
+        self.variable = variable
+        self.parsed = stringify_expr(expression, {}, namespace, transformations)
+        self.evaluated = eval_expr(self.parsed, {}, namespace)
+        self.top_node = ast.parse(self.parsed).body[0].value
 
-    def eval(self, s: str, variable: str | None = None):
+    def eval(self):
         try:
-            parsed, top_node, evaluated = eval_input(s)
-            cards = self.prepare_cards(parsed, top_node, evaluated, variable)
-            return cards
+            return self.prepare_cards()
         except Exception:
-            return self.handle_error(s)
+            return self.handle_error()
 
-    @staticmethod
-    def handle_error(s: str):
-        trace = traceback.format_exc()
-        return [
-            {"title": "Error", "input": s, "error": trace}
-        ]
+    def handle_error(self):
+        return [{"title": "Error", "input": self.expression, "error": traceback.format_exc()}]
 
-    @staticmethod
-    def disambiguate(top_node):
-        if isinstance(top_node, ast.Call) and isinstance(top_node.func, ast.Name) \
-                and top_node.func.id == 'factor' and top_node.args:
-            arg = top_node.args[0]
+    def disambiguate(self):
+        if isinstance(self.top_node, ast.Call) and isinstance(self.top_node.func, ast.Name) \
+                and self.top_node.func.id == 'factor' and self.top_node.args:
+            arg = self.top_node.args[0]
             if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name) and arg.func.id == 'Integer':
                 return {
                     'ambiguity': 'factorint({})'.format(arg.args[0].value),
@@ -78,45 +83,43 @@ class SymPyGamma:
                 }
         return None
 
-    def get_cards(self, top_node, evaluated):
-        is_applied = isinstance(top_node, ast.Call)
-        top_func_name = top_node.func.id if is_applied and isinstance(top_node.func, ast.Name) else ''
+    def get_cards(self):
+        is_applied = isinstance(self.top_node, ast.Call)
+        top_func_name = self.top_node.func.id if is_applied and isinstance(self.top_node.func, ast.Name) else ''
 
         first_func = namespace.get(top_func_name)
-        is_function = first_func and not isinstance(first_func, FunctionClass) \
-            and not isinstance(first_func, sympy.Atom) and top_func_name and top_func_name[0].islower() \
+        is_imperative = first_func is not None and not isinstance(first_func, FunctionClass) \
+            and not isinstance(first_func, sympy.Atom) and top_func_name[0].islower() \
             and top_func_name not in OTHER_SYMPY_FUNCTIONS
 
-        convert_input, cards = find_result_set(top_func_name, evaluated)
+        convert_input, cards = find_result_set(top_func_name, self.evaluated, is_imperative)
+        components = convert_input(self.top_node, self.evaluated)
 
-        components = convert_input(top_node, evaluated)
-        if 'input_evaluated' in components:
-            evaluated = components['input_evaluated']
+        return components, cards, top_func_name if is_imperative else ''
 
-        return components, cards, evaluated, top_func_name if (is_function and is_applied) else ''
+    def prepare_cards(self):
+        components, cards, top_func_name = self.get_cards()
+        if self.variable is not None:
+            components['variable'] = sympy.Symbol(self.variable)
 
-    def prepare_cards(self, parsed, top_node, evaluated, variable: str | None = None):
-        components, cards, evaluated, top_func_name = self.get_cards(top_node, evaluated)
-        if variable is not None:
-            components['variable'] = sympy.Symbol(variable)
-
+        sympy_input = removeSymPy(self.parsed)
         if top_func_name:
             latex_input = {
                 'type': 'Tex',
-                'tex': latexify(parsed)
+                'tex': latexify(self.top_node)
             }
         else:
-            latex_input = mathjax_latex(evaluated)
+            latex_input = mathjax_latex(self.evaluated, digits=None)
 
-        result = []
+        result: list[dict[str, Any]] = []
 
-        ambiguity = self.disambiguate(top_node)
+        ambiguity = self.disambiguate()
         if ambiguity is not None:
             result.append(ambiguity)
 
         result.append({
             "title": "SymPy",
-            "input": removeSymPy(parsed),
+            "input": sympy_input,
             "output": latex_input
         })
 
@@ -129,63 +132,46 @@ class SymPyGamma:
 
         # If no result cards were found, but the top-level call is to a
         # function, then add a special result card to show the result
-        if not cards and not components['variable'] and top_func_name:
+        if not cards and top_func_name:
             result.append({
                 'title': 'Result',
-                'input': removeSymPy(parsed),
-                'output': format_by_type(evaluated, top_func_name, top_node, mathjax_latex)
+                'input': sympy_input if top_func_name else str(self.evaluated),
+                'output': format_by_type(self.evaluated, top_func_name, self.top_node, mathjax_latex)
             })
-        else:
-            var = components['variable']
+        elif is_approximatable_constant(self.evaluated):
+            cards = ['float_approximation'] + cards
 
-            # If the expression is something like 'lcm(2x, 3x)', display the
-            # result of the function before the rest of the cards
-            if top_func_name and not is_function_handled(top_func_name):
-                result.append(
-                    {"title": "Result", "input": "",
-                     "output": format_by_type(evaluated, top_func_name, top_node, mathjax_latex)})
-
-            simplified = sympy.simplify(evaluated) if isinstance(evaluated, sympy.Basic) else None
-            if simplified is not None and simplified != evaluated:
+        var = components['variable']
+        if top_func_name != 'simplify':
+            simplified = sympy.simplify(self.evaluated) if isinstance(self.evaluated, sympy.Basic) else None
+            if simplified is not None and simplified != self.evaluated:
                 result.append(
                     {"title": "Simplification", "input": repr(simplified),
                      "output": mathjax_latex(simplified)})
-            elif top_func_name == 'simplify':
-                result.append(
-                    {"title": "Simplification", "input": "",
-                     "output": mathjax_latex(evaluated)})
 
-            for card_name in cards:
-                card = get_card(card_name)
+        for card_name in cards:
+            card = get_card(card_name)
 
-                if not card:
-                    continue
+            result.append({
+                'card': card_name,
+                'variable': repr(var),
+                'title': card.format_title(self.evaluated),
+                'input': card.format_input(components),
+                'pre_output': latex(card.pre_output_function(components['input_evaluated'], var)),
+                'parameters': card.card_info.get('parameters', [])
+            })
 
-                result.append({
-                    'card': card_name,
-                    'variable': repr(var),
-                    'title': card.format_title(evaluated),
-                    'input': card.format_input(repr(evaluated), components),
-                    'pre_output': latex(
-                        card.pre_output_function(evaluated, var)),
-                    'parameters': card.card_info.get('parameters', [])
-                })
-
-            if top_func_name:
-                learn_more = find_learn_more_set(top_func_name)
-                if learn_more:
-                    result.append({
-                        "title": "Learn More",
-                        "input": '',
-                        "output": learn_more
-                    })
+        learn_more = find_learn_more_set(top_func_name)
+        if learn_more:
+            result.append({
+                "title": "Learn More",
+                "input": '',
+                "output": learn_more
+            })
         return result
 
-    def eval_card(self, card_name: str, expression: str, variable="None", parameters=None):
+    def eval_card(self, card_name: str, parameters=None):
         card = get_card(card_name)
-        _, top_node, evaluated = eval_input(expression)
-        variable = sympy.Symbol(variable)
-        components, _, evaluated, _ = self.get_cards(top_node, evaluated)
-        components['variable'] = variable
+        components, _, _ = self.get_cards()
         result = card.eval(components, parameters)
         return card.format_output(result, mathjax_latex)

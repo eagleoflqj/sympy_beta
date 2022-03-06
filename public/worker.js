@@ -31,23 +31,16 @@ async function loadPyodideAndPackages () {
     import micropip
     await micropip.install(f'/{kernelName}-{kernelVersion}-py3-none-any.whl')
     from gamma.logic import SymPyGamma
-    sympy_gamma = SymPyGamma()
     def getSymPyVersion():
       from sympy import __version__
       return __version__
     def ev(expression, variable):
-        return sympy_gamma.eval(expression, variable)
-    def evcd(a, b, c, d):
+        return SymPyGamma(expression, variable).eval()
+    def evcd(card_name, expression, variable, parameters):
         try:
-            return sympy_gamma.eval_card(a, b, c, d.to_py())
-        except ValueError as e:
-            return {'error': str(e)}
+            return SymPyGamma(expression, variable).eval_card(card_name, parameters.to_py())
         except Exception as e:
-            trace = traceback.format_exc()
-            return {
-                'error': ('There was an error in Gamma. For reference '
-                        'the last five traceback entries are: ' + trace)
-            }
+            return {'error': traceback.format_exc()}
   `)
   self.postMessage({ stage: 'KERNEL_LOADED' })
 }

@@ -44,10 +44,11 @@ class ResultCard:
         line = line % components['input_evaluated']
         return sympy.parse_expr(line, global_dict=namespace)
 
-    def format_input(self, input_repr, components, **parameters):
+    def format_input(self, components, **parameters):
         if parameters is None:
             parameters = {}
         parameters = self.default_parameters(parameters)
+        input_repr = repr(components['input_evaluated'])
         variable = components['variable']
         if 'format_input_function' in self.card_info:
             return self.card_info['format_input_function'](
@@ -123,7 +124,7 @@ class MultiResultCard(ResultCard):
             return results
         return "None"
 
-    def format_input(self, input_repr, components):
+    def format_input(self, components):
         return None
 
     def format_output(self, output, formatter):
@@ -132,7 +133,7 @@ class MultiResultCard(ResultCard):
         return {
             'type': 'MultiResult',
             'results': [{
-                'input': card.format_input(self.components["input_evaluated"], self.components),
+                'input': card.format_input(self.components),
                 'output': card.format_output(result, formatter)
             } for card, result in output]
         }

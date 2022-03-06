@@ -203,9 +203,9 @@ def ordinal(n):
 
 
 # TODO: modularize all of this
-def latexify(string):
+def latexify(node):
     a = LatexVisitor()
-    a.visit(ast.parse(string))
+    a.visit(node)
     return a.latex
 
 

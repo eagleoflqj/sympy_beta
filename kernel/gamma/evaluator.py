@@ -1,7 +1,7 @@
 import ast
 
 from sympy.parsing.sympy_parser import split_symbols, function_exponentiation, implicit_application, \
-    standard_transformations, convert_xor, stringify_expr, eval_expr, NAME
+    standard_transformations, convert_xor, NAME
 
 SYNONYMS = {
     'derivative': 'diff',
@@ -95,12 +95,6 @@ namespace.update({
 })
 
 transformations = [synonyms, *standard_transformations, convert_xor, custom_implicit_transformation]
-
-
-def eval_input(s: str):
-    parsed = stringify_expr(s, {}, namespace, transformations)
-    evaluated = eval_expr(parsed, {}, namespace)
-    return parsed, ast.parse(parsed).body[0].value, evaluated
 
 
 def eval_node(node):

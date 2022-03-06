@@ -3,32 +3,32 @@ import pytest
 from gamma.logic import SymPyGamma
 
 cases = [
-    (('digits', '12'),
+    (('digits', '12', None, None),
      {'tex': '2', 'type': 'Tex'}),
-    (('factorization', '12'),
+    (('factorization', '12', None, None),
      {'rows': [['2', '2'], ['3', '1']], 'titles': ('Factor', 'Times'), 'type': 'Table'}),
-    (('factorizationDiagram', '12'),
+    (('factorizationDiagram', '12', None, None),
      {'primes': [3, 2, 2], 'type': 'FactorDiagram'}),
-    (('float_approximation', '242/33', 'None', {'digits': 15}),
+    (('float_approximation', '242/33', None, {'digits': 15}),
      {'tex': '7.33333333333333', 'type': 'Tex'}),
     (('approximator', '22/3', 'x', {'digits': 25}),
      {'approximation': '7.333333333333333333333333', 'expression': '22/3',
       'numeric': True, 'tex': '\\frac{22}{3}', 'type': 'Tex'}),
-    (('diffsteps', 'x', 'x'),
+    (('diffsteps', 'x', 'x', None),
      {'answer': {'block': '1'}, 'type': 'StepContainer',
       'content': {'level': [{'step': [{'p': (
           {'text': 'Apply the power rule: '},
           {'inline': 'x'},
           {'text': ' goes to '},
           {'inline': '1'})}]}]}}),
-    (('integral_alternate', 'x', 'x'),
+    (('integral_alternate', 'x', 'x', None),
      {'results': [{'input': 'integrate(x, x)', 'output': {'tex': '\\frac{x^{2}}{2}', 'type': 'Tex'}}],
       'type': 'MultiResult'}),
-    (('integral_alternate_fake', 'integrate(tan(x))', 'x'),
+    (('integral_alternate_fake', 'integrate(tan(x))', 'x', None),
      {'results': [{'input': 'integrate(tan(x), x)',
                    'output': {'tex': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}', 'type': 'Tex'}}],
       'type': 'MultiResult'}),
-    (('intsteps', 'integrate(tan(x))', 'x'),
+    (('intsteps', 'integrate(tan(x))', 'x', None),
      {'content':
          {'level': [
              {'step': [
@@ -73,12 +73,12 @@ cases = [
              ]}
          ]},
          'answer': {'block': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}'}, 'type': 'StepContainer'}),
-    (('truth_table', '(x | y) & (x | ~y) & (~x | y)', 'y'),
+    (('truth_table', '(x | y) & (x | ~y) & (~x | y)', 'y', None),
      {'rows': [['True', 'True', 'True'],
                ['True', 'False', 'False'],
                ['False', 'True', 'False'],
                ['False', 'False', 'False']], 'titles': ['x', 'y', 'Values'], 'type': 'TruthTable'}),
-    (('function_docs', 'factorial2'),
+    (('function_docs', 'factorial2', None, None),
      {'type': 'Document',
       'html': '<div class="document">\n<p>The double factorial <cite>n!!</cite>, not to be confused with <cite>(n!)!'
               '</cite></p>\n<p>The double factorial is defined for nonnegative integers and for odd\nnegative '
@@ -115,17 +115,17 @@ cases = [
      ),
 ]
 
-g = SymPyGamma()
-
 
 @pytest.mark.parametrize('args, expected', cases)
 def test(args: tuple, expected: dict):
-    actual = g.eval_card(*args)
+    card_name, expression, variable, parameters = args
+    g = SymPyGamma(expression, variable)
+    actual = g.eval_card(card_name, parameters)
     assert actual == expected
 
 
 def test_plot():
-    actual = g.eval_card('plot', 'x', 'x', {'xmin': 10, 'xmax': 30})
+    actual = SymPyGamma('x', 'x').eval_card('plot', {'xmin': 10, 'xmax': 30})
     assert actual['type'] == 'Plot'
     graph = actual['graphs'][0]
     assert graph['type'] == 'xy'

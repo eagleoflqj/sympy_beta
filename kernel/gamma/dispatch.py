@@ -16,10 +16,6 @@ def is_integral(input_evaluated):
     return isinstance(input_evaluated, sympy.Integral)
 
 
-def is_rational(input_evaluated):
-    return isinstance(input_evaluated, sympy.Rational) and not input_evaluated.is_Integer
-
-
 def is_float(input_evaluated):
     return isinstance(input_evaluated, sympy.Float)
 
@@ -33,16 +29,6 @@ def is_constant(input_evaluated):
     # check free_symbols instead
     return hasattr(input_evaluated, 'free_symbols') \
         and not input_evaluated.free_symbols
-
-
-def is_approximatable_constant(input_evaluated):
-    # is_constant, but exclude Integer/Float/infinity
-    return hasattr(input_evaluated, 'free_symbols') \
-        and not input_evaluated.free_symbols \
-        and hasattr(input_evaluated, 'is_Integer') \
-        and input_evaluated.is_Integer \
-        and not input_evaluated.is_Float \
-        and input_evaluated.is_finite is not True
 
 
 def is_complex(input_evaluated):
@@ -221,19 +207,17 @@ function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'factorial': Integer_result,
     'factorial2': Integer_result,
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
-    'diff': (extract_derivative, ('diff', 'diffsteps')),
+    'diff': (extract_derivative, ('diff',)),
     'factorint': (extract_first, ('factorization', 'factorizationDiagram')),
     # 'totient': (extract_first, ()),
     'help': (extract_first, ('function_docs',)),
     'plot': (extract_plot, ('plot',)),
-    'rsolve': (None, ()),
 }
 
 exclusive_predicates = [
     (is_complex, ('absolute_value', 'polar_angle', 'conjugate')),
-    (is_rational, ('float_approximation',)),
     (is_float, ('fractional_approximation',)),
-    (is_approximatable_constant, ('root_to_polynomial',)),
+    # root_to_polynomial
     (is_uncalled_function, ('function_docs',)),
     (is_matrix, ('matrix_inverse', 'matrix_eigenvals', 'matrix_eigenvectors')),
     (is_logic, ('satisfiable', 'truth_table')),
@@ -247,12 +231,7 @@ inclusive_predicates = [
 ]
 
 
-def is_function_handled(function_name: str) -> bool:
-    """Do any of the result sets handle this specific function?"""
-    return function_name in ("simplify", "product") or function_name in function_map
-
-
-def find_result_set(function_name: str, input_evaluated) -> tuple[CONVERTER, list[str]]:
+def find_result_set(function_name: str, input_evaluated, is_imperative: bool) -> tuple[CONVERTER, list[str]]:
     """
     Finds a set of result cards based on function name and evaluated input.
 
@@ -267,9 +246,11 @@ def find_result_set(function_name: str, input_evaluated) -> tuple[CONVERTER, lis
 
     converter, result_cards = function_map.get(function_name, (None, None))
     if result_cards is not None:
-        if converter:
-            result_converter = converter
+        result_converter = converter or result_converter
         return result_converter, list(result_cards)
+
+    if is_imperative:
+        return result_converter, []
 
     for predicate, result_cards in exclusive_predicates:
         if predicate(input_evaluated):

@@ -4,9 +4,7 @@ from gamma.logic import SymPyGamma
 
 cases = [
     ('242/33',
-     [{'title': 'SymPy', 'input': '242/33',
-       'output': {'type': 'Tex', 'tex': '\\frac{22}{3}', 'numeric': True, 'expression': '22/3',
-                  'approximation': '7.33333333333333'}},
+     [{'title': 'SymPy', 'input': '242/33', 'output': {'type': 'Tex', 'tex': '\\frac{22}{3}'}},
       {'card': 'float_approximation', 'variable': 'None', 'title': 'Floating-point approximation',
        'input': '(22/3).evalf()', 'pre_output': '', 'parameters': ['digits']}]),
     ('12',
@@ -24,6 +22,15 @@ cases = [
       {'input': 'div(x**2-4+x,x-2)',
        'output': {'list': [{'tex': 'x + 3', 'type': 'Tex'}, {'tex': '2', 'type': 'Tex'}], 'type': 'List'},
        'title': 'Result'}]),
+    ('solve(x**2 + 4*x + 181, x)',
+     [{'title': 'SymPy', 'input': 'solve(x**2+4*x+181,x)',
+       'output': {'type': 'Tex', 'tex': '\\mathrm{solve}\\;x^{2} + 4 x + 181=0\\;\\mathrm{for}\\;x'}},
+      {'title': 'Result', 'input': 'solve(x**2+4*x+181,x)',
+       'output': {'type': 'List',
+                  'list': [{'type': 'Tex', 'tex': '-2 - \\sqrt{177} i', 'numeric': True,
+                            'expression': '-2 - sqrt(177)*I', 'approximation': '-2.0 - 13.3041346956501 i'},
+                           {'type': 'Tex', 'tex': '-2 + \\sqrt{177} i', 'numeric': True,
+                            'expression': '-2 + sqrt(177)*I', 'approximation': '-2.0 + 13.3041346956501 i'}]}}]),
     ('sin(2*x)',
      [{'title': 'SymPy', 'input': 'sin(2*x)', 'output': {'type': 'Tex', 'tex': '\\sin{\\left(2 x \\right)}'},
        'num_variables': 1, 'variables': ['x'], 'variable': 'x'},
@@ -44,9 +51,7 @@ cases = [
        'output': {'tex': '\\frac{d}{d x} f{\\left(x \\right)} g{\\left(x \\right)} h{\\left(x \\right)}',
                   'type': 'Tex'}, 'title': 'SymPy', 'variable': 'x', 'variables': ['x']},
       {'card': 'diff', 'input': 'diff(f(x)*g(x)*h(x), x)', 'parameters': [], 'title': 'Derivative', 'variable': 'x',
-       'pre_output': '\\frac{d}{d x} f{\\left(x \\right)} g{\\left(x \\right)} h{\\left(x \\right)}'},
-      {'card': 'diffsteps', 'input': 'diff(f(x)*g(x)*h(x), x)', 'parameters': [], 'pre_output': '',
-       'title': 'Derivative Steps', 'variable': 'x'}]),
+       'pre_output': '\\frac{d}{d x} f{\\left(x \\right)} g{\\left(x \\right)} h{\\left(x \\right)}'}]),
     ('integrate(tan(x))',
      [{'input': 'integrate(tan(x))', 'output': {'tex': '\\int \\tan{\\left(x \\right)}\\, dx', 'type': 'Tex'},
        'num_variables': 1, 'title': 'SymPy', 'variable': 'x', 'variables': ['x']},
@@ -62,6 +67,23 @@ cases = [
        'input': 'factorint(3840, limit=100)', 'pre_output': '', 'parameters': []},
       {'card': 'factorizationDiagram', 'variable': 'None', 'title': 'Factorization Diagram',
        'input': 'factorint(3840, limit=256)', 'pre_output': '', 'parameters': []}]),
+    ('rsolve(y(n+2)-y(n+1)-y(n), y(n))',
+     [{'title': 'SymPy',
+       'input': "rsolve(Function('y')(n+2)-Function('y')(n+1)-Function('y')(n),Function('y')(n))",
+       'output': {'type': 'Tex',
+                  'tex': '\\mathrm{Solve~the~recurrence~}- y{\\left(n \\right)} - y{\\left(n + 1 \\right)} + '
+                         'y{\\left(n + 2 \\right)} = 0'}},
+      {'title': 'Result',
+       'input': "rsolve(Function('y')(n+2)-Function('y')(n+1)-Function('y')(n),Function('y')(n))",
+       'output': {'type': 'Tex',
+                  'tex': 'C_{0} \\left(\\frac{1}{2} - \\frac{\\sqrt{5}}{2}\\right)^{n} + C_{1} \\left(\\frac{1}{2} + '
+                         '\\frac{\\sqrt{5}}{2}\\right)^{n}'}},
+      {'title': 'Simplification',
+       'input': '(C0*(1 - sqrt(5))**n + C1*(1 + sqrt(5))**n)/2**n',
+       'output': {'type': 'Tex',
+                  'tex': '2^{- n} \\left(C_{0} \\left(1 - \\sqrt{5}\\right)^{n} + C_{1} \\left(1 + '
+                         '\\sqrt{5}\\right)^{n}\\right)'}},
+      None]),
     ('diophantine(x**2 - 4*x*y + 8*y**2 - 3*x + 7*y - 5)',
      [{'title': 'SymPy', 'input': 'diophantine(x**2-4*x*y+8*y**2-3*x+7*y-5)',
        'output': {'type': 'Tex',
@@ -85,15 +107,16 @@ cases = [
       {'card': 'plot', 'input': ['r = 1 - sin(theta)'], 'parameters': ['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax'],
        'pre_output': '', 'title': 'Plot', 'variable': 'x'}]),
     ('π',
-     [{'title': 'SymPy', 'input': 'π',
-       'output': {'type': 'Tex', 'tex': '\\pi', 'numeric': True,
-                  'expression': 'pi', 'approximation': '3.14159265358979'}}]),
+     [{'title': 'SymPy', 'input': 'π', 'output': {'type': 'Tex', 'tex': '\\pi'}},
+      {'card': 'float_approximation', 'variable': 'None', 'title': 'Floating-point approximation',
+       'input': '(pi).evalf()', 'pre_output': '', 'parameters': ['digits']}]),
 ]
 
-g = SymPyGamma()
 
-
-@pytest.mark.parametrize('input_str, expected', cases)
-def test(input_str: str, expected: dict):
-    actual = g.eval(input_str)
-    assert actual == expected
+@pytest.mark.parametrize('expression, expected', cases)
+def test(expression: str, expected: dict):
+    g = SymPyGamma(expression)
+    actual = g.eval()
+    assert len(actual) == len(expected)
+    for a, e in zip(actual, expected):
+        assert e is None or a == e
