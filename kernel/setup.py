@@ -9,6 +9,7 @@ with open('../package.json', 'r') as f:
     author = config['author']
     author_name = author['name']
     author_email = author['email']
+    project_license = config['license']
 
 setup(
     name=name,
@@ -17,7 +18,7 @@ setup(
     url=f'{homepage}/tree/master/kernel',
     author=f'{author_name}, SymPy Development Team',
     author_email=author_email,
-    packages=['gamma'],
-    license='BSD-3-Clause',
+    packages=['gamma', 'extension', 'extension/ntheory'],
+    license=project_license,
     platforms=['any'],
 )

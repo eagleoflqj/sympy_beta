@@ -20,7 +20,7 @@ jobs:
           pip install -r requirements.txt
       - name: Check code quality
         run: |
-          flake8 gamma
+          flake8 .
       - name: Run integration tests
         run: |
-          pytest --cov=gamma -n auto test
+          pytest --cov=gamma --cov=extension -n auto test

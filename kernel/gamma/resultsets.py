@@ -4,139 +4,11 @@ import sympy
 from sympy.core.symbol import Symbol
 import docutils.core
 
-from gamma.evaluator import eval_node, namespace
+from gamma.evaluator import eval_node
+from gamma.result_card import ResultCard, FakeResultCard, MultiResultCard
 import gamma.diffsteps
 import gamma.intsteps
-
-
-class ResultCard:
-    """
-    Operations to generate a result card.
-
-    title -- Title of the card
-
-    result_statement -- Statement evaluated to get result
-
-    pre_output_function -- Takes input expression and a symbol, returns a
-    SymPy object
-    """
-    def __init__(self, title, result_statement, pre_output_function,
-                 **kwargs):
-        self.card_info = kwargs
-        self.title = title
-        self.result_statement = result_statement
-        self.pre_output_function = pre_output_function
-
-    def eval(self, components, parameters=None):
-        if parameters is None:
-            parameters = {}
-        else:
-            parameters = parameters.copy()
-
-        parameters = self.default_parameters(parameters)
-
-        for component, val in components.items():
-            parameters[component] = val
-
-        variable = components['variable']
-
-        line = self.result_statement.format(_var=variable, **parameters)
-        line = line % components['input_evaluated']
-        return sympy.parse_expr(line, global_dict=namespace)
-
-    def format_input(self, components, **parameters):
-        if parameters is None:
-            parameters = {}
-        parameters = self.default_parameters(parameters)
-        input_repr = repr(components['input_evaluated'])
-        variable = components['variable']
-        if 'format_input_function' in self.card_info:
-            return self.card_info['format_input_function'](
-                self.result_statement, input_repr, components)
-        return self.result_statement.format(_var=variable, **parameters) % input_repr
-
-    def format_output(self, output, formatter):
-        if 'format_output_function' in self.card_info:
-            return self.card_info['format_output_function'](output, formatter)
-        return formatter(output)
-
-    def format_title(self, input_evaluated):
-        if self.card_info.get('format_title_function'):
-            return self.card_info['format_title_function'](self.title,
-                                                           input_evaluated)
-        return self.title
-
-    def is_multivariate(self):
-        return self.card_info.get('multivariate', True)
-
-    def default_parameters(self, kwargs):
-        if 'parameters' in self.card_info:
-            for arg in self.card_info['parameters']:
-                kwargs.setdefault(arg, '')
-        return kwargs
-
-    def __repr__(self):
-        return "<ResultCard '{}'>".format(self.title)
-
-
-class FakeResultCard(ResultCard):
-    """ResultCard whose displayed expression != actual code.
-
-    Used when creating the result to be displayed involves code that a user
-    would not normally need to do, e.g. calculating plot points (where a
-    user would simply use ``plot``)."""
-
-    def __init__(self, *args, **kwargs):
-        super(FakeResultCard, self).__init__(*args, **kwargs)
-        assert 'eval_method' in kwargs
-
-    def eval(self, components, parameters=None):
-        if parameters is None:
-            parameters = {}
-        return self.card_info['eval_method'](components, parameters)
-
-
-class MultiResultCard(ResultCard):
-    """Tries multiple statements and displays the first that works."""
-
-    def __init__(self, title, *cards):
-        super().__init__(title, '', lambda *args: '')
-        self.cards = cards
-        self.cards_used = []
-
-    def eval(self, components, parameters):
-        self.cards_used = []
-        results = []
-
-        # TODO Implicit state is bad, come up with better API
-        # in particular a way to store variable, cards used
-        for card in self.cards:
-            try:
-                result = card.eval(components, parameters)
-            except ValueError:
-                continue
-            if result is not None:
-                if not any(result == r[1] for r in results):
-                    self.cards_used.append(card)
-                    results.append((card, result))
-        if results:
-            self.components = components
-            return results
-        return "None"
-
-    def format_input(self, components):
-        return None
-
-    def format_output(self, output, formatter):
-        if not isinstance(output, list):
-            return output
-        return {
-            'type': 'MultiResult',
-            'results': [{
-                'input': card.format_input(self.components),
-                'output': card.format_output(result, formatter)
-            } for card, result in output]
-        }
+from extension.ntheory.totient import totient_card
 
 
 # Formatting functions
@@ -165,7 +37,7 @@ def format_by_type(result, function_name, node, formatter):
     """
     if function_name in _function_formatters:
         return _function_formatters[function_name](result, node, formatter)
-    elif function_name in all_cards and 'format_output_function' in all_cards[function_name].card_info:
+    elif function_name in all_cards and 'format_output' in all_cards[function_name].card_info:
         return all_cards[function_name].format_output(result, formatter)
     elif isinstance(result, (list, tuple)):
         return format_list(result, formatter)
@@ -501,16 +373,13 @@ def eval_approximator(components, parameters=None):
 
 
 # Result cards
-def no_pre_output(*args):
-    return ""
-
 
 all_cards: dict[str, ResultCard] = {
     'roots': ResultCard(
         "Roots",
         "solve(%s, {_var})",
         lambda statement, var, *args: var,
-        format_output_function=format_list),
+        format_output=format_list),
 
     'integral': ResultCard(
         "Integral",
@@ -522,7 +391,7 @@ all_cards: dict[str, ResultCard] = {
         "integrate(%s, {_var})",
         lambda i, var: sympy.Integral(i, *var),
         eval_method=eval_integral,
-        format_input_function=format_integral
+        format_input=format_integral
     ),
 
     'integral_manual': ResultCard(
@@ -535,7 +404,7 @@ all_cards: dict[str, ResultCard] = {
         "manualintegrate(%s, {_var})",
         lambda i, var: sympy.Integral(i, *var),
         eval_method=eval_integral_manual,
-        format_input_function=format_integral
+        format_input=format_integral
     ),
 
     'diff': ResultCard("Derivative",
@@ -545,58 +414,58 @@ all_cards: dict[str, ResultCard] = {
     'diffsteps': FakeResultCard(
         "Derivative Steps",
         "diff(%s, {_var})",
-        no_pre_output,
-        format_output_function=format_steps,
+        None,
+        format_output=format_steps,
         eval_method=eval_diffsteps),
 
     'intsteps': FakeResultCard(
         "Integral Steps",
         "integrate(%s, {_var})",
-        no_pre_output,
-        format_output_function=format_steps,
+        None,
+        format_output=format_steps,
         eval_method=eval_intsteps,
-        format_input_function=format_integral),
+        format_input=format_integral),
 
     'series': ResultCard(
         "Series expansion around 0",
         "series(%s, {_var}, 0, 10)",
-        no_pre_output),
+        None),
 
     'digits': ResultCard(
         "Digits in base-10 expansion of number",
         "len(str(%s))",
-        no_pre_output,
+        None,
         multivariate=False,
-        format_input_function=format_long_integer),
+        format_input=format_long_integer),
 
     'factorization': FakeResultCard(
         "Factors less than 100",
         "factorint(%s, limit=100)",
-        no_pre_output,
+        None,
         multivariate=False,
-        format_input_function=format_long_integer,
-        format_output_function=format_dict_title("Factor", "Times"),
+        format_input=format_long_integer,
+        format_output=format_dict_title("Factor", "Times"),
         eval_method=eval_factorization),
 
     'factorizationDiagram': FakeResultCard(
         "Factorization Diagram",
         "factorint(%s, limit=256)",
-        no_pre_output,
+        None,
         multivariate=False,
-        format_output_function=format_factorization_diagram,
+        format_output=format_factorization_diagram,
         eval_method=eval_factorization_diagram),
 
     'float_approximation': ResultCard(
         "Floating-point approximation",
         "(%s).evalf({digits})",
-        no_pre_output,
+        None,
         multivariate=False,
         parameters=['digits']),
 
     'fractional_approximation': ResultCard(
         "Fractional approximation",
         "nsimplify(%s)",
-        no_pre_output,
+        None,
         multivariate=False),
 
     'absolute_value': ResultCard(
@@ -646,26 +515,26 @@ all_cards: dict[str, ResultCard] = {
     'plot': FakeResultCard(
         "Plot",
         "plot(%s)",
-        no_pre_output,
-        format_input_function=format_plot_input,
-        format_output_function=format_plot,
+        None,
+        format_input=format_plot_input,
+        format_output=format_plot,
         eval_method=eval_plot,
         parameters=['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax']),
 
     'function_docs': FakeResultCard(
         "Documentation",
         "help(%s)",
-        no_pre_output,
+        None,
         multivariate=False,
         eval_method=eval_function_docs,
-        format_input_function=format_function_docs_input,
-        format_output_function=format_nothing
+        format_input=format_function_docs_input,
+        format_output=format_nothing
     ),
 
     'root_to_polynomial': ResultCard(
         "Polynomial with this root",
         "minpoly(%s)",
-        no_pre_output,
+        None,
         multivariate=False
     ),
 
@@ -679,54 +548,50 @@ all_cards: dict[str, ResultCard] = {
     'matrix_eigenvals': ResultCard(
         "Eigenvalues",
         "(%s).eigenvals()",
-        no_pre_output,
+        None,
         multivariate=False,
-        format_output_function=format_dict_title("Eigenvalue", "Multiplicity")
+        format_output=format_dict_title("Eigenvalue", "Multiplicity")
     ),
 
     'matrix_eigenvectors': ResultCard(
         "Eigenvectors",
         "(%s).eigenvects()",
-        no_pre_output,
+        None,
         multivariate=False,
-        format_output_function=format_list
+        format_output=format_list
     ),
 
     'satisfiable': ResultCard(
         "Satisfiability",
         "satisfiable(%s)",
-        no_pre_output,
+        None,
         multivariate=False,
-        format_output_function=format_dict_title('Variable', 'Possible Value')
+        format_output=format_dict_title('Variable', 'Possible Value')
     ),
 
     'truth_table': FakeResultCard(
         "Truth table",
         "%s",
-        no_pre_output,
+        None,
         multivariate=False,
         eval_method=eval_truth_table,
-        format_output_function=format_truth_table
+        format_output=format_truth_table
     ),
 
     'doit': ResultCard(
         "Result",
         "(%s).doit()",
-        no_pre_output
+        None
     ),
 
     'approximator': FakeResultCard(
         "Approximator_NOT_USER_VISIBLE",
         "%s",
-        no_pre_output,
+        None,
         eval_method=eval_approximator,
-        format_output_function=format_approximator
+        format_output=format_approximator
     ),
-    # 'totient': ResultCard(
-    #     "Result",
-    #     "(%s).doit()",
-    #     no_pre_output
-    # ),
+    'totient': totient_card,
 }
 
 
