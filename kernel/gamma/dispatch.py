@@ -1,9 +1,12 @@
 from __future__ import annotations
+
 from typing import Any, Callable
 
 import sympy
 
 from gamma.evaluator import eval_node
+
+DICT = dict[str, Any]
 
 
 # Decide which result card set to use
@@ -72,7 +75,7 @@ def is_product(input_evaluated):
 
 # Functions to convert input and extract variable used
 
-def default_variable(top_node, evaluated):
+def default_variable(top_node, evaluated) -> DICT:
     variables = list(evaluated.free_symbols) if isinstance(evaluated, sympy.Basic) else []
     return {
         'variables': variables,
@@ -81,13 +84,13 @@ def default_variable(top_node, evaluated):
     }
 
 
-def extract_first(top_node, evaluated):
+def extract_first(top_node, evaluated) -> DICT:
     result = default_variable(top_node, evaluated)
     result['input_evaluated'] = eval_node(top_node.args[0])
     return result
 
 
-def extract_integral(top_node, evaluated):
+def extract_integral(top_node, evaluated) -> DICT:
     args = [eval_node(arg) for arg in top_node.args]
     expr, limits = args[0], args[1:]
     variables = []
@@ -111,7 +114,7 @@ def extract_integral(top_node, evaluated):
     }
 
 
-def extract_derivative(top_node, evaluated):
+def extract_derivative(top_node, evaluated) -> DICT:
     args = [eval_node(arg) for arg in top_node.args]
     expr = args[0]
     free_variables = sorted(expr.free_symbols, key=str)
@@ -128,7 +131,7 @@ def extract_derivative(top_node, evaluated):
     }
 
 
-def extract_plot(top_node, evaluated):
+def extract_plot(top_node, evaluated) -> DICT:
     result = {}
     if top_node.args:
         args = [eval_node(arg) for arg in top_node.args]
@@ -200,7 +203,7 @@ result_cards: tuple
 
 Integer_result = (None, ('digits', 'factorization', 'factorizationDiagram'))
 
-CONVERTER = Callable[[Any, Any], Any]
+CONVERTER = Callable[[Any, Any], DICT]
 
 function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'Integer': Integer_result,

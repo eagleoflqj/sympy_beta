@@ -1,7 +1,9 @@
 import ast
 
-from sympy.parsing.sympy_parser import split_symbols, function_exponentiation, implicit_application, \
-    standard_transformations, convert_xor, NAME
+from sympy.parsing.sympy_parser import (NAME, convert_xor,
+                                        function_exponentiation,
+                                        implicit_application, split_symbols,
+                                        standard_transformations)
 
 SYNONYMS = {
     'derivative': 'diff',

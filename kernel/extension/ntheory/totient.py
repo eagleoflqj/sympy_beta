@@ -1,10 +1,10 @@
-from sympy import factorint, latex, Mul, Pow
+from sympy import Mul, Pow, factorint, latex
 
+from extension.util import Latex, format_latex, t
 from gamma.result_card import FakeResultCard
-from extension.util import Latex, t, format_latex
 
 
-def totient_step(n: int):
+def totient_step(n: int) -> str:
     L = Latex()
     if n == 1:
         L.a(1, t(' is coprime to itself'))

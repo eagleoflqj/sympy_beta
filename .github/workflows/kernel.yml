@@ -20,6 +20,7 @@ jobs:
           pip install -r requirements.txt
       - name: Check code quality
         run: |
+          isort -c .
           flake8 .
       - name: Run integration tests
         run: |

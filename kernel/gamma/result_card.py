@@ -1,5 +1,6 @@
 import sympy
 
+from gamma.dispatch import DICT
 from gamma.evaluator import namespace
 
 
@@ -20,7 +21,7 @@ class ResultCard:
         self.result_statement = result_statement
         self.pre_output = pre_output or no_pre_output
 
-    def eval(self, components, parameters=None):
+    def eval(self, components: DICT, parameters):
         if parameters is None:
             parameters = {}
         else:
@@ -37,7 +38,7 @@ class ResultCard:
         line = line % components['input_evaluated']
         return sympy.parse_expr(line, global_dict=namespace)
 
-    def format_input(self, components, **parameters):
+    def format_input(self, components: DICT, **parameters):
         if parameters is None:
             parameters = {}
         parameters = self.default_parameters(parameters)
@@ -78,7 +79,7 @@ class FakeResultCard(ResultCard):
     would not normally need to do, e.g. calculating plot points (where a
     user would simply use ``plot``)."""
 
-    def eval(self, components, parameters=None):
+    def eval(self, components: DICT, parameters=None):
         if parameters is None:
             parameters = {}
         return self.card_info['eval_method'](components, parameters)

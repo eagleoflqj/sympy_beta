@@ -1,12 +1,12 @@
-import sympy
 import collections
 from functools import reduce
 
+import sympy
 from sympy.core.function import AppliedUndef
 from sympy.functions.elementary.trigonometric import TrigonometricFunction
 from sympy.strategies.core import switch
 
-from .stepprinter import functionnames, replace_u_var, JSONPrinter
+from .stepprinter import JSONPrinter, functionnames, replace_u_var
 
 
 def Rule(name, props=""):

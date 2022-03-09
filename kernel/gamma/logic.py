@@ -1,16 +1,17 @@
 from __future__ import annotations
+
 import ast
 import traceback
 from typing import Any
 
 import sympy
 from sympy.core.function import FunctionClass
-from sympy.parsing.sympy_parser import stringify_expr, eval_expr
+from sympy.parsing.sympy_parser import eval_expr, stringify_expr
 
-from gamma.utils import latexify, removeSymPy, OTHER_SYMPY_FUNCTIONS
-from gamma.evaluator import namespace, transformations
 from gamma.dispatch import find_result_set
-from gamma.resultsets import get_card, format_by_type, find_learn_more_set
+from gamma.evaluator import namespace, transformations
+from gamma.resultsets import find_learn_more_set, format_by_type, get_card
+from gamma.utils import OTHER_SYMPY_FUNCTIONS, latexify, removeSymPy
 
 
 def latex(expr: sympy.Basic | str | int) -> str:

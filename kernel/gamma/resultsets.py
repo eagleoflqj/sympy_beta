@@ -1,15 +1,15 @@
-import sys
 import itertools
+import sys
+
+import docutils.core
 import sympy
 from sympy.core.symbol import Symbol
-import docutils.core
 
-from gamma.evaluator import eval_node
-from gamma.result_card import ResultCard, FakeResultCard, MultiResultCard
 import gamma.diffsteps
 import gamma.intsteps
 from extension.ntheory.totient import totient_card
-
+from gamma.evaluator import eval_node
+from gamma.result_card import FakeResultCard, MultiResultCard, ResultCard
 
 # Formatting functions
 _function_formatters = {}
@@ -202,7 +202,8 @@ def eval_plot(components, parameters=None):
     xmin, xmax = parameters.get('xmin', -10), parameters.get('xmax', 10)
     pmin, pmax = parameters.get('tmin', 0), parameters.get('tmax', 2 * sympy.pi)
     tmin, tmax = parameters.get('tmin', 0), parameters.get('tmax', 10)
-    from sympy.plotting.plot import LineOver1DRangeSeries, Parametric2DLineSeries
+    from sympy.plotting.plot import (LineOver1DRangeSeries,
+                                     Parametric2DLineSeries)
     functions = components["input_evaluated"]
     if isinstance(functions, sympy.Basic):
         functions = [(functions, 'xy')]
@@ -595,7 +596,7 @@ all_cards: dict[str, ResultCard] = {
 }
 
 
-def get_card(name):
+def get_card(name: str) -> ResultCard:
     return all_cards[name]
 
 
