@@ -30,9 +30,9 @@ const wrapper = (() => {
   }
 })()
 
-const ev = wrapper('ev')
-const evcd = wrapper('evcd')
+const evalInput = wrapper('eval_input')
+const evalCard = wrapper('eval_card')
 const getPyodideVersion = wrapper('getPyodideVersion')
-const getSymPyVersion = wrapper('getSymPyVersion')
+const getSymPyVersion = wrapper('get_sympy_version')
 
-export { ev, evcd, register, getPyodideVersion, getSymPyVersion }
+export { evalInput, evalCard, register, getPyodideVersion, getSymPyVersion }

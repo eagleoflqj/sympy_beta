@@ -26,21 +26,12 @@ async function loadPyodideAndPackages () {
   const config = { kernelName, kernelVersion }
   self.pyodide.registerJsModule('config', config)
   await self.pyodide.runPythonAsync(`
-    import traceback
     from config import kernelName, kernelVersion
     import micropip
     await micropip.install(f'/{kernelName}-{kernelVersion}-py3-none-any.whl')
-    from gamma.logic import SymPyGamma
-    def getSymPyVersion():
-      from sympy import __version__
-      return __version__
-    def ev(expression, variable):
-        return SymPyGamma(expression, variable).eval()
-    def evcd(card_name, expression, variable, parameters):
-        try:
-            return SymPyGamma(expression, variable).eval_card(card_name, parameters.to_py())
-        except Exception as e:
-            return {'error': traceback.format_exc()}
+    from api import eval_input, eval_card as eval_card_inner, get_sympy_version
+    def eval_card(card_name, expression, variable, parameters):
+        return eval_card_inner(card_name, expression, variable, parameters.to_py())
   `)
   self.postMessage({ stage: 'KERNEL_LOADED' })
 }
@@ -50,21 +41,16 @@ const pyodideReadyPromise = loadPyodideAndPackages()
 self.onmessage = async (event) => {
   await pyodideReadyPromise
   const { id, func, args } = event.data
-  try {
-    if (func === 'getPyodideVersion') {
-      self.postMessage({ id, result: self.pyodide.version })
-      return
-    }
-    const f = self.pyodide.globals.get(func)
-    const tempResult = f(...args)
-    if (self.pyodide.isPyProxy(tempResult)) {
-      const result = tempResult.toJs({ dict_converter: Object.fromEntries })
-      tempResult.destroy()
-      self.postMessage({ id, result })
-    } else {
-      self.postMessage({ id, result: tempResult })
-    }
-  } catch (error) {
-    self.postMessage({ error: error.message })
+  if (func === 'getPyodideVersion') {
+    self.postMessage({ id, result: self.pyodide.version })
+    return
   }
+  const f = self.pyodide.globals.get(func)
+  let result = f(...args)
+  if (self.pyodide.isPyProxy(result)) {
+    const tempResult = result
+    result = result.toJs({ dict_converter: Object.fromEntries })
+    tempResult.destroy()
+  }
+  self.postMessage({ id, result })
 }

@@ -202,8 +202,7 @@ def eval_plot(components, parameters=None):
     xmin, xmax = parameters.get('xmin', -10), parameters.get('xmax', 10)
     pmin, pmax = parameters.get('tmin', 0), parameters.get('tmax', 2 * sympy.pi)
     tmin, tmax = parameters.get('tmin', 0), parameters.get('tmax', 10)
-    from sympy.plotting.plot import (LineOver1DRangeSeries,
-                                     Parametric2DLineSeries)
+    from sympy.plotting.plot import LineOver1DRangeSeries, Parametric2DLineSeries
     functions = components["input_evaluated"]
     if isinstance(functions, sympy.Basic):
         functions = [(functions, 'xy')]

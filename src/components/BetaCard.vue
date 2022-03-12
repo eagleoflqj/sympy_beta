@@ -2,14 +2,14 @@
 import { ref, reactive, onMounted, toRaw } from 'vue'
 import { NButton, NSpace, NSpin, NCard, NCode } from 'naive-ui'
 import { Eye, EyeSlash } from '@vicons/fa'
-import { evcd } from '@/js/workerAPI.js'
+import { evalCard } from '@/js/workerAPI.js'
 import { Plot2D } from '@/js/plot.js'
 import BetaAmbiguity from '@/components/BetaAmbiguity.vue'
 import BetaContainer from '@/components/BetaContainer.vue'
 import BetaOption from '@/components/BetaOption.vue'
 
 const props = defineProps({
-  cell: {
+  card: {
     type: Object,
     default: () => {}
   },
@@ -23,7 +23,7 @@ const props = defineProps({
   }
 })
 
-const { cell, input } = toRaw(props)
+const { card, input } = toRaw(props)
 
 const cardResult = reactive({})
 
@@ -31,23 +31,23 @@ let digits = 15
 const numericCallbacks = reactive([])
 
 onMounted(async () => {
-  if (typeof cell.card === 'undefined') {
-    if (cell.ambiguity) {
+  if (typeof card.name === 'undefined') {
+    if (card.ambiguity || card.error) {
       return
     }
     const numerics = []
-    if (cell.output.numeric) {
-      numerics.push(cell.output)
-    } else if (cell.output.list) {
-      cell.output.list.forEach(item => item.numeric && numerics.push(item))
+    if (card.output.numeric) {
+      numerics.push(card.output)
+    } else if (card.output.list) {
+      card.output.list.forEach(item => item.numeric && numerics.push(item))
     }
     numerics.forEach(item => numericCallbacks.push(async () =>
-      Object.assign(item, await evcd('approximator', item.expression, 'x', { digits }))))
+      Object.assign(item, await evalCard('approximator', item.expression, 'x', { digits }))))
   } else {
-    const hasDigits = cell.parameters.indexOf('digits') >= 0
+    const hasDigits = card.parameters.indexOf('digits') >= 0
     const evaluate = async () => {
       const parameters = hasDigits ? { digits } : {}
-      Object.assign(cardResult, await evcd(cell.card, input, cell.variable, parameters))
+      Object.assign(cardResult, await evalCard(card.name, input, card.variable, parameters))
     }
     evaluate()
     if (hasDigits) {
@@ -66,7 +66,7 @@ const colors = d3.scale.category10()
 
 function getPlot (container) {
   plot = new Plot2D(container, cardResult.graphs, async (parameters) => {
-    const { graphs } = await evcd(cell.card, input, cell.variable, parameters)
+    const { graphs } = await evalCard(card.name, input, card.variable, parameters)
     return graphs
   })
   return plot
@@ -112,15 +112,15 @@ function toggleFullscreen (event) {
 const step = ref(null)
 
 async function seeSteps () {
-  if (cell.card === 'diff') {
+  if (card.name === 'diff') {
     step.value = {
       title: 'Derivative Steps',
-      output: await evcd('diffsteps', input, cell.variable, {})
+      output: await evalCard('diffsteps', input, card.variable, {})
     }
-  } else if (cell.card === 'integral_alternate') {
+  } else if (card.name === 'integral_alternate') {
     step.value = {
       title: 'Integral Steps',
-      output: await evcd('intsteps', input, cell.variable, {})
+      output: await evalCard('intsteps', input, card.variable, {})
     }
   }
 }
@@ -128,30 +128,30 @@ async function seeSteps () {
 
 <template>
   <beta-ambiguity
-    v-if="cell.ambiguity"
-    :ambiguity="cell.ambiguity"
-    :description="cell.description"
+    v-if="card.ambiguity"
+    :ambiguity="card.ambiguity"
+    :description="card.description"
   />
   <n-card
     v-else
-    :title="cell.title"
+    :title="card.title"
     :class="['result_card', {
-      result_card_error: cell.error || cell.exception_info || cardResult && cardResult.error,
+      result_card_error: card.error || cardResult && cardResult.error,
       fullscreen: isFullscreen
     }]"
     @keyup.esc="toggleFullscreen"
   >
-    <div v-if="cell.input">
+    <div v-if="card.input">
       <n-code
-        v-if="typeof cell.input === 'string'"
-        :code="cell.input"
+        v-if="typeof card.input === 'string'"
+        :code="card.input"
         language="python"
         inline
         style="word-break: break-all"
       />
       <template v-else>
         plot([
-        <template v-for="f, index in cell.input">
+        <template v-for="f, index in card.input">
           {{ index ? ", " : "" }}
           <span
             :style="{ color: colors(index), cursor: 'pointer' }"
@@ -172,17 +172,17 @@ async function seeSteps () {
 
     <div class="cell_output">
       <vue-mathjax
-        v-if="cell.pre_output"
-        :formula="'$' + cell.pre_output + ' = $'"
+        v-if="card.pre_output"
+        :formula="'$' + card.pre_output + ' = $'"
       />
-      <template v-if="cell.output">
-        <beta-container :card="cell.output" />
-        <div v-if="cell.num_variables > 1">
+      <template v-if="card.output">
+        <beta-container :card="card.output" />
+        <div v-if="card.num_variables > 1">
           Evaluate with respect to …
           <n-space>
             <n-button
-              v-for="variable in cell.variables"
-              :disabled="variable === cell.variable"
+              v-for="variable in card.variables"
+              :disabled="variable === card.variable"
               type="primary"
               @click="chooseVariable(variable)"
             >
@@ -191,10 +191,7 @@ async function seeSteps () {
           </n-space>
         </div>
       </template>
-      <template v-else-if="cell.card">
-        <div v-if="cell.cell_output">
-          {{ cell.cell_output }}
-        </div>
+      <template v-else-if="card.name">
         <div
           v-if="cardResult.error"
           class="cell_output_plain"
@@ -215,22 +212,11 @@ async function seeSteps () {
           />
         </div>
       </template>
-      <template v-else-if="cell.exception_info">
-        <!-- {% if cell.exception_info.input_start %}
-      <div class="cell_output_plain">
-        <span>{{ cell.exception_info.input_start }}</span>
-        <span>{{ cell.exception_info.input_end }}</span>
-      </div>
-      {% endif %}
       <div
-        class="cell_output_plain"
-        >{% if cell.exception_info.offset %}{{ cell.exception_info.offset }}: {% endif %}{{ cell.exception_info.msg }}</div>-->
-      </template>
-      <div
-        v-else-if="cell.error"
+        v-else-if="card.error"
         class="cell_output_plain"
       >
-        {{ cell.error }}
+        {{ card.error }}
       </div>
     </div>
     <beta-option
@@ -239,15 +225,15 @@ async function seeSteps () {
       :callback="moreDigits"
     />
     <beta-option
-      v-if="(cell.card === 'diff' || cell.card === 'integral_alternate') && step === null"
+      v-if="(card.name === 'diff' || card.name === 'integral_alternate') && step === null"
       name="See Steps"
       :callback="seeSteps"
     />
   </n-card>
   <beta-card
     v-if="step !== null"
-    :cell="step"
-    :input="cell.input"
+    :card="step"
+    :input="card.input"
   />
 </template>
 

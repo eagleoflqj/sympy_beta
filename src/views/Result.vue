@@ -2,7 +2,7 @@
 import { ref, reactive, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { NSpace, NSpin } from 'naive-ui'
-import { ev } from '@/js/workerAPI.js'
+import { evalInput } from '@/js/workerAPI.js'
 import BetaSearch from '@/components/BetaSearch.vue'
 import BetaCard from '@/components/BetaCard.vue'
 import { homepage } from '@/../package.json'
@@ -10,18 +10,20 @@ import { homepage } from '@/../package.json'
 const route = useRoute()
 const expr = ref('')
 const variableRef = ref(null)
-const result = reactive([])
+const cards = reactive([])
 
 watchEffect(async () => {
   if (typeof route.params.expr === 'undefined') {
     return
   }
   expr.value = route.params.expr
-  result.splice(0)
-  result.push(...await ev(expr.value, variableRef.value))
-
-  // TODO: finish integration with Sphinx
-  // setupDocumentation();
+  cards.splice(0)
+  const { result, error } = await evalInput(expr.value, variableRef.value)
+  if (result) {
+    cards.push(...result)
+  } else {
+    cards.push({ error })
+  }
 })
 
 function chooseVariable (variable) {
@@ -36,14 +38,14 @@ function chooseVariable (variable) {
   >
     <beta-search />
     <div
-      v-if="result.length === 0"
+      v-if="cards.length === 0"
       style="text-align: center"
     >
       <n-spin />
     </div>
     <beta-card
-      v-for="cell in result"
-      :cell="cell"
+      v-for="card in cards"
+      :card="card"
       :input="expr"
       :choose-variable="chooseVariable"
     />

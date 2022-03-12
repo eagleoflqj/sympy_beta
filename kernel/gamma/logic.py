@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import ast
-import traceback
 from typing import Any
 
 import sympy
 from sympy.core.function import FunctionClass
 from sympy.parsing.sympy_parser import eval_expr, stringify_expr
 
-from gamma.dispatch import find_result_set
+from gamma.dispatch import DICT, find_result_set
 from gamma.evaluator import namespace, transformations
 from gamma.resultsets import find_learn_more_set, format_by_type, get_card
 from gamma.utils import OTHER_SYMPY_FUNCTIONS, latexify, removeSymPy
@@ -61,16 +60,7 @@ class SymPyGamma:
         self.evaluated = eval_expr(self.parsed, {}, namespace)
         self.top_node = ast.parse(self.parsed).body[0].value
 
-    def eval(self):
-        try:
-            return self.prepare_cards()
-        except Exception:
-            return self.handle_error()
-
-    def handle_error(self):
-        return [{"title": "Error", "input": self.expression, "error": traceback.format_exc()}]
-
-    def disambiguate(self):
+    def disambiguate(self) -> DICT | None:
         if isinstance(self.top_node, ast.Call) and isinstance(self.top_node.func, ast.Name) \
                 and self.top_node.func.id == 'factor' and self.top_node.args:
             arg = self.top_node.args[0]
@@ -98,7 +88,7 @@ class SymPyGamma:
 
         return components, cards, top_func_name if is_imperative else ''
 
-    def prepare_cards(self):
+    def eval(self) -> DICT:
         components, cards, top_func_name = self.get_cards()
         if self.variable is not None:
             components['variable'] = sympy.Symbol(self.variable)
@@ -146,15 +136,14 @@ class SymPyGamma:
         if top_func_name != 'simplify':
             simplified = sympy.simplify(self.evaluated) if isinstance(self.evaluated, sympy.Basic) else None
             if simplified is not None and simplified != self.evaluated:
-                result.append(
-                    {"title": "Simplification", "input": repr(simplified),
-                     "output": mathjax_latex(simplified)})
+                result.append({"title": "Simplification", "input": repr(simplified),
+                               "output": mathjax_latex(simplified, digits=None)})
 
         for card_name in cards:
             card = get_card(card_name)
 
             result.append({
-                'card': card_name,
+                'name': card_name,
                 'variable': repr(var),
                 'title': card.format_title(self.evaluated),
                 'input': card.format_input(components),
@@ -169,7 +158,7 @@ class SymPyGamma:
                 "input": '',
                 "output": learn_more
             })
-        return result
+        return {'result': result}
 
     def eval_card(self, card_name: str, parameters=None):
         card = get_card(card_name)

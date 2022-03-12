@@ -1,13 +1,8 @@
 import sympy
-from sympy.integrals.manualintegrate import (AddRule, AlternativeRule,
-                                             ArctanRule, ConstantRule,
-                                             ConstantTimesRule,
-                                             CyclicPartsRule, DontKnowRule,
-                                             ExpRule, PartsRule, PiecewiseRule,
-                                             PowerRule, ReciprocalRule,
-                                             RewriteRule, TrigRule, URule,
-                                             _manualintegrate, evaluates,
-                                             integral_steps)
+from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, ArctanRule, ConstantRule, ConstantTimesRule,
+                                             CyclicPartsRule, DontKnowRule, ExpRule, PartsRule, PiecewiseRule,
+                                             PowerRule, ReciprocalRule, RewriteRule, TrigRule, URule, _manualintegrate,
+                                             evaluates, integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
 

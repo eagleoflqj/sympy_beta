@@ -1,6 +1,6 @@
 import pytest
 
-from gamma.logic import SymPyGamma
+from api import eval_card
 
 cases = [
     (('digits', '12', None, None),
@@ -119,13 +119,12 @@ cases = [
 @pytest.mark.parametrize('args, expected', cases)
 def test(args: tuple, expected: dict):
     card_name, expression, variable, parameters = args
-    g = SymPyGamma(expression, variable)
-    actual = g.eval_card(card_name, parameters)
+    actual = eval_card(card_name, expression, variable, parameters)
     assert actual == expected
 
 
 def test_plot():
-    actual = SymPyGamma('x', 'x').eval_card('plot', {'xmin': 10, 'xmax': 30})
+    actual = eval_card('plot', 'x', 'x', {'xmin': 10, 'xmax': 30})
     assert actual['type'] == 'Plot'
     graph = actual['graphs'][0]
     assert graph['type'] == 'xy'
