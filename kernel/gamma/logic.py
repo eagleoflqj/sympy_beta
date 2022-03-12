@@ -141,6 +141,8 @@ class SymPyGamma:
 
         for card_name in cards:
             card = get_card(card_name)
+            if not card.applicable(components):
+                continue
 
             result.append({
                 'name': card_name,

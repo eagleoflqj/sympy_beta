@@ -1,7 +1,13 @@
-from sympy import Mul, Pow, factorint, latex
+from sympy import Integer, Mul, Pow, factorint, latex
 
 from extension.util import Latex, format_latex, t
+from gamma.dispatch import DICT
 from gamma.result_card import FakeResultCard
+
+
+def applicable(components: DICT) -> bool:
+    n = components['input_evaluated']
+    return isinstance(n, Integer) and n > 0
 
 
 def totient_step(n: int) -> str:
@@ -36,4 +42,5 @@ def eval_totient(components, parameters=None):
     return totient_step(n)
 
 
-totient_card = FakeResultCard("Step", "totient(%s)", None, eval_method=eval_totient, format_output=format_latex)
+totient_card = FakeResultCard("Step", "totient(%s)", None, eval_method=eval_totient, format_output=format_latex,
+                              applicable=applicable)

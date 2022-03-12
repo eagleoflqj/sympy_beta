@@ -68,6 +68,12 @@ class ResultCard:
                 kwargs.setdefault(arg, '')
         return kwargs
 
+    def applicable(self, components: DICT):
+        inner = self.card_info.get('applicable')
+        if not inner:
+            return True
+        return inner(components)
+
     def __repr__(self):
         return "<ResultCard '{}'>".format(self.title)
 

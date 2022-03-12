@@ -284,24 +284,7 @@ def eval_plot(components, parameters=None):
 
 def eval_factorization(components, parameters=None):
     number = components["input_evaluated"]
-    if number == 0:
-        raise ValueError("Can't factor 0")
-    factors = sympy.ntheory.factorint(number, limit=100)
-    return {factor: exp for factor, exp in factors.items() if factor <= 100}
-
-
-def eval_factorization_diagram(components, parameters=None):
-    # Raises ValueError (stops card from appearing) if the factors are too
-    # large so that the diagram will look nice
-    number = int(components["input_evaluated"])
-    if number > 256:
-        raise ValueError("Number too large")
-    elif number == 0:
-        raise ValueError("Can't factor 0")
-    factors = sympy.ntheory.factorint(number, limit=101)
-    if any(factor > 256 for factor in factors):
-        raise ValueError("Number too large")
-    return factors
+    return sympy.ntheory.factorint(number)
 
 
 def eval_integral(components, parameters=None):
@@ -439,21 +422,23 @@ all_cards: dict[str, ResultCard] = {
         format_input=format_long_integer),
 
     'factorization': FakeResultCard(
-        "Factors less than 100",
-        "factorint(%s, limit=100)",
+        "Factors",
+        "factorint(%s)",
         None,
         multivariate=False,
+        applicable=lambda components: components['input_evaluated'] > 0,
         format_input=format_long_integer,
         format_output=format_dict_title("Factor", "Times"),
         eval_method=eval_factorization),
 
     'factorizationDiagram': FakeResultCard(
         "Factorization Diagram",
-        "factorint(%s, limit=256)",
+        "factorint(%s)",
         None,
         multivariate=False,
+        applicable=lambda components: 0 < components['input_evaluated'] <= 256,
         format_output=format_factorization_diagram,
-        eval_method=eval_factorization_diagram),
+        eval_method=eval_factorization),
 
     'float_approximation': ResultCard(
         "Floating-point approximation",
