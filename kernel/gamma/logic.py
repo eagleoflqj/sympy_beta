@@ -133,7 +133,7 @@ class SymPyGamma:
             cards = ['float_approximation'] + cards
 
         var = components['variable']
-        if top_func_name != 'simplify':
+        if top_func_name not in ('factor', 'simplify'):
             simplified = sympy.simplify(self.evaluated) if isinstance(self.evaluated, sympy.Basic) else None
             if simplified is not None and simplified != self.evaluated:
                 result.append({"title": "Simplification", "input": repr(simplified),
