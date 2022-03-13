@@ -34,8 +34,8 @@ class ResultCard:
 
         variable = components['variable']
 
-        line = self.result_statement.format(_var=variable, **parameters)
-        line = line % components['input_evaluated']
+        line = self.result_statement.format(_var=variable, **parameters) % components['input_evaluated']\
+            if self.result_statement is not None else components['expression']
         return sympy.parse_expr(line, global_dict=namespace)
 
     def format_input(self, components: DICT, **parameters):
@@ -94,7 +94,7 @@ class FakeResultCard(ResultCard):
 class MultiResultCard(ResultCard):
     """Tries multiple statements and displays the first that works."""
 
-    def __init__(self, title, *cards):
+    def __init__(self, title, *cards: ResultCard):
         super().__init__(title, '', lambda *args: '')
         self.cards = cards
         self.cards_used = []

@@ -7,6 +7,7 @@ from sympy.core.symbol import Symbol
 
 import gamma.diffsteps
 import gamma.intsteps
+from extension.ntheory.is_prime import is_prime_card
 from extension.ntheory.totient import totient_card
 from gamma.evaluator import eval_node
 from gamma.result_card import FakeResultCard, MultiResultCard, ResultCard
@@ -358,6 +359,7 @@ def eval_approximator(components, parameters=None):
 # Result cards
 
 all_cards: dict[str, ResultCard] = {
+    'result': ResultCard('Result', None, None, format_input=lambda line, result, components: components['expression']),
     'roots': ResultCard(
         "Roots",
         "solve(%s, {_var})",
@@ -576,6 +578,7 @@ all_cards: dict[str, ResultCard] = {
         eval_method=eval_approximator,
         format_output=format_approximator
     ),
+    'is_prime': is_prime_card,
     'totient': totient_card,
 }
 

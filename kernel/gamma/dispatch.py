@@ -212,6 +212,7 @@ function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
     'diff': (extract_derivative, ('diff',)),
     'factorint': (extract_first, ('factorization', 'factorizationDiagram')),
+    'isprime': (extract_first, ('result', 'is_prime',)),
     'totient': (extract_first, ('totient',)),
     'help': (extract_first, ('function_docs',)),
     'plot': (extract_plot, ('plot',)),

@@ -85,6 +85,7 @@ class SymPyGamma:
 
         convert_input, cards = find_result_set(top_func_name, self.evaluated, is_imperative)
         components = convert_input(self.top_node, self.evaluated)
+        components['expression'] = self.expression
 
         return components, cards, top_func_name if is_imperative else ''
 
