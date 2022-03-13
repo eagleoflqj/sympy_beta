@@ -22,6 +22,7 @@ jobs:
         run: |
           isort -c .
           flake8 .
+          pyright api extension test
       - name: Run integration tests
         run: |
           pytest --cov=gamma --cov=extension -n auto test
