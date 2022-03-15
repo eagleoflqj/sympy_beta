@@ -11,13 +11,14 @@
   },
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "dev": "node scripts/build_wheel.js . && vite",
+    "dev": "node scripts/build_wheel.js . && vite --host",
     "lint": "eslint --ext .js,.vue --fix public scripts src",
     "build": "vite build && node scripts/build_wheel.js dist",
     "serve": "vite preview"
   },
   "dependencies": {
     "jquery.terminal": "^2.32.0",
+    "markdown-escape": "^1.1.0",
     "vue": "^3.2.31",
     "vue-mathjax-next": "0.0.4",
     "vue-router": "^4.0.12"

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import { NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop } from 'naive-ui'
+import { NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop, NMessageProvider } from 'naive-ui'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
@@ -33,7 +33,9 @@ watchEffect(() => {
     <n-layout-content :style="showFooter && {flex: '1 0 auto', backgroundColor: '#eee'}">
       <router-view v-slot="{ Component }">
         <keep-alive>
-          <component :is="Component" />
+          <n-message-provider>
+            <component :is="Component" />
+          </n-message-provider>
         </keep-alive>
       </router-view>
     </n-layout-content>

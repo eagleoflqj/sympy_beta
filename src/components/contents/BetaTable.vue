@@ -1,12 +1,13 @@
 <script setup>
 import { NTable, NScrollbar } from 'naive-ui'
 import BetaContainer from '@/components/BetaContainer.vue'
+import BetaCopyMarkdownButton from '@/components/BetaCopyMarkdownButton.vue'
 import { onMounted } from 'vue'
 
 const props = defineProps({
   card: {
     type: Object,
-    default: () => {}
+    required: true
   }
 })
 
@@ -14,7 +15,7 @@ const maxNRow = 10
 onMounted(() => {
   const { card } = props
   const nColumn = Math.ceil(card.rows.length / maxNRow)
-  card.titles.splice(0, card.titles.length, ...[].concat(...new Array(nColumn).fill(card.titles)))
+  card.titles.splice(0, card.titles.length, ...[].concat(...Array(nColumn).fill(card.titles)))
   const remainingRows = card.rows.splice(maxNRow)
   for (const i in remainingRows) {
     const j = i % maxNRow
@@ -24,6 +25,15 @@ onMounted(() => {
 </script>
 
 <template>
+  <div
+    style="
+  text-align: right"
+  >
+    <beta-copy-markdown-button
+      :thead="card.titles"
+      :tbody="card.rows"
+    />
+  </div>
   <n-scrollbar x-scrollable>
     <n-table style="width: 0; margin: auto">
       <thead>
