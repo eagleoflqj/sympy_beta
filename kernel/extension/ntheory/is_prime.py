@@ -1,11 +1,11 @@
 from sympy import Integer, factorint, floor, latex, primerange, sqrt
 
 from extension.ntheory.util import cross_mul, is_positive_integer, is_prime_from_factor_dict, pow_list_from_factor_dict
-from extension.util import Latex, format_latex
-from gamma.dispatch import DICT
+from extension.util import Latex, format_latex, take_int_input
 from gamma.result_card import FakeResultCard
 
 
+@take_int_input
 def is_prime_step(n: int) -> str:
     L = Latex()
     if n == 1:
@@ -54,10 +54,5 @@ def is_prime_step(n: int) -> str:
     return L.f()
 
 
-def eval_is_prime(components: DICT, parameters=None) -> str:
-    n = int(components['input_evaluated'])
-    return is_prime_step(n)
-
-
-is_prime_card = FakeResultCard("Step", "isprime(%s)", None, eval_method=eval_is_prime, format_output=format_latex,
+is_prime_card = FakeResultCard("Step", "isprime(%s)", None, eval_method=is_prime_step, format_output=format_latex,
                                applicable=is_positive_integer)

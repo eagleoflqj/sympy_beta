@@ -1,3 +1,8 @@
+from typing import Any, Callable
+
+from gamma.dispatch import DICT
+
+
 def t(text: str) -> str:
     return R'\text{' + text + '}'
 
@@ -38,3 +43,9 @@ def format_latex(tex: str, formatter=None):
         'type': 'Tex',
         'tex': tex
     }
+
+
+def take_int_input(inner: Callable[[int], str]) -> Callable[[DICT, Any], str]:
+    def wrapper(components: DICT, parameters: None) -> str:
+        return inner(int(components['input_evaluated']))
+    return wrapper
