@@ -60,7 +60,7 @@ class ResultCard:
         return self.title
 
     def is_multivariate(self):
-        return self.card_info.get('multivariate', True)
+        return self.card_info.get('multivariate', False)
 
     def default_parameters(self, kwargs):
         if 'parameters' in self.card_info:

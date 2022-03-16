@@ -201,14 +201,14 @@ result_cards: tuple
   If not empty, specifies a list of result cards to display.
 """
 
-Integer_result = (None, ('digits', 'factorization', 'factorizationDiagram'))
+factorial_result = (None, ('digits', 'factorization', 'factorizationDiagram'))
 
 CONVERTER = Callable[[Any, Any], DICT]
 
 function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
-    'Integer': Integer_result,
-    'factorial': Integer_result,
-    'factorial2': Integer_result,
+    'Integer': (None, ('digits', 'roman_numeral', 'factorization', 'factorizationDiagram')),
+    'factorial': factorial_result,
+    'factorial2': factorial_result,
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
     'diff': (extract_derivative, ('diff',)),
     'factorint': (extract_first, ('factorization', 'factorizationDiagram')),

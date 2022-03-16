@@ -29,7 +29,7 @@ def is_prime_step(n: int) -> str:
                     L.n()
                 digits = list(int(d) for d in str(m))
                 sum_of_digits = sum(digits)
-                L.t('The sum of digits of ').a(m).t(' is ').a('+'.join(str(m)), '=', sum_of_digits)
+                L.t('The sum of digits of ').a(m).t(' is ').eq('+'.join(str(m)), sum_of_digits)
                 m = sum_of_digits
             L.t(', which is a multiple of 3').n()
             L.t('So ').a(n).t(' is a multiple of 3')

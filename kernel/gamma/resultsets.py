@@ -7,6 +7,7 @@ from sympy.core.symbol import Symbol
 
 import gamma.diffsteps
 import gamma.intsteps
+from extension.elementary.roman_numeral import roman_numeral_card
 from extension.ntheory.is_prime import is_prime_card
 from extension.ntheory.totient import totient_card
 from gamma.evaluator import eval_node
@@ -580,6 +581,7 @@ all_cards: dict[str, ResultCard] = {
     ),
     'is_prime': is_prime_card,
     'totient': totient_card,
+    'roman_numeral': roman_numeral_card,
 }
 
 
