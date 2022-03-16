@@ -13,6 +13,8 @@ cases = [
        'input': 'len(str(12))', 'pre_output': '', 'parameters': []},
       {'name': 'roman_numeral', 'variable': 'None', 'title': 'Roman numeral', 'input': '12', 'pre_output': '',
        'parameters': []},
+      {'name': 'binary_form', 'variable': 'None', 'title': 'Binary form', 'input': 'np.base_repr(12)', 'pre_output': '',
+       'parameters': []},
       {'name': 'factorization', 'variable': 'None', 'title': 'Factors',
        'input': 'factorint(12)', 'pre_output': '', 'parameters': []},
       {'name': 'factorizationDiagram', 'variable': 'None', 'title': 'Factorization Diagram',
