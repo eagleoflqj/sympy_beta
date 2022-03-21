@@ -23,7 +23,7 @@ const markdownText = computed(() => {
 })
 
 function escape (text) {
-  return escapeMarkdown(text).replace('|', '\\|')
+  return escapeMarkdown(text).replace(/\|/g, '\\|')
 }
 
 function arrayToMarkdown (array) {

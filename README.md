@@ -12,6 +12,7 @@ Originally,
 SymPy Beta = SymPy Gamma + (Pyodide - GAE - django) + (Vue + NaiveUI - jQuery)
 
 Since 0.5.0, the Pyodide Shell is added (and jQuery is back for using jQuery Terminal)
+Since 0.6.0, extra functionalities are added to the kernel. See [kernel extension](kernel/extension)
 
 SymPy Beta is NOT an official SymPy project.
 # Debug
