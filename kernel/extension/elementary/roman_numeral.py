@@ -35,5 +35,5 @@ def int_to_roman_numeral(n: int) -> str:
     return R'\mathrm{' + ret + '}'
 
 
-roman_numeral_card = FakeResultCard("Roman numeral", "%s", None, eval_method=int_to_roman_numeral,
+roman_numeral_card = FakeResultCard("Roman numeral", None, None, eval_method=int_to_roman_numeral,
                                     format_output=format_latex, applicable=between_1_and_3999)

@@ -17,23 +17,24 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "jquery.terminal": "^2.32.0",
+    "jquery.terminal": "^2.32.1",
     "markdown-escape": "^1.1.0",
     "vue": "^3.2.31",
     "vue-mathjax-next": "0.0.4",
-    "vue-router": "^4.0.12"
+    "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@vicons/fa": "^0.12.0",
+    "@vicons/material": "^0.12.0",
     "@vicons/tabler": "^0.12.0",
-    "@vitejs/plugin-vue": "^2.2.0",
-    "eslint": "^8.9.0",
+    "@vitejs/plugin-vue": "^2.2.4",
+    "eslint": "^8.11.0",
     "eslint-config-standard": "^17.0.0-0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-vue": "^8.4.1",
-    "naive-ui": "^2.25.2",
-    "vite": "^2.8.1"
+    "eslint-plugin-vue": "^8.5.0",
+    "naive-ui": "^2.26.4",
+    "vite": "^2.8.6"
   }
 }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sympy
 
 from gamma.dispatch import DICT
@@ -15,7 +17,7 @@ class ResultCard:
     pre_output_function -- Takes input expression and a symbol, returns a
     SymPy object
     """
-    def __init__(self, title, result_statement, pre_output, **kwargs):
+    def __init__(self, title, result_statement: str | None, pre_output, **kwargs):
         self.card_info = kwargs
         self.title = title
         self.result_statement = result_statement
@@ -47,17 +49,13 @@ class ResultCard:
         if 'format_input' in self.card_info:
             return self.card_info['format_input'](
                 self.result_statement, input_repr, components)
-        return self.result_statement.format(_var=variable, **parameters) % input_repr
+        return None if self.result_statement is None \
+            else self.result_statement.format(_var=variable, **parameters) % input_repr
 
     def format_output(self, output, formatter):
         if 'format_output' in self.card_info:
             return self.card_info['format_output'](output, formatter)
         return formatter(output)
-
-    def format_title(self, input_evaluated):
-        if self.card_info.get('format_title'):
-            return self.card_info['format_title'](self.title, input_evaluated)
-        return self.title
 
     def is_multivariate(self):
         return self.card_info.get('multivariate', False)

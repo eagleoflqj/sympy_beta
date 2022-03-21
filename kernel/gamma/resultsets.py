@@ -8,6 +8,7 @@ from sympy.core.symbol import Symbol
 import gamma.diffsteps
 import gamma.intsteps
 from extension.elementary.binary_form import binary_form_card
+from extension.elementary.chinese_numeral import chinese_numeral_card
 from extension.elementary.roman_numeral import roman_numeral_card
 from extension.ntheory.is_prime import is_prime_card
 from extension.ntheory.totient import totient_card
@@ -584,6 +585,7 @@ all_cards: dict[str, ResultCard] = {
     'totient': totient_card,
     'roman_numeral': roman_numeral_card,
     'binary_form': binary_form_card,
+    'chinese_numeral': chinese_numeral_card,
 }
 
 

@@ -38,14 +38,14 @@ class Latex:
         return ''.join(self.buffer)
 
 
-def format_latex(tex: str, formatter=None):
+def format_latex(tex: str, formatter=None) -> DICT:
     return {
         'type': 'Tex',
         'tex': tex
     }
 
 
-def take_int_input(inner: Callable[[int], str]) -> Callable[[DICT, Any], str]:
-    def wrapper(components: DICT, parameters: None) -> str:
+def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:
+    def wrapper(components: DICT, parameters: None) -> Any:
         return inner(int(components['input_evaluated']))
     return wrapper
