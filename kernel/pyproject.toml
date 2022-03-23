@@ -1,0 +1,3 @@
+[tool.pyright]
+include = ["api", "extension", "gamma", "test"]
+exclude = ["gamma/pre_exec.py", "gamma/resultsets.py"]

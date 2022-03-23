@@ -129,6 +129,14 @@ cases = [
      [{'title': 'SymPy', 'input': 'π', 'output': {'type': 'Tex', 'tex': '\\pi'}},
       {'name': 'float_approximation', 'variable': 'None', 'title': 'Floating-point approximation',
        'input': '(pi).evalf()', 'pre_output': '', 'parameters': ['digits']}]),
+    ('factor(12)',
+     [{'ambiguity': 'factorint(12)',
+       'description': [{'type': 'Expression', 'value': 'factor'},
+                       {'type': 'Text', 'value': ' factors polynomials, while '},
+                       {'type': 'Expression', 'value': 'factorint'},
+                       {'type': 'Text', 'value': ' factors integers.'}]},
+      {'title': 'SymPy', 'input': 'factor(12)', 'output': {'type': 'Tex', 'tex': '\\mathrm{Factorization~of~}12'}},
+      {'title': 'Result', 'input': 'factor(12)', 'output': {'type': 'Tex', 'tex': '12'}}]),
 ]
 
 

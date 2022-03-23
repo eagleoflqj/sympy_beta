@@ -7,6 +7,7 @@ from sympy.core.symbol import Symbol
 
 import gamma.diffsteps
 import gamma.intsteps
+from api.data_type import Document, FactorDiagram, List, Plot, Reference, Table, TruthTable
 from extension.elementary.binary_form import binary_form_card
 from extension.elementary.chinese_numeral import chinese_numeral_card
 from extension.elementary.roman_numeral import roman_numeral_card
@@ -49,11 +50,8 @@ def format_by_type(result, function_name, node, formatter):
         return formatter(result)
 
 
-def format_nothing(arg, formatter):
-    return {
-        'type': 'Document',
-        'html': arg
-    }
+def format_document(arg: str, formatter):
+    return Document(html=arg)
 
 
 def format_steps(arg, formatter):
@@ -83,13 +81,9 @@ def format_function_docs_input(line, function, components):
     return line % function
 
 
-def format_dict_title(*title):
+def format_dict_title(*title: str):
     def _format_dict(dictionary, formatter):
-        data = {
-            'type': 'Table',
-            'titles': title,
-            'rows': []
-        }
+        data = Table(titles=title, rows=[])
         try:
             fdict = dictionary.items()
             if not any(isinstance(i, Symbol) for i in dictionary):
@@ -104,23 +98,15 @@ def format_dict_title(*title):
 
 def format_list(items, formatter):
     try:
-        return {
-            'type': 'List',
-            'list': [formatter(item) for item in items]
-        }
+        return List(list=[formatter(item) for item in items])
     except TypeError:  # not iterable, like None
         return formatter(items)
 
 
-def format_nested_list_title(*titles):
+def format_nested_list_title(*titles: str):
     def _format_nested_list_title(items, formatter):
         try:
-            data = {
-                'type': 'Table',
-                'titles': titles,
-                'rows': [[formatter(sub_item) for sub_item in item] for item in items]
-            }
-            return data
+            return Table(titles=titles, rows=[[formatter(sub_item) for sub_item in item] for item in items])
         except TypeError:  # not iterable, like None
             return formatter(items)
     return _format_nested_list_title
@@ -141,11 +127,8 @@ def format_series_fake_title(title, evaluated):
 def format_truth_table(table, formatter):
     # table is (variables, [(bool, bool...)] representing combination of values
     # and result
-    return {
-        'type': 'TruthTable',
-        'titles': [str(s) for s in table[0]] + ["Values"],
-        'rows': [[str(v) for v in entry] for entry in table[1]]
-    }
+    return TruthTable(titles=[str(s) for s in table[0]] + ["Values"],
+                      rows=[[str(v) for v in entry] for entry in table[1]])
 
 
 def format_approximator(approximation, formatter):
@@ -158,17 +141,11 @@ def format_factorization_diagram(factors, formatter):
     for prime in reversed(sorted(factors)):
         times = factors[prime]
         primes.extend([prime] * times)
-    return {
-        'type': 'FactorDiagram',
-        'primes': primes
-    }
+    return FactorDiagram(primes=primes)
 
 
-def format_plot(plot_data, formatter):
-    return {
-        'type': 'Plot',
-        **plot_data
-    }
+def format_plot(plot_data: tuple[str, list[dict]], formatter):
+    return Plot(variable=plot_data[0], graphs=plot_data[1])
 
 
 def format_plot_input(result_statement, input_repr, components):
@@ -280,10 +257,7 @@ def eval_plot(components, parameters=None):
             },
             'data': None
         })
-    return {
-        'variable': repr(variable),
-        'graphs': graphs
-    }
+    return repr(variable), graphs
 
 
 def eval_factorization(components, parameters=None):
@@ -518,7 +492,7 @@ all_cards: dict[str, ResultCard] = {
         multivariate=False,
         eval_method=eval_function_docs,
         format_input=format_function_docs_input,
-        format_output=format_nothing
+        format_output=format_document
     ),
 
     'root_to_polynomial': ResultCard(
@@ -626,7 +600,4 @@ def find_learn_more_set(function_name: str):
     urls = learn_more_sets.get(function_name)
     if urls is None:
         return None
-    return {
-        'type': 'Reference',
-        'links': urls
-    }
+    return Reference(links=urls)

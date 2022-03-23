@@ -1,5 +1,6 @@
 from typing import Any, Callable
 
+from api.data_type import Tex, _Tex
 from gamma.dispatch import DICT
 
 
@@ -38,11 +39,8 @@ class Latex:
         return ''.join(self.buffer)
 
 
-def format_latex(tex: str, formatter=None) -> DICT:
-    return {
-        'type': 'Tex',
-        'tex': tex
-    }
+def format_latex(tex: str, formatter=None) -> _Tex:
+    return Tex(tex=tex)
 
 
 def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:

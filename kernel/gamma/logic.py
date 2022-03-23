@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import ast
-from typing import Any
+from typing import Any, cast
 
 import sympy
 from sympy.core.function import FunctionClass
 from sympy.parsing.sympy_parser import eval_expr, stringify_expr
 
+from api.data_type import Tex, _Tex
 from gamma.dispatch import DICT, find_result_set
 from gamma.evaluator import namespace, transformations
 from gamma.resultsets import find_learn_more_set, format_by_type, get_card
@@ -19,7 +20,7 @@ def latex(expr: sympy.Basic | str | int) -> str:
         return ''
     if isinstance(expr, sympy.Basic):
         # solveset(sin(x)) click More Digits
-        expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))
+        expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
     return sympy.latex(expr)
 
 
@@ -29,7 +30,7 @@ def is_approximatable_constant(input_evaluated):
            and not input_evaluated.is_Integer and not input_evaluated.is_Float and input_evaluated.is_finite
 
 
-def mathjax_latex(*args, digits: int | None = 15):
+def mathjax_latex(*args, digits: int | None = 15) -> _Tex:
     tex_code = []
     for obj in args:
         if hasattr(obj, 'as_latex'):
@@ -37,18 +38,13 @@ def mathjax_latex(*args, digits: int | None = 15):
         else:
             tex_code.append(latex(obj))
 
-    result = {
-        'type': 'Tex',
-        'tex': ''.join(tex_code)
-    }
+    result = Tex(tex=''.join(tex_code))
     if digits is not None and len(args) == 1:
         obj = args[0]
         if is_approximatable_constant(obj):
-            result.update({
-                'numeric': True,
-                'expression': repr(obj),
-                'approximation': latex(obj.evalf(digits))
-            })
+            result['numeric'] = True
+            result['expression'] = repr(obj)
+            result['approximation'] = latex(obj.evalf(digits))
     return result
 
 
@@ -58,7 +54,7 @@ class SymPyGamma:
         self.variable = variable
         self.parsed = stringify_expr(expression, {}, namespace, transformations)
         self.evaluated = eval_expr(self.parsed, {}, namespace)
-        self.top_node = ast.parse(self.parsed).body[0].value
+        self.top_node = cast(ast.Expr, ast.parse(self.parsed).body[0]).value
 
     def disambiguate(self) -> DICT | None:
         if isinstance(self.top_node, ast.Call) and isinstance(self.top_node.func, ast.Name) \
@@ -66,7 +62,7 @@ class SymPyGamma:
             arg = self.top_node.args[0]
             if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name) and arg.func.id == 'Integer':
                 return {
-                    'ambiguity': 'factorint({})'.format(arg.args[0].value),
+                    'ambiguity': 'factorint({})'.format(cast(ast.Constant, arg.args[0]).value),
                     'description': [{'type': 'Expression', 'value': 'factor'},
                                     {'type': 'Text', 'value': ' factors polynomials, while '},
                                     {'type': 'Expression', 'value': 'factorint'},
@@ -75,8 +71,8 @@ class SymPyGamma:
         return None
 
     def get_cards(self):
-        is_applied = isinstance(self.top_node, ast.Call)
-        top_func_name = self.top_node.func.id if is_applied and isinstance(self.top_node.func, ast.Name) else ''
+        top_func_name = self.top_node.func.id if isinstance(self.top_node, ast.Call)\
+                                                 and isinstance(self.top_node.func, ast.Name) else ''
 
         first_func = namespace.get(top_func_name)
         is_imperative = first_func is not None and not isinstance(first_func, FunctionClass) \
@@ -96,10 +92,7 @@ class SymPyGamma:
 
         sympy_input = removeSymPy(self.parsed)
         if top_func_name:
-            latex_input = {
-                'type': 'Tex',
-                'tex': latexify(self.top_node)
-            }
+            latex_input = Tex(tex=latexify(self.top_node))
         else:
             latex_input = mathjax_latex(self.evaluated, digits=None)
 

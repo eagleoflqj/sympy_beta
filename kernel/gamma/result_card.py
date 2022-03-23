@@ -17,7 +17,7 @@ class ResultCard:
     pre_output_function -- Takes input expression and a symbol, returns a
     SymPy object
     """
-    def __init__(self, title, result_statement: str | None, pre_output, **kwargs):
+    def __init__(self, title: str, result_statement: str | None, pre_output, **kwargs):
         self.card_info = kwargs
         self.title = title
         self.result_statement = result_statement

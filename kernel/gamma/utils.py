@@ -1,5 +1,6 @@
 import ast
 import re
+from typing import cast
 
 import sympy
 from sympy.core.relational import Relational
@@ -30,11 +31,12 @@ class LatexVisitor(ast.NodeVisitor):
 
     def visit_Call(self, node):
         buffer = []
-        fname = node.func.id
+        func = cast(ast.Name, node.func)
+        fname = func.id
 
         # Only apply to lowercase names (i.e. functions, not classes)
         if fname in self.__class__.EXCEPTIONS:
-            node.func.id = self.__class__.EXCEPTIONS[fname].__name__
+            func.id = self.__class__.EXCEPTIONS[fname].__name__
             self.latex = sympy.latex(eval_node(node))
         else:
             result = self.format(fname, node)
@@ -46,7 +48,7 @@ class LatexVisitor(ast.NodeVisitor):
 
                 latexes = []
                 for arg in node.args:
-                    if isinstance(arg, ast.Call) and getattr(arg.func, 'id', None) and arg.func.id[0].islower():
+                    if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name) and arg.func.id[0].islower():
                         latexes.append(self.visit_Call(arg))
                     else:
                         latexes.append(sympy.latex(eval_node(arg)))
