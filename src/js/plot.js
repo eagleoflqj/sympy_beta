@@ -449,25 +449,10 @@ Plot2D.prototype.option = function (opt, value) {
   if (typeof value === 'undefined') {
     return this.options.indexOf(opt) >= 0
   }
-  // createCookie(opt, value, 365);
 }
 
 Plot2D.prototype.asDataURI = function () {
   return this._backend.asDataURI()
 }
-
-// Graph object
-
-// {
-//     type: 'polar',
-//     points: {
-//         x: [], // these are the coordinates to actually display
-//         y: []
-//     },
-//     data: {
-//         r: [], // shown to user
-//         theta: []
-//     }
-// }
 
 export { Plot2D }

@@ -1,5 +1,7 @@
+import enum
 import itertools
 import sys
+from typing import Any, Callable
 
 import docutils.core
 import sympy
@@ -159,73 +161,65 @@ def format_plot_input(result_statement, input_repr, components):
         return 'plot({})'.format(input_repr)
 
 
-GRAPH_TYPES = {
-    'xy': [lambda x, y: x, lambda x, y: y],
-    'parametric': [lambda x, y: x, lambda x, y: y],
-    'polar': [lambda x, y: float(y * sympy.cos(x)),
-              lambda x, y: float(y * sympy.sin(x))]
+class GraphType(enum.Enum):
+    xy = 0
+    parametric = 1
+    polar = 2
+
+
+graph_handler: dict[GraphType, tuple[Callable[[float, float], float], Callable[[float, float], float]]] = {
+    GraphType.xy: (lambda x, y: x, lambda x, y: y),
+    GraphType.parametric: (lambda x, y: x, lambda x, y: y),
+    GraphType.polar: (lambda theta, r: float(r * sympy.cos(theta)), lambda theta, r: float(r * sympy.sin(theta)))
 }
 
 
-def determine_graph_type(key: str) -> str:
+def determine_graph_type(key: str) -> GraphType:
     if key.startswith('r'):
-        return 'polar'
+        return GraphType.polar
     elif key.startswith('p'):
-        return 'parametric'
-    else:
-        return 'xy'
+        return GraphType.parametric
+    return GraphType.xy
 
 
 def eval_plot(components, parameters=None):
-    if parameters is None:
-        parameters = {}
-
-    xmin, xmax = parameters.get('xmin', -10), parameters.get('xmax', 10)
-    pmin, pmax = parameters.get('tmin', 0), parameters.get('tmax', 2 * sympy.pi)
-    tmin, tmax = parameters.get('tmin', 0), parameters.get('tmax', 10)
-    from sympy.plotting.plot import LineOver1DRangeSeries, Parametric2DLineSeries
-    functions = components["input_evaluated"]
-    if isinstance(functions, sympy.Basic):
-        functions = [(functions, 'xy')]
-    elif isinstance(functions, list):
-        functions = [(f, 'xy') for f in functions]
-    elif isinstance(functions, dict):
-        functions = [(f, determine_graph_type(key)) for key, f in functions.items()]
-
-    graphs = []
-    for func, graph_type in functions:
-        if graph_type == 'parametric':
-            x_func, y_func = func
-            x_vars, y_vars = x_func.free_symbols, y_func.free_symbols
-            variables = x_vars.union(y_vars)
-            if x_vars != y_vars:
-                raise ValueError("Both functions in a parametric plot must have the same variable")
-        else:
-            variables = func.free_symbols
-
+    def get_variable(variables):
         if len(variables) > 1:
             raise ValueError("Cannot plot multivariate function")
-        elif len(variables) == 0:
-            variable = sympy.Symbol('x')
+        if len(variables) == 0:
+            return sympy.Symbol('x')
+        return list(variables)[0]
+
+    if parameters is None:
+        parameters = {}
+    from sympy.plotting.plot import LineOver1DRangeSeries, Parametric2DLineSeries
+    functions = components["input_evaluated"]
+    if isinstance(functions, list):
+        func_type_list: list[tuple[Any, GraphType]] = [(f, GraphType.xy) for f in functions]
+    elif isinstance(functions, dict):
+        func_type_list = [(f, determine_graph_type(key)) for key, f in functions.items()]
+    else:
+        func_type_list = [(functions, GraphType.xy)]
+
+    variable = 'x'
+    graphs = []
+    for func, graph_type in func_type_list:
+        if graph_type == GraphType.parametric:
+            x_func, y_func = func
+            x_vars, y_vars = x_func.free_symbols, y_func.free_symbols
+            if x_vars != y_vars:
+                raise ValueError("Both functions in a parametric plot must have the same variable")
+            variable = get_variable(x_vars.union(y_vars))
+            graph_range = (variable, parameters.get('tmin', 0), parameters.get('tmax', 10))
+            series = Parametric2DLineSeries(x_func, y_func, graph_range, nb_of_points=150)
         else:
-            variable = list(variables)[0]
-
-        try:
-            if graph_type == 'xy':
-                graph_range = (variable, xmin, xmax)
-            elif graph_type == 'polar':
-                graph_range = (variable, pmin, pmax)
-            elif graph_type == 'parametric':
-                graph_range = (variable, tmin, tmax)
-
-            if graph_type in ('xy', 'polar'):
-                series = LineOver1DRangeSeries(func, graph_range, nb_of_points=150)
-            elif graph_type == 'parametric':
-                series = Parametric2DLineSeries(x_func, y_func, graph_range, nb_of_points=150)
-            # returns a list of [[x,y], [next_x, next_y]] pairs
-            series = list(series.get_segments())
-        except TypeError:
-            raise ValueError("Cannot plot function")
+            variable = get_variable(func.free_symbols)
+            if graph_type == GraphType.xy:
+                graph_range = (variable, parameters.get('xmin', -10), parameters.get('xmax', 10))
+            else:
+                graph_range = (variable, parameters.get('tmin', 0), parameters.get('tmax', 2 * sympy.pi))
+            series = LineOver1DRangeSeries(func, graph_range, nb_of_points=150)
+        series = list(series.get_segments())  # returns a list of [[x,y], [next_x, next_y]] pairs
 
         xvalues = []
         yvalues = []
@@ -238,7 +232,7 @@ def eval_plot(components, parameters=None):
                 y = -CEILING
             return y
 
-        x_transform, y_transform = GRAPH_TYPES[graph_type]
+        x_transform, y_transform = graph_handler[graph_type]
         series.append([series[-1][1], None])
         for point in series:
             if point[0][1] is None:
@@ -249,13 +243,11 @@ def eval_plot(components, parameters=None):
             yvalues.append(y_transform(x, y))
 
         graphs.append({
-            'type': graph_type,
             'function': sympy.jscode(sympy.sympify(func)),
             'points': {
                 'x': xvalues,
                 'y': yvalues
-            },
-            'data': None
+            }
         })
     return repr(variable), graphs
 

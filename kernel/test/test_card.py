@@ -127,6 +127,5 @@ def test_plot():
     actual = eval_card('plot', 'x', 'x', {'xmin': 10, 'xmax': 30})
     assert actual['type'] == 'Plot'
     graph = actual['graphs'][0]
-    assert graph['type'] == 'xy'
     assert graph['points']['x'][0] == 10
     assert graph['points']['x'][-1] == 30
