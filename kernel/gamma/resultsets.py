@@ -16,7 +16,7 @@ from extension.elementary.roman_numeral import roman_numeral_card
 from extension.ntheory.is_prime import is_prime_card
 from extension.ntheory.totient import totient_card
 from gamma.evaluator import eval_node
-from gamma.result_card import FakeResultCard, MultiResultCard, ResultCard
+from gamma.result_card import MultiResultCard, ResultCard
 
 # Formatting functions
 _function_formatters = {}
@@ -44,7 +44,7 @@ def format_by_type(result, function_name, node, formatter):
     """
     if function_name in _function_formatters:
         return _function_formatters[function_name](result, node, formatter)
-    elif function_name in all_cards and 'format_output' in all_cards[function_name].card_info:
+    elif function_name in all_cards and all_cards[function_name].format_output:
         return all_cards[function_name].format_output(result, formatter)
     elif isinstance(result, (list, tuple)):
         return format_list(result, formatter)
@@ -76,11 +76,6 @@ def format_integral(line, result, components):
         limits = ', '.join(map(repr, components['variables']))
 
     return line.format(_var=limits) % components['integrand']
-
-
-def format_function_docs_input(line, function, components):
-    function = getattr(components['input_evaluated'], '__name__', str(function))
-    return line % function
 
 
 def format_dict_title(*title: str):
@@ -157,6 +152,7 @@ def format_plot_input(result_statement, input_repr, components):
             return [str(f) for f in functions]
         if isinstance(functions, dict):
             return [f'{y} = {x}' for y, x in functions.items()]
+        return None
     else:
         return 'plot({})'.format(input_repr)
 
@@ -340,7 +336,7 @@ all_cards: dict[str, ResultCard] = {
         "integrate(%s, {_var})",
         sympy.Integral),
 
-    'integral_fake': FakeResultCard(
+    'integral_fake': ResultCard(
         "Integral",
         "integrate(%s, {_var})",
         lambda i, var: sympy.Integral(i, *var),
@@ -353,7 +349,7 @@ all_cards: dict[str, ResultCard] = {
         "manualintegrate(%s, {_var})",
         sympy.Integral),
 
-    'integral_manual_fake': FakeResultCard(
+    'integral_manual_fake': ResultCard(
         "Integral",
         "manualintegrate(%s, {_var})",
         lambda i, var: sympy.Integral(i, *var),
@@ -365,48 +361,39 @@ all_cards: dict[str, ResultCard] = {
                        "diff(%s, {_var})",
                        sympy.Derivative),
 
-    'diffsteps': FakeResultCard(
+    'diffsteps': ResultCard(
         "Derivative Steps",
         "diff(%s, {_var})",
-        None,
         format_output=format_steps,
         eval_method=eval_diffsteps),
 
-    'intsteps': FakeResultCard(
+    'intsteps': ResultCard(
         "Integral Steps",
         "integrate(%s, {_var})",
-        None,
         format_output=format_steps,
         eval_method=eval_intsteps,
         format_input=format_integral),
 
     'series': ResultCard(
         "Series expansion around 0",
-        "series(%s, {_var}, 0, 10)",
-        None),
+        "series(%s, {_var}, 0, 10)"),
 
     'digits': ResultCard(
         "Digits in base-10 expansion of number",
         "len(str(%s))",
-        None,
-        multivariate=False,
         format_input=format_long_integer),
 
-    'factorization': FakeResultCard(
+    'factorization': ResultCard(
         "Factors",
         "factorint(%s)",
-        None,
-        multivariate=False,
         applicable=lambda components: components['input_evaluated'] > 0,
         format_input=format_long_integer,
         format_output=format_dict_title("Factor", "Times"),
         eval_method=eval_factorization),
 
-    'factorizationDiagram': FakeResultCard(
+    'factorizationDiagram': ResultCard(
         "Factorization Diagram",
         "factorint(%s)",
-        None,
-        multivariate=False,
         applicable=lambda components: 0 < components['input_evaluated'] <= 256,
         format_output=format_factorization_diagram,
         eval_method=eval_factorization),
@@ -414,136 +401,105 @@ all_cards: dict[str, ResultCard] = {
     'float_approximation': ResultCard(
         "Floating-point approximation",
         "(%s).evalf({digits})",
-        None,
-        multivariate=False,
         parameters=['digits']),
 
     'fractional_approximation': ResultCard(
         "Fractional approximation",
-        "nsimplify(%s)",
-        None,
-        multivariate=False),
+        "nsimplify(%s)"),
 
     'absolute_value': ResultCard(
         "Absolute value",
         "Abs(%s)",
-        lambda s, *args: sympy.Abs(s, evaluate=False),
-        multivariate=False),
+        lambda s, *args: sympy.Abs(s, evaluate=False)),
 
     'polar_angle': ResultCard(
         "Angle in the complex plane",
         "atan2(*(%s).as_real_imag()).evalf()",
-        lambda s, *args: sympy.atan2(*s.as_real_imag()),
-        multivariate=False),
+        lambda s, *args: sympy.atan2(*s.as_real_imag())),
 
     'conjugate': ResultCard(
         "Complex conjugate",
         "conjugate(%s)",
-        lambda s, *args: sympy.conjugate(s),
-        multivariate=False),
+        lambda s, *args: sympy.conjugate(s)),
 
     'trigexpand': ResultCard(
         "Alternate form",
         "(%s).expand(trig=True)",
-        lambda statement, var, *args: statement,
-        multivariate=False),
+        lambda statement, var, *args: statement),
 
     'trigsimp': ResultCard(
         "Alternate form",
         "trigsimp(%s)",
-        lambda statement, var, *args: statement,
-        multivariate=False),
+        lambda statement, var, *args: statement),
 
     'trigsincos': ResultCard(
         "Alternate form",
         "(%s).rewrite(csc, sin, sec, cos, cot, tan)",
-        lambda statement, var, *args: statement,
-        multivariate=False
+        lambda statement, var, *args: statement
     ),
 
     'trigexp': ResultCard(
         "Alternate form",
         "(%s).rewrite(sin, exp, cos, exp, tan, exp)",
-        lambda statement, var, *args: statement,
-        multivariate=False
+        lambda statement, var, *args: statement
     ),
 
-    'plot': FakeResultCard(
+    'plot': ResultCard(
         "Plot",
         "plot(%s)",
-        None,
         format_input=format_plot_input,
         format_output=format_plot,
         eval_method=eval_plot,
         parameters=['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax']),
 
-    'function_docs': FakeResultCard(
+    'function_docs': ResultCard(
         "Documentation",
         "help(%s)",
-        None,
-        multivariate=False,
         eval_method=eval_function_docs,
-        format_input=format_function_docs_input,
         format_output=format_document
     ),
 
     'root_to_polynomial': ResultCard(
         "Polynomial with this root",
         "minpoly(%s)",
-        None,
-        multivariate=False
     ),
 
     'matrix_inverse': ResultCard(
         "Inverse of matrix",
         "(%s).inv()",
         lambda statement, var, *args: sympy.Pow(statement, -1, evaluate=False),
-        multivariate=False
     ),
 
     'matrix_eigenvals': ResultCard(
         "Eigenvalues",
         "(%s).eigenvals()",
-        None,
-        multivariate=False,
         format_output=format_dict_title("Eigenvalue", "Multiplicity")
     ),
 
     'matrix_eigenvectors': ResultCard(
         "Eigenvectors",
         "(%s).eigenvects()",
-        None,
-        multivariate=False,
         format_output=format_list
     ),
 
     'satisfiable': ResultCard(
         "Satisfiability",
         "satisfiable(%s)",
-        None,
-        multivariate=False,
         format_output=format_dict_title('Variable', 'Possible Value')
     ),
 
-    'truth_table': FakeResultCard(
+    'truth_table': ResultCard(
         "Truth table",
         "%s",
-        None,
-        multivariate=False,
         eval_method=eval_truth_table,
         format_output=format_truth_table
     ),
 
-    'doit': ResultCard(
-        "Result",
-        "(%s).doit()",
-        None
-    ),
+    'doit': ResultCard("Result", "(%s).doit()"),
 
-    'approximator': FakeResultCard(
+    'approximator': ResultCard(
         "Approximator_NOT_USER_VISIBLE",
         "%s",
-        None,
         eval_method=eval_approximator,
         format_output=format_approximator
     ),

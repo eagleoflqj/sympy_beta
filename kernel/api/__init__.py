@@ -6,11 +6,9 @@ from typing import Callable
 from gamma.dispatch import DICT
 from gamma.logic import SymPyGamma
 
-Inner = Callable[..., DICT]
 
-
-def catch(func: Inner) -> Inner:
-    def closure(*args) -> DICT:
+def catch(func: Callable) -> Callable:
+    def closure(*args):
         try:
             return func(*args)
         except Exception:

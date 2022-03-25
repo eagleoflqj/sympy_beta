@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Any, Callable
+
 import sympy
 
+from api.data_type import Dict
 from gamma.dispatch import DICT
 from gamma.evaluator import namespace
 
@@ -17,13 +20,24 @@ class ResultCard:
     pre_output_function -- Takes input expression and a symbol, returns a
     SymPy object
     """
-    def __init__(self, title: str, result_statement: str | None, pre_output, **kwargs):
-        self.card_info = kwargs
+    def __init__(self, title: str, result_statement: str | None, pre_output: Callable[[Any, Any], Any] | None = None,
+                 applicable: Callable[[DICT], bool] | None = None,
+                 format_input: Callable[[Any, Any, Any], str | list[str] | None] | None = None,
+                 eval_method: Callable[[DICT, DICT | None], Any] | None = None,
+                 format_output: Callable[..., Dict] | None = None, parameters: list[str] | None = None):
         self.title = title
         self.result_statement = result_statement
-        self.pre_output = pre_output or no_pre_output
+        self.pre_output = pre_output
+        self._applicable = applicable
+        self._format_input = format_input
+        self.eval_method = eval_method
+        self._format_output = format_output
+        self.parameters = parameters
 
     def eval(self, components: DICT, parameters):
+        if self.eval_method:
+            return self.eval_method(components, parameters)
+
         if parameters is None:
             parameters = {}
         else:
@@ -40,89 +54,53 @@ class ResultCard:
             if self.result_statement is not None else components['expression']
         return sympy.parse_expr(line, global_dict=namespace)
 
-    def format_input(self, components: DICT, **parameters):
-        if parameters is None:
-            parameters = {}
-        parameters = self.default_parameters(parameters)
+    def format_input(self, components: DICT):
+        parameters = self.default_parameters({})
         input_repr = repr(components['input_evaluated'])
         variable = components['variable']
-        if 'format_input' in self.card_info:
-            return self.card_info['format_input'](
-                self.result_statement, input_repr, components)
+        if self._format_input:
+            return self._format_input(self.result_statement, input_repr, components)
         return None if self.result_statement is None \
             else self.result_statement.format(_var=variable, **parameters) % input_repr
 
     def format_output(self, output, formatter):
-        if 'format_output' in self.card_info:
-            return self.card_info['format_output'](output, formatter)
+        if self._format_output:
+            return self._format_output(output, formatter)
         return formatter(output)
 
     def is_multivariate(self):
-        return self.card_info.get('multivariate', False)
+        return False  # todo: whether multivariate depends on input: diff(x+y) is but diff(x+y, x) isn't
 
     def default_parameters(self, kwargs):
-        if 'parameters' in self.card_info:
-            for arg in self.card_info['parameters']:
+        if self.parameters:
+            for arg in self.parameters:
                 kwargs.setdefault(arg, '')
         return kwargs
 
-    def applicable(self, components: DICT):
-        inner = self.card_info.get('applicable')
-        if not inner:
-            return True
-        return inner(components)
-
-    def __repr__(self):
-        return "<ResultCard '{}'>".format(self.title)
-
-
-class FakeResultCard(ResultCard):
-    """ResultCard whose displayed expression != actual code.
-
-    Used when creating the result to be displayed involves code that a user
-    would not normally need to do, e.g. calculating plot points (where a
-    user would simply use ``plot``)."""
-
-    def eval(self, components: DICT, parameters=None):
-        if parameters is None:
-            parameters = {}
-        return self.card_info['eval_method'](components, parameters)
+    def applicable(self, components: DICT) -> bool:
+        return self._applicable is None or self._applicable(components)
 
 
 class MultiResultCard(ResultCard):
     """Tries multiple statements and displays the first that works."""
 
     def __init__(self, title, *cards: ResultCard):
-        super().__init__(title, '', lambda *args: '')
+        super().__init__(title, None, lambda *args: '')
         self.cards = cards
-        self.cards_used = []
 
-    def eval(self, components, parameters):
-        self.cards_used = []
+    def eval(self, components: DICT, parameters):
         results = []
-
-        # TODO Implicit state is bad, come up with better API
-        # in particular a way to store variable, cards used
         for card in self.cards:
-            try:
-                result = card.eval(components, parameters)
-            except ValueError:
-                continue
+            result = card.eval(components, parameters)
             if result is not None:
                 if not any(result == r[1] for r in results):
-                    self.cards_used.append(card)
                     results.append((card, result))
-        if results:
-            self.components = components
-            return results
-        return "None"
-
-    def format_input(self, components):
-        return None
+        # TODO Implicit state is bad, come up with better API
+        # in particular a way to store variable, cards used
+        self.components = components
+        return results
 
     def format_output(self, output, formatter):
-        if not isinstance(output, list):
-            return output
         return {
             'type': 'MultiResult',
             'results': [{
@@ -130,7 +108,3 @@ class MultiResultCard(ResultCard):
                 'output': card.format_output(result, formatter)
             } for card, result in output]
         }
-
-
-def no_pre_output(*args):
-    return ""

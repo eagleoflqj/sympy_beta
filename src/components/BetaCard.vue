@@ -44,7 +44,7 @@ onMounted(async () => {
     numerics.forEach(item => numericCallbacks.push(async () =>
       Object.assign(item, await evalCard('approximator', item.expression, 'x', { digits }))))
   } else {
-    const hasDigits = card.parameters.indexOf('digits') >= 0
+    const hasDigits = (card.parameters || []).indexOf('digits') >= 0
     const evaluate = async () => {
       const parameters = hasDigits ? { digits } : {}
       Object.assign(cardResult, await evalCard(card.name, input, card.variable, parameters))

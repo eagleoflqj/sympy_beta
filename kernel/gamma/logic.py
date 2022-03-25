@@ -138,14 +138,17 @@ class SymPyGamma:
             if not card.applicable(components):
                 continue
 
-            result.append({
+            card_data = {
                 'name': card_name,
                 'variable': repr(var),
                 'title': card.title,
                 'input': card.format_input(components),
-                'pre_output': latex(card.pre_output(components['input_evaluated'], var)),
-                'parameters': card.card_info.get('parameters', [])
-            })
+            }
+            if card.pre_output:
+                card_data['pre_output'] = latex(card.pre_output(components['input_evaluated'], var))
+            if card.parameters:
+                card_data['parameters'] = card.parameters
+            result.append(card_data)
 
         learn_more = find_learn_more_set(top_func_name)
         if learn_more:

@@ -2,7 +2,7 @@ from sympy import Integer
 
 from extension.util import format_latex, take_int_input
 from gamma.dispatch import DICT
-from gamma.result_card import FakeResultCard
+from gamma.result_card import ResultCard
 
 roman_chars = ['I', 'V', 'X', 'L', 'C', 'D', 'M', '', '']
 
@@ -35,5 +35,5 @@ def int_to_roman_numeral(n: int) -> str:
     return R'\mathrm{' + ret + '}'
 
 
-roman_numeral_card = FakeResultCard("Roman numeral", None, None, eval_method=int_to_roman_numeral,
-                                    format_output=format_latex, applicable=between_1_and_3999)
+roman_numeral_card = ResultCard("Roman numeral", None, eval_method=int_to_roman_numeral,
+                                format_output=format_latex, applicable=between_1_and_3999)

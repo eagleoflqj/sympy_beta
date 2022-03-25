@@ -3,7 +3,7 @@ from sympy import Integer
 from api.data_type import ChineseNumeral
 from extension.util import take_int_input
 from gamma.dispatch import DICT
-from gamma.result_card import FakeResultCard
+from gamma.result_card import ResultCard
 
 normal_chars = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
 normal_units = ['百', '千', '万', '亿']
@@ -81,5 +81,5 @@ def format_output(output: tuple[str, str], parameters: None):
     return ChineseNumeral(normal=output[0], financial=output[1])
 
 
-chinese_numeral_card = FakeResultCard("Chinese numeral", None, None, eval_method=int_to_chinese_numeral,
-                                      format_output=format_output, applicable=not_too_big)
+chinese_numeral_card = ResultCard("Chinese numeral", None, eval_method=int_to_chinese_numeral,
+                                  format_output=format_output, applicable=not_too_big)

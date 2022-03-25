@@ -2,7 +2,7 @@ from sympy import Integer, factorint, latex
 
 from extension.ntheory.util import cross_mul, is_positive_integer, is_prime_from_factor_dict, pow_list_from_factor_dict
 from extension.util import Latex, format_latex, t, take_int_input
-from gamma.result_card import FakeResultCard
+from gamma.result_card import ResultCard
 
 
 @take_int_input
@@ -32,5 +32,5 @@ def totient_step(n: int) -> str:
     return L.f()
 
 
-totient_card = FakeResultCard("Step", "totient(%s)", None, eval_method=totient_step, format_output=format_latex,
-                              applicable=is_positive_integer)
+totient_card = ResultCard("Step", "totient(%s)", eval_method=totient_step, format_output=format_latex,
+                          applicable=is_positive_integer)
