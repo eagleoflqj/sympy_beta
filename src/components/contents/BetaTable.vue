@@ -35,7 +35,7 @@ onMounted(() => {
     />
   </div>
   <n-scrollbar x-scrollable>
-    <n-table style="width: 0; margin: auto">
+    <n-table style="width: 0; margin: auto; white-space: nowrap">
       <thead>
         <tr>
           <th v-for="title in card.titles">

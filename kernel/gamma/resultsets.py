@@ -14,6 +14,7 @@ from extension.elementary.binary_form import binary_form_card
 from extension.elementary.chinese_numeral import chinese_numeral_card
 from extension.elementary.roman_numeral import roman_numeral_card
 from extension.ntheory.is_prime import is_prime_card
+from extension.ntheory.modulo import modulo_card
 from extension.ntheory.totient import totient_card
 from gamma.evaluator import eval_node
 from gamma.result_card import MultiResultCard, ResultCard
@@ -508,6 +509,7 @@ all_cards: dict[str, ResultCard] = {
     'roman_numeral': roman_numeral_card,
     'binary_form': binary_form_card,
     'chinese_numeral': chinese_numeral_card,
+    'modulo': modulo_card,
 }
 
 
