@@ -13,4 +13,5 @@ def format_output(output: tuple[int, list[int]], parameters: None):
                  rows=[[f'{output[0]} mod m'] + [str(i) for i in output[1]]])
 
 
-modulo_card = ResultCard('Modulo 2 to 9', None, eval_method=modulo, format_output=format_output)
+modulo_card = ResultCard('Modulo 2 to 9', None, eval_method=modulo, format_output=format_output,
+                         wiki='Modulo_operation')

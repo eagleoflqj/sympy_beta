@@ -81,5 +81,5 @@ def format_output(output: tuple[str, str], parameters: None):
     return ChineseNumeral(normal=output[0], financial=output[1])
 
 
-chinese_numeral_card = ResultCard("Chinese numeral", None, eval_method=int_to_chinese_numeral,
+chinese_numeral_card = ResultCard("Chinese numeral", None, eval_method=int_to_chinese_numeral, wiki='Chinese_numerals',
                                   format_output=format_output, applicable=not_too_big)

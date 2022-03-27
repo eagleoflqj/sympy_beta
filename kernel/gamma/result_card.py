@@ -25,7 +25,8 @@ class ResultCard:
                  applicable: Callable[[DICT], bool] | None = None,
                  format_input: Callable[[Any, Any, Any], str | list[str] | None] | None = None,
                  eval_method: Callable[[DICT, DICT | None], Any] | None = None,
-                 format_output: Callable[..., Dict] | None = None, parameters: list[str] | None = None):
+                 format_output: Callable[..., Dict] | None = None, parameters: list[str] | None = None,
+                 wiki: str | None = None):
         self.title = title
         self.result_statement = result_statement
         self.pre_output = pre_output
@@ -35,6 +36,7 @@ class ResultCard:
         self._format_output = format_output
         self.parameters = parameters
         self.source: str | None = None
+        self.wiki = wiki
 
     def eval(self, components: DICT, parameters):
         if self.eval_method:
@@ -98,6 +100,8 @@ class ResultCard:
             data['parameters'] = self.parameters
         if self.source:
             data['source'] = self.source
+        if self.wiki:
+            data['wiki'] = self.wiki
         return data
 
 

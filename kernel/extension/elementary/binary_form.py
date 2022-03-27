@@ -16,5 +16,5 @@ def binary_form(n: int) -> str:
     return np.base_repr(n) + '_2'
 
 
-binary_form_card = ResultCard("Binary form", "np.base_repr(%s)", eval_method=binary_form,
+binary_form_card = ResultCard("Binary form", "np.base_repr(%s)", eval_method=binary_form, wiki='Binary_number',
                               format_output=format_latex, applicable=not_too_big)

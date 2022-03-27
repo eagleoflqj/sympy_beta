@@ -32,5 +32,5 @@ def totient_step(n: int) -> str:
     return L.f()
 
 
-totient_card = ResultCard("Step", "totient(%s)", eval_method=totient_step, format_output=format_latex,
-                          applicable=is_positive_integer)
+totient_card = ResultCard("Step", None, eval_method=totient_step, format_output=format_latex,
+                          applicable=is_positive_integer, wiki="Euler's_totient_function")

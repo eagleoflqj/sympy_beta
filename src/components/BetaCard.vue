@@ -8,6 +8,7 @@ import BetaAmbiguity from '@/components/BetaAmbiguity.vue'
 import BetaContainer from '@/components/BetaContainer.vue'
 import BetaOption from '@/components/BetaOption.vue'
 import BetaSourceButton from '@/components/BetaSourceButton.vue'
+import BetaWikiButton from '@/components/BetaWikiButton.vue'
 
 const props = defineProps({
   card: {
@@ -142,11 +143,15 @@ async function seeSteps () {
     }]"
     @keyup.esc="toggleFullscreen"
   >
-    <template
-      v-if="card.source"
-      #header-extra
-    >
-      <beta-source-button :source="card.source" />
+    <template #header-extra>
+      <beta-source-button
+        v-if="card.source"
+        :source="card.source"
+      />
+      <beta-wiki-button
+        v-if="card.wiki"
+        :wiki="card.wiki"
+      />
     </template>
     <div v-if="card.input">
       <n-code
