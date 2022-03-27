@@ -7,6 +7,7 @@ import sympy
 from api.data_type import Dict
 from gamma.dispatch import DICT
 from gamma.evaluator import namespace
+from gamma.utils import latex
 
 
 class ResultCard:
@@ -28,11 +29,12 @@ class ResultCard:
         self.title = title
         self.result_statement = result_statement
         self.pre_output = pre_output
-        self._applicable = applicable
+        self.applicable = applicable
         self._format_input = format_input
         self.eval_method = eval_method
         self._format_output = format_output
         self.parameters = parameters
+        self.source: str | None = None
 
     def eval(self, components: DICT, parameters):
         if self.eval_method:
@@ -77,8 +79,26 @@ class ResultCard:
                 kwargs.setdefault(arg, '')
         return kwargs
 
-    def applicable(self, components: DICT) -> bool:
-        return self._applicable is None or self._applicable(components)
+    def get_data(self, card_name: str, components: DICT) -> DICT | None:
+        if self.applicable and not self.applicable(components):
+            return None
+        data: DICT = {
+            'name': card_name,
+            'title': self.title
+        }
+        _input = self.format_input(components)
+        if _input:
+            data['input'] = _input
+        var = components['variable']
+        if var:
+            data['variable'] = repr(var)
+        if self.pre_output:
+            data['pre_output'] = latex(self.pre_output(components['input_evaluated'], var))
+        if self.parameters:
+            data['parameters'] = self.parameters
+        if self.source:
+            data['source'] = self.source
+        return data
 
 
 class MultiResultCard(ResultCard):

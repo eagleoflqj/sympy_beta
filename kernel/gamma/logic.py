@@ -11,17 +11,7 @@ from api.data_type import Tex, _Tex
 from gamma.dispatch import DICT, find_result_set
 from gamma.evaluator import namespace, transformations
 from gamma.resultsets import find_learn_more_set, format_by_type, get_card
-from gamma.utils import OTHER_SYMPY_FUNCTIONS, latexify, removeSymPy
-
-
-def latex(expr: sympy.Basic | str | int) -> str:
-    # sympy.latex('') == '\\mathtt{\\text{}}'
-    if expr == '':
-        return ''
-    if isinstance(expr, sympy.Basic):
-        # solveset(sin(x)) click More Digits
-        expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
-    return sympy.latex(expr)
+from gamma.utils import OTHER_SYMPY_FUNCTIONS, latex, latexify, removeSymPy
 
 
 def is_approximatable_constant(input_evaluated):
@@ -126,7 +116,6 @@ class SymPyGamma:
         elif is_approximatable_constant(self.evaluated):
             cards = ['float_approximation'] + cards
 
-        var = components['variable']
         if top_func_name not in ('factor', 'simplify'):
             simplified = sympy.simplify(self.evaluated) if isinstance(self.evaluated, sympy.Basic) else None
             if simplified is not None and simplified != self.evaluated:
@@ -135,20 +124,9 @@ class SymPyGamma:
 
         for card_name in cards:
             card = get_card(card_name)
-            if not card.applicable(components):
-                continue
-
-            card_data = {
-                'name': card_name,
-                'variable': repr(var),
-                'title': card.title,
-                'input': card.format_input(components),
-            }
-            if card.pre_output:
-                card_data['pre_output'] = latex(card.pre_output(components['input_evaluated'], var))
-            if card.parameters:
-                card_data['parameters'] = card.parameters
-            result.append(card_data)
+            card_data = card.get_data(card_name, components)
+            if card_data:
+                result.append(card_data)
 
         learn_more = find_learn_more_set(top_func_name)
         if learn_more:

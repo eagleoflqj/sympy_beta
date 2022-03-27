@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import re
 from typing import cast
@@ -223,3 +225,13 @@ def removeSymPy(string):
         return re_calls.sub(re_calls_sub, string).replace(" ", "")
     except IndexError:
         return string
+
+
+def latex(expr: sympy.Basic | str | int) -> str:
+    # sympy.latex('') == '\\mathtt{\\text{}}'
+    if expr == '':
+        return ''
+    if isinstance(expr, sympy.Basic):
+        # solveset(sin(x)) click More Digits
+        expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
+    return sympy.latex(expr)

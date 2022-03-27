@@ -10,12 +10,7 @@ from sympy.core.symbol import Symbol
 import gamma.diffsteps
 import gamma.intsteps
 from api.data_type import Document, FactorDiagram, List, Plot, Reference, Table, TruthTable
-from extension.elementary.binary_form import binary_form_card
-from extension.elementary.chinese_numeral import chinese_numeral_card
-from extension.elementary.roman_numeral import roman_numeral_card
-from extension.ntheory.is_prime import is_prime_card
-from extension.ntheory.modulo import modulo_card
-from extension.ntheory.totient import totient_card
+from extension.util import load_with_source
 from gamma.evaluator import eval_node
 from gamma.result_card import MultiResultCard, ResultCard
 
@@ -504,12 +499,12 @@ all_cards: dict[str, ResultCard] = {
         eval_method=eval_approximator,
         format_output=format_approximator
     ),
-    'is_prime': is_prime_card,
-    'totient': totient_card,
-    'roman_numeral': roman_numeral_card,
-    'binary_form': binary_form_card,
-    'chinese_numeral': chinese_numeral_card,
-    'modulo': modulo_card,
+    'is_prime': load_with_source('extension.ntheory.is_prime'),
+    'totient': load_with_source('extension.ntheory.totient'),
+    'roman_numeral': load_with_source('extension.elementary.roman_numeral'),
+    'binary_form': load_with_source('extension.elementary.binary_form'),
+    'chinese_numeral': load_with_source('extension.elementary.chinese_numeral'),
+    'modulo': load_with_source('extension.ntheory.modulo'),
 }
 
 

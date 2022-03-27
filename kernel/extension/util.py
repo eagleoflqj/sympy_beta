@@ -1,7 +1,9 @@
+import importlib
 from typing import Any, Callable
 
 from api.data_type import Tex, _Tex
 from gamma.dispatch import DICT
+from gamma.result_card import ResultCard
 
 
 def t(text: str) -> str:
@@ -47,3 +49,12 @@ def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:
     def wrapper(components: DICT, parameters: None) -> Any:
         return inner(int(components['input_evaluated']))
     return wrapper
+
+
+def load_with_source(module_name: str) -> ResultCard:
+    module = importlib.import_module(module_name)
+    dirs = module_name.split('.')
+    card_name = f'{dirs[-1]}_card'
+    card: ResultCard = module.__getattribute__(card_name)
+    card.source = '/'.join(dirs) + '.py'
+    return card

@@ -7,6 +7,7 @@ import { Plot2D } from '@/js/plot.js'
 import BetaAmbiguity from '@/components/BetaAmbiguity.vue'
 import BetaContainer from '@/components/BetaContainer.vue'
 import BetaOption from '@/components/BetaOption.vue'
+import BetaSourceButton from '@/components/BetaSourceButton.vue'
 
 const props = defineProps({
   card: {
@@ -141,6 +142,12 @@ async function seeSteps () {
     }]"
     @keyup.esc="toggleFullscreen"
   >
+    <template
+      v-if="card.source"
+      #header-extra
+    >
+      <beta-source-button :source="card.source" />
+    </template>
     <div v-if="card.input">
       <n-code
         v-if="typeof card.input === 'string'"
