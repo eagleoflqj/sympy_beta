@@ -207,7 +207,7 @@ CONVERTER = Callable[[Any, Any], DICT]
 
 function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'Integer': (None, ('digits', 'roman_numeral', 'chinese_numeral', 'binary_form', 'factorization',
-                       'factorizationDiagram', 'modulo')),
+                       'factorizationDiagram', 'modulo', 'quadratic_residue')),
     'factorial': factorial_result,
     'factorial2': factorial_result,
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),

@@ -80,3 +80,11 @@ class _Plot(Dict):
 
 def Plot(variable: str, graphs: list[dict]):
     return _Plot(type='Plot', variable=variable, graphs=graphs)
+
+
+class _Text(Dict):
+    text: str
+
+
+def Text(text: str):
+    return _Text(type='Text', text=text)
