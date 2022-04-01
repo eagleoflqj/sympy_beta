@@ -206,7 +206,7 @@ factorial_result = (None, ('digits', 'factorization', 'factorizationDiagram'))
 CONVERTER = Callable[[Any, Any], DICT]
 
 function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
-    'Integer': (None, ('digits', 'roman_numeral', 'chinese_numeral', 'binary_form', 'factorization',
+    'Integer': (None, ('digits', 'english_numeral', 'roman_numeral', 'chinese_numeral', 'binary_form', 'factorization',
                        'factorizationDiagram', 'modulo', 'quadratic_residue')),
     'factorial': factorial_result,
     'factorial2': factorial_result,

@@ -1,7 +1,7 @@
 import importlib
 from typing import Any, Callable
 
-from api.data_type import Tex, _Tex
+from api.data_type import Tex, Text, _Tex
 from gamma.dispatch import DICT
 from gamma.result_card import ResultCard
 
@@ -43,6 +43,10 @@ class Latex:
 
 def format_latex(tex: str, formatter=None) -> _Tex:
     return Tex(tex=tex)
+
+
+def format_text(text: str, formatter=None):
+    return Text(text=text)
 
 
 def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:

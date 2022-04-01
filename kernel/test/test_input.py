@@ -10,6 +10,8 @@ cases = [
     ('12',
      [{'title': 'SymPy', 'input': '12', 'output': {'type': 'Tex', 'tex': '12'}},
       {'name': 'digits', 'title': 'Digits in base-10 expansion of number', 'input': 'len(str(12))'},
+      {'name': 'english_numeral', 'title': 'English numeral', 'source': 'extension/elementary/english_numeral.py',
+       'wiki': 'English_numerals'},
       {'name': 'roman_numeral', 'title': 'Roman numeral', 'source': 'extension/elementary/roman_numeral.py',
        'wiki': 'Roman_numerals'},
       {'name': 'chinese_numeral', 'title': 'Chinese numeral', 'source': 'extension/elementary/chinese_numeral.py',
