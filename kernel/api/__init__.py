@@ -22,7 +22,7 @@ def eval_input(raw_input: str, variable: str | None = None):
 
 
 @catch
-def eval_card(card_name: str, expression: str, variable: str, parameters: DICT):
+def eval_card(card_name: str, expression: str, variable: str | None, parameters: DICT | None):
     return SymPyGamma(expression, variable).eval_card(card_name, parameters)
 
 

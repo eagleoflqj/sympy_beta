@@ -507,6 +507,7 @@ all_cards: dict[str, ResultCard] = {
     'modulo': load_with_source('extension.ntheory.modulo'),
     'quadratic_residue': load_with_source('extension.ntheory.quadratic_residue'),
     'english_numeral': load_with_source('extension.elementary.english_numeral'),
+    'primitive_root': load_with_source('extension.ntheory.primitive_root'),
 }
 
 
