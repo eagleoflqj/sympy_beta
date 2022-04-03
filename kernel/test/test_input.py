@@ -134,6 +134,10 @@ cases = [
                        {'type': 'Text', 'value': ' factors integers.'}]},
       {'title': 'SymPy', 'input': 'factor(12)', 'output': {'type': 'Tex', 'tex': '\\mathrm{Factorization~of~}12'}},
       {'title': 'Result', 'input': 'factor(12)', 'output': {'type': 'Tex', 'tex': '12'}}]),
+    ('2.1',
+     [{'title': 'SymPy', 'input': '2.1', 'output': {'type': 'Tex', 'tex': '2.1'}},
+      {'name': 'rational', 'title': 'Rational', 'input': "Rational('2.1')",
+       'source': 'extension/elementary/rational.py'}]),
 ]
 
 
