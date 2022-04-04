@@ -509,6 +509,7 @@ all_cards: dict[str, ResultCard] = {
     'english_numeral': load_with_source('extension.elementary.english_numeral'),
     'primitive_root': load_with_source('extension.ntheory.primitive_root'),
     'rational': load_with_source('extension.elementary.rational'),
+    'pie_chart': load_with_source('extension.elementary.pie_chart'),
 }
 
 

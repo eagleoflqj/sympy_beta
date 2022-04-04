@@ -6,7 +6,8 @@ cases = [
     ('242/33',
      [{'title': 'SymPy', 'input': '242/33', 'output': {'type': 'Tex', 'tex': '\\frac{22}{3}'}},
       {'name': 'float_approximation', 'title': 'Floating-point approximation',
-       'input': '(22/3).evalf()', 'parameters': ['digits']}]),
+       'input': '(22/3).evalf()', 'parameters': ['digits']},
+      {'name': 'pie_chart', 'title': 'Pie chart', 'source': 'extension/elementary/pie_chart.py'}]),
     ('12',
      [{'title': 'SymPy', 'input': '12', 'output': {'type': 'Tex', 'tex': '12'}},
       {'name': 'digits', 'title': 'Digits in base-10 expansion of number', 'input': 'len(str(12))'},
@@ -137,7 +138,8 @@ cases = [
     ('2.1',
      [{'title': 'SymPy', 'input': '2.1', 'output': {'type': 'Tex', 'tex': '2.1'}},
       {'name': 'rational', 'title': 'Rational', 'input': "Rational('2.1')",
-       'source': 'extension/elementary/rational.py'}]),
+       'source': 'extension/elementary/rational.py'},
+      {'name': 'pie_chart', 'title': 'Pie chart', 'source': 'extension/elementary/pie_chart.py'}]),
 ]
 
 

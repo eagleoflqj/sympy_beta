@@ -1,9 +1,16 @@
+import base64
 import importlib
+import io
 from typing import Any, Callable
 
-from api.data_type import Tex, Text, _Tex
+import matplotlib
+from matplotlib.figure import Figure
+
+from api.data_type import Svg, Tex, Text, _Tex
 from gamma.dispatch import DICT
 from gamma.result_card import ResultCard
+
+matplotlib.use('SVG')
 
 
 def t(text: str) -> str:
@@ -47,6 +54,15 @@ def format_latex(tex: str, formatter=None) -> _Tex:
 
 def format_text(text: str, formatter=None):
     return Text(text=text)
+
+
+def format_figure(output: tuple[Figure, str], formatter=None):
+    figure, name = output
+    buf = io.BytesIO()
+    figure.savefig(buf, format='svg', metadata={'Date': None})
+    buf.seek(0)
+    svg = base64.b64encode(buf.read()).decode()
+    return Svg(svg=svg, name=name)
 
 
 def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:

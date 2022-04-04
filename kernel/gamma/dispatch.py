@@ -34,6 +34,10 @@ def is_constant(input_evaluated):
         and not input_evaluated.free_symbols
 
 
+def is_rational(input_evaluated):
+    return isinstance(input_evaluated, sympy.Rational)
+
+
 def is_complex(input_evaluated):
     try:
         return sympy.I in input_evaluated.atoms()
@@ -208,7 +212,7 @@ CONVERTER = Callable[[Any, Any], DICT]
 function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'Integer': (None, ('digits', 'english_numeral', 'roman_numeral', 'chinese_numeral', 'binary_form', 'factorization',
                        'factorizationDiagram', 'modulo', 'quadratic_residue', 'primitive_root')),
-    'Float': (None, ('rational',)),
+    'Float': (None, ('rational', 'pie_chart')),
     'factorial': factorial_result,
     'factorial2': factorial_result,
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
@@ -220,7 +224,8 @@ function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'plot': (extract_plot, ('plot',)),
 }
 
-exclusive_predicates = [
+exclusive_predicates: list[tuple[Callable[[Any], bool], tuple[str, ...]]] = [
+    (is_rational, ('pie_chart',)),
     (is_complex, ('absolute_value', 'polar_angle', 'conjugate')),
     (is_float, ('fractional_approximation',)),
     # root_to_polynomial

@@ -88,3 +88,12 @@ class _Text(Dict):
 
 def Text(text: str):
     return _Text(type='Text', text=text)
+
+
+class _Svg(Dict):
+    svg: str
+    name: str
+
+
+def Svg(svg: str, name: str):
+    return _Svg(type='Svg', svg=svg, name=name)

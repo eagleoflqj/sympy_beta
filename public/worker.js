@@ -12,7 +12,7 @@ async function loadPyodideAndPackages () {
     indexURL: pyodideURL
   })
   self.postMessage({ stage: 'PYODIDE_DOWNLOADED' })
-  await self.pyodide.loadPackage(['micropip', 'docutils', 'numpy', 'sympy', 'typing-extensions'],
+  await self.pyodide.loadPackage(['micropip', 'docutils', 'matplotlib', 'numpy', 'sympy', 'typing-extensions'],
     console.log, msg => {
       console.error(msg)
       errorMsg = msg
