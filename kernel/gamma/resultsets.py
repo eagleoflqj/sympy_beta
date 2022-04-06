@@ -13,6 +13,7 @@ from api.data_type import Document, FactorDiagram, List, Plot, Reference, Table,
 from extension.util import load_with_source
 from gamma.evaluator import eval_node
 from gamma.result_card import MultiResultCard, ResultCard
+from gamma.utils import mathjax_latex
 
 # Formatting functions
 _function_formatters = {}
@@ -41,18 +42,18 @@ def format_by_type(result, function_name, node, formatter):
     if function_name in _function_formatters:
         return _function_formatters[function_name](result, node, formatter)
     elif function_name in all_cards and all_cards[function_name].format_output:
-        return all_cards[function_name].format_output(result, formatter)
+        return all_cards[function_name].format_output(result)
     elif isinstance(result, (list, tuple)):
-        return format_list(result, formatter)
+        return format_list(result)
     else:
         return formatter(result)
 
 
-def format_document(arg: str, formatter):
+def format_document(arg: str):
     return Document(html=arg)
 
 
-def format_steps(arg, formatter):
+def format_steps(arg):
     arg['type'] = 'StepContainer'
     return arg
 
@@ -75,7 +76,7 @@ def format_integral(line, result, components):
 
 
 def format_dict_title(*title: str):
-    def _format_dict(dictionary, formatter):
+    def _format_dict(dictionary):
         data = Table(titles=title, rows=[])
         try:
             fdict = dictionary.items()
@@ -85,15 +86,15 @@ def format_dict_title(*title: str):
                 data['rows'].append([str(key), str(val)])
             return data
         except AttributeError:  # not iterable/not a dict
-            return formatter(dictionary)
+            return mathjax_latex(dictionary)
     return _format_dict
 
 
-def format_list(items, formatter):
+def format_list(items):
     try:
-        return List(list=[formatter(item) for item in items])
+        return List(list=[mathjax_latex(item) for item in items])
     except TypeError:  # not iterable, like None
-        return formatter(items)
+        return mathjax_latex(items)
 
 
 def format_nested_list_title(*titles: str):
@@ -117,19 +118,19 @@ def format_series_fake_title(title, evaluated):
     return title.format(about, up_to)
 
 
-def format_truth_table(table, formatter):
+def format_truth_table(table):
     # table is (variables, [(bool, bool...)] representing combination of values
     # and result
     return TruthTable(titles=[str(s) for s in table[0]] + ["Values"],
                       rows=[[str(v) for v in entry] for entry in table[1]])
 
 
-def format_approximator(approximation, formatter):
+def format_approximator(approximation):
     obj, digits = approximation
-    return formatter(obj, digits=digits)
+    return mathjax_latex(obj, digits=digits)
 
 
-def format_factorization_diagram(factors, formatter):
+def format_factorization_diagram(factors):
     primes = []
     for prime in reversed(sorted(factors)):
         times = factors[prime]
@@ -137,7 +138,7 @@ def format_factorization_diagram(factors, formatter):
     return FactorDiagram(primes=primes)
 
 
-def format_plot(plot_data: tuple[str, list[dict]], formatter):
+def format_plot(plot_data: tuple[str, list[dict]]):
     return Plot(variable=plot_data[0], graphs=plot_data[1])
 
 

@@ -7,6 +7,7 @@ from typing import cast
 import sympy
 from sympy.core.relational import Relational
 
+from api.data_type import Tex
 from gamma.evaluator import eval_node
 
 OTHER_SYMPY_FUNCTIONS = ('sqrt',)
@@ -235,3 +236,27 @@ def latex(expr: sympy.Basic | str | int) -> str:
         # solveset(sin(x)) click More Digits
         expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
     return sympy.latex(expr)
+
+
+def is_approximatable_constant(input_evaluated):
+    # is_constant, but exclude Integer/Float/infinity
+    return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols \
+           and not input_evaluated.is_Integer and not input_evaluated.is_Float and input_evaluated.is_finite
+
+
+def mathjax_latex(*args, digits: int | None = 15):
+    tex_code = []
+    for obj in args:
+        if hasattr(obj, 'as_latex'):
+            tex_code.append(obj.as_latex())
+        else:
+            tex_code.append(latex(obj))
+
+    result = Tex(tex=''.join(tex_code))
+    if digits is not None and len(args) == 1:
+        obj = args[0]
+        if is_approximatable_constant(obj):
+            result['numeric'] = True
+            result['expression'] = repr(obj)
+            result['approximation'] = latex(obj.evalf(digits))
+    return result

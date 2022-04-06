@@ -7,35 +7,11 @@ import sympy
 from sympy.core.function import FunctionClass
 from sympy.parsing.sympy_parser import eval_expr, stringify_expr
 
-from api.data_type import Tex, _Tex
+from api.data_type import Tex
 from gamma.dispatch import DICT, find_result_set
 from gamma.evaluator import namespace, transformations
 from gamma.resultsets import find_learn_more_set, format_by_type, get_card
-from gamma.utils import OTHER_SYMPY_FUNCTIONS, latex, latexify, removeSymPy
-
-
-def is_approximatable_constant(input_evaluated):
-    # is_constant, but exclude Integer/Float/infinity
-    return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols \
-           and not input_evaluated.is_Integer and not input_evaluated.is_Float and input_evaluated.is_finite
-
-
-def mathjax_latex(*args, digits: int | None = 15) -> _Tex:
-    tex_code = []
-    for obj in args:
-        if hasattr(obj, 'as_latex'):
-            tex_code.append(obj.as_latex())
-        else:
-            tex_code.append(latex(obj))
-
-    result = Tex(tex=''.join(tex_code))
-    if digits is not None and len(args) == 1:
-        obj = args[0]
-        if is_approximatable_constant(obj):
-            result['numeric'] = True
-            result['expression'] = repr(obj)
-            result['approximation'] = latex(obj.evalf(digits))
-    return result
+from gamma.utils import OTHER_SYMPY_FUNCTIONS, is_approximatable_constant, latexify, mathjax_latex, removeSymPy
 
 
 class SymPyGamma:
@@ -141,4 +117,4 @@ class SymPyGamma:
         card = get_card(card_name)
         components, _, _ = self.get_cards()
         result = card.eval(components, parameters)
-        return card.format_output(result, mathjax_latex)
+        return card.format_output(result)

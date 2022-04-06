@@ -48,15 +48,15 @@ class Latex:
         return ''.join(self.buffer)
 
 
-def format_latex(tex: str, formatter=None) -> _Tex:
+def format_latex(tex: str) -> _Tex:
     return Tex(tex=tex)
 
 
-def format_text(text: str, formatter=None):
+def format_text(text: str):
     return Text(text=text)
 
 
-def format_figure(output: tuple[Figure, str], formatter=None):
+def format_figure(output: tuple[Figure, str]):
     figure, name = output
     buf = io.BytesIO()
     figure.savefig(buf, format='svg', metadata={'Date': None})

@@ -7,7 +7,7 @@ import sympy
 from api.data_type import Dict
 from gamma.dispatch import DICT
 from gamma.evaluator import namespace
-from gamma.utils import latex
+from gamma.utils import latex, mathjax_latex
 
 
 class ResultCard:
@@ -25,7 +25,7 @@ class ResultCard:
                  applicable: Callable[[DICT], bool] | None = None,
                  format_input: Callable[[Any, Any, Any], str | list[str] | None] | None = None,
                  eval_method: Callable[[DICT, DICT | None], Any] | None = None,
-                 format_output: Callable[..., Dict] | None = None, parameters: list[str] | None = None,
+                 format_output: Callable[[Any], Dict] | None = None, parameters: list[str] | None = None,
                  wiki: str | None = None):
         self.title = title
         self.result_statement = result_statement
@@ -67,10 +67,10 @@ class ResultCard:
         return None if self.result_statement is None \
             else self.result_statement.format(_var=variable, **parameters) % input_repr
 
-    def format_output(self, output, formatter):
+    def format_output(self, output):
         if self._format_output:
-            return self._format_output(output, formatter)
-        return formatter(output)
+            return self._format_output(output)
+        return mathjax_latex(output)
 
     def is_multivariate(self):
         return False  # todo: whether multivariate depends on input: diff(x+y) is but diff(x+y, x) isn't
@@ -124,11 +124,11 @@ class MultiResultCard(ResultCard):
         self.components = components
         return results
 
-    def format_output(self, output, formatter):
+    def format_output(self, output):
         return {
             'type': 'MultiResult',
             'results': [{
                 'input': card.format_input(self.components),
-                'output': card.format_output(result, formatter)
+                'output': card.format_output(result)
             } for card, result in output]
         }

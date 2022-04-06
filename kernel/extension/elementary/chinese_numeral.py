@@ -77,7 +77,7 @@ def int_to_chinese_numeral(n: int) -> tuple[str, str]:
     return normal, financial
 
 
-def format_output(output: tuple[str, str], parameters: None):
+def format_output(output: tuple[str, str]):
     return ChineseNumeral(normal=output[0], financial=output[1])
 
 

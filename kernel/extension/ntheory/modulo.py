@@ -8,7 +8,7 @@ def modulo(n: int) -> tuple[int, list[int]]:
     return n, [n % i for i in range(2, 10)]
 
 
-def format_output(output: tuple[int, list[int]], parameters: None):
+def format_output(output: tuple[int, list[int]]):
     return Table(titles=['m'] + list(map(str, range(2, 10))),
                  rows=[[f'{output[0]} mod m'] + [str(i) for i in output[1]]])
 
