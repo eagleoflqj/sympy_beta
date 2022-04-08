@@ -19,8 +19,8 @@ def is_integral(input_evaluated):
     return isinstance(input_evaluated, sympy.Integral)
 
 
-def is_float(input_evaluated):
-    return isinstance(input_evaluated, sympy.Float)
+def is_real(input_evaluated):
+    return isinstance(input_evaluated, sympy.Expr) and input_evaluated.is_real
 
 
 def is_numbersymbol(input_evaluated):
@@ -212,7 +212,7 @@ CONVERTER = Callable[[Any, Any], DICT]
 function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
     'Integer': (None, ('digits', 'english_numeral', 'roman_numeral', 'chinese_numeral', 'binary_form', 'factorization',
                        'factorizationDiagram', 'modulo', 'quadratic_residue', 'primitive_root')),
-    'Float': (None, ('rational', 'pie_chart')),
+    'Float': (None, ('rational', 'pie_chart', 'continued_fraction')),
     'factorial': factorial_result,
     'factorial2': factorial_result,
     'integrate': (extract_integral, ('integral_alternate_fake', 'intsteps')),
@@ -225,9 +225,9 @@ function_map: dict[str, tuple[CONVERTER | None, tuple[str, ...]]] = {
 }
 
 exclusive_predicates: list[tuple[Callable[[Any], bool], tuple[str, ...]]] = [
-    (is_rational, ('pie_chart',)),
+    (is_rational, ('pie_chart', 'continued_fraction')),
     (is_complex, ('absolute_value', 'polar_angle', 'conjugate')),
-    (is_float, ('fractional_approximation',)),
+    (is_real, ('pie_chart', 'continued_fraction')),
     # root_to_polynomial
     (is_uncalled_function, ('function_docs',)),
     (is_matrix, ('matrix_inverse', 'matrix_eigenvals', 'matrix_eigenvectors')),

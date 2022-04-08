@@ -400,9 +400,8 @@ all_cards: dict[str, ResultCard] = {
         "(%s).evalf({digits})",
         parameters=['digits']),
 
-    'fractional_approximation': ResultCard(
-        "Fractional approximation",
-        "nsimplify(%s)"),
+    # todo: use it wisely, eg: long float input, float result
+    'fractional_approximation': ResultCard("Fractional approximation", "nsimplify(%s)"),
 
     'absolute_value': ResultCard(
         "Absolute value",
@@ -511,6 +510,7 @@ all_cards: dict[str, ResultCard] = {
     'primitive_root': load_with_source('extension.ntheory.primitive_root'),
     'rational': load_with_source('extension.elementary.rational'),
     'pie_chart': load_with_source('extension.elementary.pie_chart'),
+    'continued_fraction': load_with_source('extension.ntheory.continued_fraction'),
 }
 
 
