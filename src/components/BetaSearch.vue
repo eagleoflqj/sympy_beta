@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NInputGroup, NInput, NButton, NSpace } from 'naive-ui'
+import { NInputGroup, NInput, NButton, NH1 } from 'naive-ui'
 
 const input = ref()
 const router = useRouter()
@@ -18,21 +18,18 @@ watchEffect(() => {
 </script>
 
 <template>
-  <n-space
+  <div
     class="input"
-    vertical
   >
-    <h1>
+    <n-h1>
       <router-link :to="'/'">
         <img
-          src="/src/assets/logo.png"
-          alt="SymPy Beta logo"
-          width="75"
-          height="50"
+          src="/favicon.svg"
+          alt=""
         >
         SymPy Beta
       </router-link>
-    </h1>
+    </n-h1>
     <n-input-group style="width: calc(100vw - 24px); max-width: 584px; margin: auto">
       <n-input
         v-model:value="input"
@@ -48,5 +45,34 @@ watchEffect(() => {
         =
       </n-button>
     </n-input-group>
-  </n-space>
+  </div>
 </template>
+
+<style scoped>
+h1 {
+  margin-bottom: 0
+}
+
+h1 a {
+  color: #fff;
+  text-decoration: none;
+}
+
+h1 a img {
+  vertical-align: middle;
+}
+
+img {
+  height: 75px
+}
+.input {
+  text-align: center;
+  padding-bottom: 20px;
+  background: #3b5526;
+}
+
+.input input[type="text"] {
+  font-family: "Droid Sans Mono", monospace;
+  text-align: left;
+}
+</style>

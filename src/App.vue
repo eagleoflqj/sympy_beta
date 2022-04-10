@@ -66,27 +66,6 @@ label {
   padding: 0;
 }
 
-h1 {
-  font-family: "Gentium Basic", serif;
-  font-weight: normal;
-  margin: 0;
-}
-
-h1 a:link,
-h1 a:visited,
-h1 a:active {
-  color: #fff;
-  text-decoration: none;
-}
-
-h1 a:hover {
-  color: #96c56f;
-}
-
-h1 a img {
-  vertical-align: bottom;
-}
-
 .fullscreen {
   position: fixed;
   left: 0;
@@ -110,17 +89,6 @@ h1 a img {
 .card_actions li {
   display: inline-block;
   border-bottom: 2px solid #ccc;
-}
-
-.input {
-  text-align: center;
-  padding: 20px 0;
-  background: #3b5526;
-}
-
-.input input[type="text"] {
-  font-family: "Droid Sans Mono", monospace;
-  text-align: left;
 }
 
 .foot {
