@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import ast
 import re
 from typing import cast
@@ -241,7 +239,8 @@ def latex(expr: sympy.Basic | str | int) -> str:
 def is_approximatable_constant(input_evaluated):
     # is_constant, but exclude Integer/Float/infinity
     return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols \
-           and not input_evaluated.is_Integer and not input_evaluated.is_Float and input_evaluated.is_finite
+           and not input_evaluated.is_Integer and not input_evaluated.is_Float \
+           and input_evaluated.is_finite  # type: ignore
 
 
 def mathjax_latex(*args, digits: int | None = 15):

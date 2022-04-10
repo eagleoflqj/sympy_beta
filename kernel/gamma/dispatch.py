@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Any, Callable
 
 import sympy
@@ -20,7 +18,7 @@ def is_integral(input_evaluated):
 
 
 def is_real(input_evaluated):
-    return isinstance(input_evaluated, sympy.Expr) and input_evaluated.is_real
+    return isinstance(input_evaluated, sympy.Expr) and input_evaluated.is_real  # type: ignore
 
 
 def is_numbersymbol(input_evaluated):

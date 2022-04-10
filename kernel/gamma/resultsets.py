@@ -6,6 +6,7 @@ from typing import Any, Callable
 import docutils.core
 import sympy
 from sympy.core.symbol import Symbol
+from sympy.integrals.manualintegrate import manualintegrate
 
 import gamma.diffsteps
 import gamma.intsteps
@@ -163,7 +164,8 @@ class GraphType(enum.Enum):
 graph_handler: dict[GraphType, tuple[Callable[[float, float], float], Callable[[float, float], float]]] = {
     GraphType.xy: (lambda x, y: x, lambda x, y: y),
     GraphType.parametric: (lambda x, y: x, lambda x, y: y),
-    GraphType.polar: (lambda theta, r: float(r * sympy.cos(theta)), lambda theta, r: float(r * sympy.sin(theta)))
+    GraphType.polar: (lambda theta, r: float(r * sympy.cos(theta)),  # type: ignore
+                      lambda theta, r: float(r * sympy.sin(theta)))  # type: ignore
 }
 
 
@@ -255,7 +257,7 @@ def eval_integral(components, parameters=None):
 
 
 def eval_integral_manual(components, parameters=None):
-    return sympy.integrals.manualintegrate.manualintegrate(components['integrand'], components['variable'])
+    return manualintegrate(components['integrand'], components['variable'])
 
 
 def eval_diffsteps(components, parameters=None):

@@ -1,6 +1,4 @@
 # todo: merge _Class and Class when https://github.com/python/mypy/issues/6131 is resolved
-from __future__ import annotations
-
 from typing import Sequence, TypedDict
 
 from typing_extensions import NotRequired

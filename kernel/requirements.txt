@@ -1,8 +1,8 @@
 # prod
 docutils==0.18.1
-matplotlib==3.3.3
-numpy==1.21.4
-sympy==1.9
+matplotlib==3.5.1
+numpy==1.22.3
+sympy==1.10.1
 typing-extensions==4.1.1
 wheel==0.37.1
 

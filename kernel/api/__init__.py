@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import traceback
 from typing import Callable
 
@@ -28,4 +26,4 @@ def eval_card(card_name: str, expression: str, variable: str | None, parameters:
 
 def get_sympy_version() -> str:
     import sympy
-    return sympy.__version__
+    return sympy.__version__  # type: ignore

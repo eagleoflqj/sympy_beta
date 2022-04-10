@@ -1,4 +1,4 @@
-const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.19.1/full/'
+const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/'
 
 importScripts(`${pyodideURL}pyodide.js`)
 

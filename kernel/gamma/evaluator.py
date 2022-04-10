@@ -1,6 +1,7 @@
 import ast
+from tokenize import NAME
 
-from sympy.parsing.sympy_parser import (NAME, convert_xor, function_exponentiation, implicit_application, split_symbols,
+from sympy.parsing.sympy_parser import (convert_xor, function_exponentiation, implicit_application, split_symbols,
                                         standard_transformations)
 
 SYNONYMS = {

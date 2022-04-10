@@ -1,6 +1,6 @@
 // blocker: Firefox https://stackoverflow.com/questions/44118600/web-workers-how-to-import-modules
 // import { pyodideURL, kernelVersion } from '/package.json'
-const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.19.1/full/'
+const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/'
 const kernelName = 'sympy_beta_kernel'
 const kernelVersion = '1.0.0'
 

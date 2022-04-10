@@ -25,7 +25,7 @@ def totient_step(n: int) -> str:
         res = 1
         for _pow in pows:
             b, e = _pow.base, _pow.exp
-            part = (b - 1) * b ** (e - 1)
+            part = (b - 1) * b ** (e - 1)  # type: ignore
             res *= part
             L.a(R'\phi(%s) = (%s - 1) \times %s^{%s - 1} = %s' % (latex(_pow), b, b, e, part)).n()
         L.as_a_result([R'\phi(%s) = %s' % (n, res)])

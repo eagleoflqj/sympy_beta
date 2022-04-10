@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sympy import Integer, continued_fraction, continued_fraction_iterator, sympify
 
 from api.data_type import ContinuedFraction
@@ -14,7 +12,7 @@ def not_integer(components: DICT) -> bool:
 def continued_frac(components: DICT, parameters=None) -> tuple[int, list[int], list[int] | None]:
     num = sympify(components['expression'], rational=True)
     try:
-        res = continued_fraction(num)
+        res: list = continued_fraction(num)
         if isinstance(res[0], list):
             n = res[0][0]
             res = [n] + [res[0][1:] + [n]]

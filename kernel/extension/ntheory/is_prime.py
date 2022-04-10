@@ -1,3 +1,5 @@
+from typing import cast
+
 from sympy import Integer, factorint, floor, latex, primerange, sqrt
 
 from extension.ntheory.util import cross_mul, is_positive_integer, is_prime_from_factor_dict, pow_list_from_factor_dict
@@ -38,7 +40,7 @@ def is_prime_step(n: int) -> str:
             if square_root.is_Integer:
                 L.eq(n, f'{square_root}^2').t(', so ').a(n).t(' is a multiple of ').a(square_root)
             else:
-                floor_of_sqrt = floor(square_root)
+                floor_of_sqrt = cast(Integer, floor(square_root))
                 L.a(latex(sqrt(n, evaluate=False)), R'\approx', square_root.round(3))\
                     .t(', so trying primes up to ').a(floor_of_sqrt).t(' suffices').n()
                 for p in primerange(floor_of_sqrt + 1):
