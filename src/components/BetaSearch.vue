@@ -37,6 +37,7 @@ watchEffect(() => {
         placeholder
         clearable
         @keyup.enter="submit"
+        style="font-family: 'Droid Sans Mono', monospace"
       />
       <n-button
         type="primary"
@@ -50,7 +51,8 @@ watchEffect(() => {
 
 <style scoped>
 h1 {
-  margin-bottom: 0
+  margin-bottom: 0;
+  text-align: center;
 }
 
 h1 a {
@@ -65,14 +67,11 @@ h1 a img {
 img {
   height: 75px
 }
+
 .input {
-  text-align: center;
   padding-bottom: 20px;
   background: #3b5526;
-}
-
-.input input[type="text"] {
-  font-family: "Droid Sans Mono", monospace;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 </style>
