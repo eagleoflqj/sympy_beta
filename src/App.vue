@@ -31,13 +31,13 @@ watchEffect(() => {
     content-style="height: 100%; display: flex; flex-direction: column"
   >
     <n-layout-content :style="showFooter && {flex: '1 0 auto', backgroundColor: '#eee'}">
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <n-message-provider>
+      <n-message-provider>
+        <router-view v-slot="{ Component }">
+          <keep-alive>
             <component :is="Component" />
-          </n-message-provider>
-        </keep-alive>
-      </router-view>
+          </keep-alive>
+        </router-view>
+      </n-message-provider>
     </n-layout-content>
     <n-back-top />
     <n-layout-footer
