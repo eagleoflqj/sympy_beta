@@ -11,9 +11,9 @@
   },
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "dev": "node scripts/build_wheel.js . && vite --host",
+    "dev": "node scripts/build_wheel.js && vite --host",
     "lint": "eslint --ext .js,.vue --fix public scripts src",
-    "build": "vite build && node scripts/build_wheel.js dist",
+    "build": "node scripts/build_wheel.js && vite build",
     "serve": "vite preview --host"
   },
   "dependencies": {
