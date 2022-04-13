@@ -5,6 +5,7 @@ import { NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutF
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
+import ReloadPrompt from '@/components/ReloadPrompt.vue'
 
 const route = useRoute()
 const showFooter = ref(true)
@@ -16,6 +17,7 @@ watchEffect(() => {
 
 <template>
   <n-notification-provider>
+    <reload-prompt />
     <runtime-loader />
   </n-notification-provider>
   <n-layout-header
