@@ -36,8 +36,8 @@ watchEffect(() => {
         type="text"
         placeholder
         clearable
-        @keyup.enter="submit"
         style="font-family: 'Droid Sans Mono', monospace"
+        @keyup.enter="submit"
       />
       <n-button
         type="primary"
