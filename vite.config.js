@@ -13,6 +13,7 @@ export default defineConfig({
       includeAssets: ['*.whl'],
       manifest: {
         name: 'SymPy Beta',
+        short_name: 'SymPy Beta',
         'icons': [
           {
             src: 'favicon.svg',
