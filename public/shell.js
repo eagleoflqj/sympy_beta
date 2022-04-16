@@ -27,7 +27,7 @@ async function loadPyodideAndPackages () {
         return to_js([res], depth=1)
     def clear_console():
         pyconsole.buffer = []
-  `, namespace)
+  `, { globals: namespace })
   reprShorten = namespace.get('repr_shorten')
   self.postMessage({ type: 'ready', arg: namespace.get('BANNER') })
   awaitFut = namespace.get('await_fut')
