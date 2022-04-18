@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NInputGroup, NInput, NButton, NH1 } from 'naive-ui'
+import { NInputGroup, NInput, NButton, NH1, NPopover } from 'naive-ui'
 
 const input = ref()
 const router = useRouter()
@@ -39,12 +39,17 @@ watchEffect(() => {
         style="font-family: 'Droid Sans Mono', monospace"
         @keyup.enter="submit"
       />
-      <n-button
-        type="primary"
-        @click="submit"
-      >
-        =
-      </n-button>
+      <n-popover>
+        <template #trigger>
+          <n-button
+            type="primary"
+            @click="submit"
+          >
+            =
+          </n-button>
+        </template>
+        compute input
+      </n-popover>
     </n-input-group>
   </div>
 </template>
