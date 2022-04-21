@@ -195,6 +195,7 @@ async function seeSteps () {
             <n-button
               v-for="variable in card.variables"
               :disabled="variable === card.variable"
+              secondary
               type="primary"
               @click="chooseVariable(variable)"
             >

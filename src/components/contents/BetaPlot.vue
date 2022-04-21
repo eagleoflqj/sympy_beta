@@ -92,24 +92,28 @@ function setupPlots () {
     </n-checkbox-group>
     <n-space>
       <n-button
+        secondary
         type="primary"
         @click="reset"
       >
         Reset
       </n-button>
       <n-button
+        secondary
         type="primary"
         @click="squareViewport"
       >
         Square Viewport
       </n-button>
       <n-button
+        secondary
         type="primary"
         @click="callback.toggleFullscreen"
       >
         Fullscreen
       </n-button>
       <n-button
+        secondary
         type="primary"
         @click="exportSVG"
       >

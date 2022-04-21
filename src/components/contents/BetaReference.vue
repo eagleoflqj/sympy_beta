@@ -1,4 +1,6 @@
 <script setup>
+import { NA } from 'naive-ui'
+
 defineProps({
   card: {
     type: Object,
@@ -10,10 +12,12 @@ defineProps({
 <template>
   <ul>
     <li v-for="link in card.links">
-      <a
+      <n-a
         :href="link"
         target="_blank"
-      >{{ link }}</a>
+      >
+        {{ link }}
+      </n-a>
     </li>
   </ul>
 </template>

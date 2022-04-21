@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import { NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop, NMessageProvider } from 'naive-ui'
+import { NConfigProvider, NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop, NMessageProvider } from 'naive-ui'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
@@ -10,45 +10,53 @@ import ReloadPrompt from '@/components/ReloadPrompt.vue'
 const route = useRoute()
 const showFooter = ref(true)
 
+const theme = ref(null)
+
+function setTheme (newTheme) {
+  theme.value = newTheme
+}
+
 watchEffect(() => {
   showFooter.value = route.name !== 'Terminal'
 })
 </script>
 
 <template>
-  <n-notification-provider>
-    <reload-prompt />
-    <runtime-loader />
-  </n-notification-provider>
-  <n-layout-header
-    style="height: 42px"
-    bordered
-  >
-    <beta-header />
-  </n-layout-header>
-  <n-layout
-    position="absolute"
-    :native-scrollbar="false"
-    style="top: 42px"
-    content-style="height: 100%; display: flex; flex-direction: column"
-  >
-    <n-layout-content :style="showFooter && {flex: '1 0 auto', backgroundColor: '#eee'}">
-      <n-message-provider>
-        <router-view v-slot="{ Component }">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
-        </router-view>
-      </n-message-provider>
-    </n-layout-content>
-    <n-back-top />
-    <n-layout-footer
-      v-if="showFooter"
-      style="flex-shrink: 0"
+  <n-config-provider :theme="theme">
+    <n-notification-provider>
+      <reload-prompt />
+      <runtime-loader />
+    </n-notification-provider>
+    <n-layout-header
+      style="height: 42px; display: flex; align-items: center; justify-content: space-between;"
+      bordered
     >
-      <beta-footer />
-    </n-layout-footer>
-  </n-layout>
+      <beta-header :set-theme="setTheme" />
+    </n-layout-header>
+    <n-layout
+      position="absolute"
+      :native-scrollbar="false"
+      style="top: 42px"
+      content-style="height: 100%; display: flex; flex-direction: column"
+    >
+      <n-layout-content :style="showFooter && {flex: '1 0 auto'}">
+        <n-message-provider>
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component" />
+            </keep-alive>
+          </router-view>
+        </n-message-provider>
+      </n-layout-content>
+      <n-back-top />
+      <n-layout-footer
+        v-if="showFooter"
+        style="flex-shrink: 0"
+      >
+        <beta-footer />
+      </n-layout-footer>
+    </n-layout>
+  </n-config-provider>
 </template>
 
 <style>
@@ -143,18 +151,7 @@ p {
     margin: 3px;
   }
 
-  .example-group li {
-    margin: 0.25em 0;
-  }
-
-  .example-group {
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    border: 1px solid #ccc;
-  }
-
-  .result,
-  #footer {
+  .result {
     width: 100%;
     margin: 10px auto;
   }

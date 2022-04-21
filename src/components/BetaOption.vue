@@ -16,6 +16,7 @@ defineProps({
 <template>
   <div class="card_options">
     <n-button
+      secondary
       type="primary"
       @click="callback"
     >

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, toRaw, onMounted } from 'vue'
+import { NA } from 'naive-ui'
 import { FactorDiagram } from '@/js/factordiagram.js'
 
 const props = defineProps({
@@ -22,8 +23,10 @@ onMounted(() => (new FactorDiagram(card.primes, container.value)).draw())
   >
     <svg ref="container" />
   </div>
-  <a
+  <n-a
     href="https://mathlesstraveled.com/2012/10/05/factorization-diagrams/"
     target="_blank"
-  >About this diagram</a>
+  >
+    About this diagram
+  </n-a>
 </template>

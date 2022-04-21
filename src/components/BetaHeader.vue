@@ -3,6 +3,15 @@ import { h, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { NMenu } from 'naive-ui'
 
+import BetaSwitchTheme from '@/components/BetaSwitchTheme.vue'
+
+defineProps({
+  setTheme: {
+    type: Function,
+    required: true
+  }
+})
+
 const route = useRoute()
 
 const menuOptions = [
@@ -35,4 +44,5 @@ const menuValue = computed(() => {
     :value="menuValue"
     :options="menuOptions"
   />
+  <beta-switch-theme :set-theme="setTheme" />
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { NButton } from 'naive-ui'
+import { NButton, NSpace, NA } from 'naive-ui'
 import BetaSearch from '@/components/BetaSearch.vue'
 import BetaCollapse from '@/components/BetaCollapse.vue'
 import categorys from '@/js/categorys.js'
@@ -37,23 +37,28 @@ function randomExample () {
     >
       Examples
     </h2>
-    <n-button
-      type="primary"
-      @click="randomExample"
-    >
-      Random Example
-    </n-button>
-    <beta-collapse
-      v-for="category in categorys"
-      :category="category"
-    />
+    <n-space vertical>
+      <n-button
+        secondary
+        type="primary"
+        @click="randomExample"
+      >
+        Random Example
+      </n-button>
+      <beta-collapse
+        v-for="category in categorys"
+        :category="category"
+      />
+    </n-space>
     <p>
       … and more: see
       the
-      <a
+      <n-a
         href="https://docs.sympy.org"
         target="_blank"
-      >documentation</a> to learn
+      >
+        documentation
+      </n-a> to learn
       about the full range of SymPy's capabilities.
     </p>
   </div>

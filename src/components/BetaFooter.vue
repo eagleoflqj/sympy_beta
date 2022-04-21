@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { NSpin } from 'naive-ui'
+import { NSpin, NA } from 'naive-ui'
 import { getPyodideVersion, getSymPyVersion } from '@/js/workerAPI.js'
 import { homepage } from '@/../package.json'
 
@@ -40,10 +40,12 @@ onMounted(async () => {
     </p>
     <p>
       This project is Free and Open Source (AGPLv3+):
-      <a
+      <n-a
         :href="homepage"
         target="_blank"
-      >SymPy Beta on GitHub</a>.
+      >
+        SymPy Beta on GitHub
+      </n-a>.
     </p>
   </div>
 </template>

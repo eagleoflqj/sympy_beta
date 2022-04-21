@@ -1,5 +1,5 @@
 <script setup>
-import { NIcon, NPopover, NButton } from 'naive-ui'
+import { NIcon, NPopover, NButton, NA } from 'naive-ui'
 import { Image } from '@vicons/fa'
 
 defineProps({
@@ -20,7 +20,7 @@ defineProps({
       <n-button
         text
       >
-        <a
+        <n-a
           :href="img ? img.src : '#'"
           :download="name"
         >
@@ -28,7 +28,7 @@ defineProps({
             :component="Image"
             size="32"
           />
-        </a>
+        </n-a>
       </n-button>
     </template>
     Download SVG

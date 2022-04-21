@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NInputGroup, NInput, NButton, NH1, NPopover } from 'naive-ui'
+import { NInputGroup, NInput, NButton, NH1, NA, NPopover } from 'naive-ui'
 
 const input = ref()
 const router = useRouter()
@@ -27,7 +27,7 @@ watchEffect(() => {
           src="/favicon.svg"
           alt=""
         >
-        SymPy Beta
+        <n-a>SymPy Beta</n-a>
       </router-link>
     </n-h1>
     <n-input-group style="width: calc(100vw - 24px); max-width: 584px; margin: auto">
@@ -61,7 +61,6 @@ h1 {
 }
 
 h1 a {
-  color: #fff;
   text-decoration: none;
 }
 
@@ -75,7 +74,6 @@ img {
 
 .input {
   padding-bottom: 20px;
-  background: #3b5526;
   display: flex;
   flex-direction: column;
 }
