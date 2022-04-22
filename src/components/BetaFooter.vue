@@ -6,6 +6,9 @@ import { homepage } from '@/../package.json'
 
 const pyodideVersion = ref(null)
 const sympyVersion = ref(null)
+const commit = '__COMMIT__'
+const commitURL = `${homepage}/commit/${commit}`
+const buildDate = '__BUILD_DATE__'
 
 onMounted(async () => {
   pyodideVersion.value = await getPyodideVersion()
@@ -33,6 +36,13 @@ onMounted(async () => {
         v-else
         size="small"
       />
+      <br>
+      Commit <n-a
+        :href="commitURL"
+        target="_blank"
+      >
+        {{ commit.slice(0, 7) }}
+      </n-a> · Built at {{ buildDate }}
     </p>
     <p>
       &copy; 2013-2020 SymPy Development Team

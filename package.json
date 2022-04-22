@@ -24,6 +24,7 @@
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^4.0.0",
     "@vicons/fa": "^0.12.0",
     "@vicons/material": "^0.12.0",
     "@vicons/tabler": "^0.12.0",
