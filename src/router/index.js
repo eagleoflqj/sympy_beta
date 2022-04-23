@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Main from '@/views/Main.vue'
-import Result from '@/views/Result.vue'
-import Terminal from '@/views/Terminal.vue'
+import MainView from '@/views/MainView.vue'
+import ResultView from '@/views/ResultView.vue'
+import TerminalView from '@/views/TerminalView.vue'
 
 const routes = [
-  { path: '/', name: 'Main', component: Main },
-  { path: '/terminal', name: 'Terminal', component: Terminal },
-  { path: '/input/:expr', name: 'Result', component: Result }
+  { path: '/', name: 'Main', component: MainView },
+  { path: '/terminal', name: 'Terminal', component: TerminalView },
+  { path: '/input/:expr', name: 'Result', component: ResultView }
 ]
 
 const router = createRouter({
