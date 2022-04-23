@@ -3,7 +3,8 @@ const { rename } = require('fs')
 const { exit } = require('process')
 const { kernelName, kernelVersion } = require('../package.json')
 process.chdir('kernel')
-const child = spawn('python3', ['setup.py', 'bdist_wheel'])
+const child = spawn('python3', ['setup.py', 'bdist_wheel'],
+  { env: { ...process.env, SOURCE_DATE_EPOCH: 315532800 } })
 child.on('exit', code => {
   if (code !== 0) {
     console.error('Fail to build wheel.')
