@@ -16,6 +16,7 @@ export default defineConfig({
     vue(),
     pluginRewriteAll(),
     VitePWA({
+      registerType: 'autoUpdate',
       includeAssets: ['*.whl'],
       manifest: {
         name: 'SymPy Beta',
