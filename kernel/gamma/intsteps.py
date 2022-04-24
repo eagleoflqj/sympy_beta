@@ -2,24 +2,9 @@ import sympy
 from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, ArctanRule, ConstantRule, ConstantTimesRule,
                                              CyclicPartsRule, DontKnowRule, ExpRule, PartsRule, PiecewiseRule,
                                              PowerRule, ReciprocalRule, RewriteRule, TrigRule, URule, _manualintegrate,
-                                             evaluates, integral_steps)
+                                             integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
-
-# Need this to break loops
-# TODO: add manualintegrate flag to integrate
-_evaluating = None
-
-
-@evaluates(DontKnowRule)
-def eval_dontknow(context, symbol):
-    global _evaluating
-    if _evaluating == context:
-        return None
-    _evaluating = context
-    result = sympy.integrate(context, symbol)
-    _evaluating = None
-    return result
 
 
 def contains_dont_know(rule):
@@ -35,8 +20,8 @@ def contains_dont_know(rule):
                     sub_rule = item[0]
                 else:  # AlternativeRule
                     sub_rule = item
-            if contains_dont_know(sub_rule):
-                return True
+                if contains_dont_know(sub_rule):
+                    return True
     return False
 
 
