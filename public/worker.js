@@ -3,16 +3,19 @@
 const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/'
 const kernelName = 'sympy_beta_kernel'
 const kernelVersion = '1.0.0'
+const useDevSymPy = false
 
 importScripts(`${pyodideURL}pyodide.js`)
 
 async function loadPyodideAndPackages () {
   let errorMsg
+  const pkgs = ['micropip', 'docutils', 'matplotlib', 'numpy', 'typing-extensions',
+    useDevSymPy ? 'mpmath' : 'sympy']
   self.pyodide = await loadPyodide({
     indexURL: pyodideURL
   })
   self.postMessage({ stage: 'PYODIDE_DOWNLOADED' })
-  await self.pyodide.loadPackage(['micropip', 'docutils', 'matplotlib', 'numpy', 'sympy', 'typing-extensions'],
+  await self.pyodide.loadPackage(pkgs,
     console.log, msg => {
       console.error(msg)
       errorMsg = msg
@@ -23,11 +26,13 @@ async function loadPyodideAndPackages () {
     throw new Error()
   }
   self.postMessage({ stage: 'PKG_DOWNLOADED' })
-  const config = { kernelName, kernelVersion }
+  const config = { kernelName, kernelVersion, useDevSymPy }
   self.pyodide.registerJsModule('config', config)
   await self.pyodide.runPythonAsync(`
-    from config import kernelName, kernelVersion
+    from config import kernelName, kernelVersion, useDevSymPy
     import micropip
+    if useDevSymPy:
+        await micropip.install('/sympy-1.11.dev0-py3-none-any.whl')
     await micropip.install(f'/{kernelName}-{kernelVersion}-py3-none-any.whl')
     from api import eval_input, eval_card as eval_card_inner, get_sympy_version
     def eval_card(card_name, expression, variable, parameters):
