@@ -39,7 +39,7 @@ def replace_u_var(rule, old_u, new_u):
             result = []
             for item in val:
                 if isinstance(item, tuple):
-                    result.append(replace_u_var(item, old_u, new_u))
+                    result.append((replace_u_var(item[0], old_u, new_u), item[1]))
                 else:
                     result.append(item)
             d[field] = result

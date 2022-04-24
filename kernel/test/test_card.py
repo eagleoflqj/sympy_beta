@@ -1,3 +1,6 @@
+import hashlib
+import json
+
 import pytest
 
 from api import eval_card
@@ -129,3 +132,15 @@ def test_plot():
     graph = actual['graphs'][0]
     assert graph['points']['x'][0] == 10
     assert graph['points']['x'][-1] == 30
+
+
+integrate_step_cases = [
+    ('exp(x)/(1+exp(2*x))', b'\xee\x19(\xb2t-\xf7\x85I\xb5\xf9\xcaG\xca\xb7\x87')
+]
+
+
+@pytest.mark.parametrize('expr, expected', integrate_step_cases)
+def test_integrate_step(expr: str, expected: bytes):
+    actual = eval_card('intsteps', expr, 'x', None)
+    print(actual)
+    assert hashlib.md5(json.dumps(actual).encode()).digest() == expected
