@@ -38,8 +38,10 @@ def replace_u_var(rule, old_u, new_u):
         elif isinstance(val, list):
             result = []
             for item in val:
-                if isinstance(item, tuple):
+                if type(item) is tuple:
                     result.append((replace_u_var(item[0], old_u, new_u), item[1]))
+                elif isinstance(item, tuple):
+                    result.append(replace_u_var(item, old_u, new_u))
                 else:
                     result.append(item)
             d[field] = result

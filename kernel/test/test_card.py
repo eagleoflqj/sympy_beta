@@ -31,51 +31,6 @@ cases = [
      {'results': [{'input': 'integrate(tan(x), x)',
                    'output': {'tex': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}', 'type': 'Tex'}}],
       'type': 'MultiResult'}),
-    (('intsteps', 'integrate(tan(x))', 'x', None),
-     {'content':
-         {'level': [
-             {'step': [
-                 {'p': ({'text': 'Rewrite the integrand:'},)},
-                 {'p': (
-                     {'block': '\\tan{\\left(x \\right)} = \\frac{\\sin{\\left(x \\right)}}{\\cos{\\left(x \\right)}}'},
-                 )},
-                 {'step': [
-                     {'p': ({'text': 'Let '}, {'inline': 'u = \\cos{\\left(x \\right)}'})},
-                     {'p': ({'text': 'Then let '},
-                            {'inline': 'du = - \\sin{\\left(x \\right)} dx'},
-                            {'text': ' and substitute '}, {'inline': '- du'},
-                            {'text': ':'})},
-                     {'p': ({'block': '\\int \\left(- \\frac{1}{u}\\right)\\, du'},)},
-                     {'level': [
-                         {'step': [
-                             {'p': (
-                                 {'text': 'The integral of a constant times a function is the constant times the '
-                                          'integral of the function:'},
-                             )},
-                             {'p': ({'block': '\\int \\frac{1}{u}\\, du = - \\int \\frac{1}{u}\\, du'},)},
-                             {'level': [
-                                 {'step': [
-                                     {'p': (
-                                         {'text': 'The integral of '},
-                                         {'inline': '\\frac{1}{u}'}, {'text': ' is '},
-                                         {'inline': '\\log{\\left(u \\right)}'}
-                                     )}]}]},
-                             {'p': (
-                                 {'text': 'So, the result is: '},
-                                 {'inline': '- \\log{\\left(u \\right)}'}
-                             )}
-                         ]}
-                     ]},
-                     {'p': ({'text': 'Now substitute '}, {'inline': 'u'}, {'text': ' back in:'})},
-                     {'p': ({'block': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}'},)}
-                 ]}
-             ]},
-             {'step': [
-                 {'p': ({'text': 'Add the constant of integration:'},)},
-                 {'p': ({'block': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}+ \\mathrm{constant}'},)}
-             ]}
-         ]},
-         'answer': {'block': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}'}, 'type': 'StepContainer'}),
     (('truth_table', '(x | y) & (x | ~y) & (~x | y)', 'y', None),
      {'rows': [['True', 'True', 'True'],
                ['True', 'False', 'False'],
@@ -135,12 +90,13 @@ def test_plot():
 
 
 integrate_step_cases = [
-    ('exp(x)/(1+exp(2*x))', b'\xee\x19(\xb2t-\xf7\x85I\xb5\xf9\xcaG\xca\xb7\x87')
+    ('tan(x)', b'P\x06z2\xb3&\xc4\x8eJ\x11\xc2\x01)\x8bG\x01'),  # todo: fix sympy#23348
+    ('exp(x)/(1+exp(2*x))', b'\xa1\xe0\x93\xc1\xb6\xb9Ei\xb3g%\x1c\xd5\x97TG'),
+    ('1/(x*(x+1))', b'\x81\xbel\xf3\x10T\xdf[\xb9\xb5[\x01\x04{j['),
 ]
 
 
 @pytest.mark.parametrize('expr, expected', integrate_step_cases)
 def test_integrate_step(expr: str, expected: bytes):
     actual = eval_card('intsteps', expr, 'x', None)
-    print(actual)
     assert hashlib.md5(json.dumps(actual).encode()).digest() == expected

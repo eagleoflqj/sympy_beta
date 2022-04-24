@@ -25,14 +25,18 @@ def eval_dontknow(context, symbol):
 def contains_dont_know(rule):
     if isinstance(rule, DontKnowRule):
         return True
-    else:
-        for val in rule._asdict().values():
-            if isinstance(val, tuple):
-                if contains_dont_know(val):
-                    return True
-            elif isinstance(val, list):
-                if any(contains_dont_know(i) for i in val):
-                    return True
+    for val in rule._asdict().values():
+        if isinstance(val, tuple):
+            if contains_dont_know(val):
+                return True
+        elif isinstance(val, list):
+            for item in val:
+                if type(item) is tuple:  # PiecewiseRule
+                    sub_rule = item[0]
+                else:  # AlternativeRule
+                    sub_rule = item
+            if contains_dont_know(sub_rule):
+                return True
     return False
 
 
@@ -133,15 +137,11 @@ class IntegralPrinter(JSONPrinter):
             # commutative always puts the symbol at the end when printed
             dx = sympy.Symbol('d' + rule.symbol.name, commutative=0)
             self.append(self.format_text("Let "),
-                        self.format_math(sympy.Eq(u, rule.u_func, evaluate=False)))
-            self.append(self.format_text("Then let "),
-                        self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx, evaluate=False)),
-                        self.format_text(" and substitute "),
-                        self.format_math(rule.constant * du),
-                        self.format_text(":"))
-
-            integrand = rule.constant * rule.substep.context.subs(rule.u_var, u)
-            self.append(self.format_math_display(sympy.Integral(integrand, u)))
+                        self.format_math(sympy.Eq(u, rule.u_func, evaluate=False)),
+                        self.format_text(', then '),
+                        self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx, evaluate=False)))
+            self.append(self.format_text("Substitute:"))
+            self.append(self.format_math_display(sympy.Integral(rule.substep.context, u)))
 
             with self.new_level():
                 self.print_rule(replace_u_var(rule.substep, rule.symbol.name, u))
