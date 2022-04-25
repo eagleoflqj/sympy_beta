@@ -50,7 +50,7 @@ cases = [
                             'expression': '-2 - sqrt(177)*I', 'approximation': '-2.0 - 13.3041346956501 i'},
                            {'type': 'Tex', 'tex': '-2 + \\sqrt{177} i', 'numeric': True,
                             'expression': '-2 + sqrt(177)*I', 'approximation': '-2.0 + 13.3041346956501 i'}]}}]),
-    ('sin(2*x)',
+    ('sin 2x',
      [{'title': 'SymPy', 'input': 'sin(2*x)', 'output': {'type': 'Tex', 'tex': '\\sin{\\left(2 x \\right)}'}},
       {'name': 'trig_alternate', 'variable': 'x', 'title': 'Alternate forms', 'pre_output': ''},
       {'name': 'plot', 'variable': 'x', 'title': 'Plot',

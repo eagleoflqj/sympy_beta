@@ -1,6 +1,7 @@
 # prod
 docutils==0.18.1
 matplotlib==3.5.1
+nltk==3.7
 numpy==1.22.3
 sympy==1.10.1
 typing-extensions==4.1.1

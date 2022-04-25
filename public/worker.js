@@ -9,7 +9,7 @@ importScripts(`${pyodideURL}pyodide.js`)
 
 async function loadPyodideAndPackages () {
   let errorMsg
-  const pkgs = ['micropip', 'docutils', 'matplotlib', 'numpy', 'typing-extensions',
+  const pkgs = ['micropip', 'docutils', 'matplotlib', 'numpy', 'nltk', 'typing-extensions',
     useDevSymPy ? 'mpmath' : 'sympy']
   self.pyodide = await loadPyodide({
     indexURL: pyodideURL
@@ -29,10 +29,17 @@ async function loadPyodideAndPackages () {
   const config = { kernelName, kernelVersion, useDevSymPy }
   self.pyodide.registerJsModule('config', config)
   await self.pyodide.runPythonAsync(`
+    from pathlib import Path
     from config import kernelName, kernelVersion, useDevSymPy
     import micropip
+    from pyodide.http import pyfetch
     if useDevSymPy:
         await micropip.install('/sympy-1.11.dev0-py3-none-any.whl')
+    words_res = await pyfetch('/words.zip')
+    path = Path('/home/pyodide/nltk_data/corpora')
+    path.mkdir(parents=True)
+    with open(path/'words.zip', 'wb') as f:
+        f.write(await words_res.bytes())
     await micropip.install(f'/{kernelName}-{kernelVersion}-py3-none-any.whl')
     from api import eval_input, eval_card as eval_card_inner, get_sympy_version
     def eval_card(card_name, expression, variable, parameters):
