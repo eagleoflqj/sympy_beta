@@ -1,4 +1,5 @@
 # prod
+antlr4-python3-runtime==4.7
 docutils==0.18.1
 matplotlib==3.5.1
 nltk==3.7

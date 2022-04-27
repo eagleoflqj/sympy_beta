@@ -15,6 +15,8 @@ package-lock.json
 *.egg-info
 .coverage
 build
+antlr4-python3-runtime-4.7
 
 # resource
 *.zip
+*.tar.gz

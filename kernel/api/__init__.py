@@ -1,6 +1,8 @@
 import traceback
 from typing import Callable
 
+from sympy.parsing.latex import parse_latex
+
 from gamma.dispatch import DICT
 from gamma.logic import SymPyGamma
 
@@ -17,6 +19,12 @@ def catch(func: Callable) -> Callable:
 @catch
 def eval_input(raw_input: str, variable: str | None = None):
     return SymPyGamma(raw_input, variable).eval()
+
+
+@catch
+def eval_latex_input(raw_input: str):
+    expr = parse_latex(raw_input)
+    return {'result': str(expr)}
 
 
 @catch

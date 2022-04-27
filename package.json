@@ -12,8 +12,8 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "vite --host",
-    "lint": "eslint --ext .js,.vue --fix public scripts src",
-    "build": "node scripts/download_vocabulary.js && node scripts/build_wheel.js && vite build",
+    "lint": "eslint --ext .mjs,.js,.vue --fix public scripts src",
+    "build": "node scripts/download_vocabulary.js && node scripts/build_antlr.mjs && node scripts/build_wheel.js && vite build",
     "serve": "vite preview --host"
   },
   "dependencies": {

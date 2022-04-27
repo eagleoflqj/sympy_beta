@@ -31,8 +31,9 @@ const wrapper = (() => {
 })()
 
 const evalInput = wrapper('eval_input')
+const evalLatexInput = wrapper('eval_latex_input')
 const evalCard = wrapper('eval_card')
 const getPyodideVersion = wrapper('getPyodideVersion')
 const getSymPyVersion = wrapper('get_sympy_version')
 
-export { evalInput, evalCard, register, getPyodideVersion, getSymPyVersion }
+export { evalInput, evalLatexInput, evalCard, register, getPyodideVersion, getSymPyVersion }

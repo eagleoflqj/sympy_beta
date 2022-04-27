@@ -2,7 +2,7 @@
 import { ref, reactive, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { NSpace, NSpin, NA } from 'naive-ui'
-import { evalInput } from '@/js/workerAPI.js'
+import { evalInput, evalLatexInput } from '@/js/workerAPI.js'
 import BetaSearch from '@/components/BetaSearch.vue'
 import BetaCard from '@/components/BetaCard.vue'
 import { homepage } from '@/../package.json'
@@ -13,11 +13,22 @@ const variableRef = ref(null)
 const cards = reactive([])
 
 watchEffect(async () => {
-  if (typeof route.params.expr === 'undefined') {
+  const routeExpr = route.params.expr
+  if (typeof routeExpr === 'undefined') {
     return
   }
-  expr.value = route.params.expr
   cards.splice(0)
+  if (route.params.inputType === 'LaTex') {
+    console.log(typeof routExpr)
+    const { result, error } = await evalLatexInput(routeExpr)
+    if (error) {
+      cards.push({ error })
+      return
+    }
+    expr.value = result
+  } else {
+    expr.value = routeExpr
+  }
   const { result, error } = await evalInput(expr.value, variableRef.value)
   if (result) {
     cards.push(...result)
