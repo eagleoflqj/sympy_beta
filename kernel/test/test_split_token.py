@@ -5,6 +5,8 @@ from gamma.evaluator import token_splittable
 split_cases = [
     'aBc',
     'xyz',
+    'x_1y',
+    'xy_1',
 ]
 
 
@@ -17,6 +19,7 @@ non_split_cases = [
     'Alpha',
     't0',
     'velocity',
+    'x_1',
 ]
 
 

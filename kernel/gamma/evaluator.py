@@ -41,7 +41,7 @@ def synonyms(tokens, local_dict, global_dict):
 
 
 vocabulary: set[str] = set(words.words())
-variable_pattern = re.compile(r'([A-Za-z][a-z]*)\d*')
+variable_pattern = re.compile(r'([A-Za-z][a-z]*)_?\d*')
 
 
 def token_splittable(token: str) -> bool:
