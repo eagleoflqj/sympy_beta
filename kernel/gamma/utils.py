@@ -233,7 +233,7 @@ def latex(expr: sympy.Basic | str | int) -> str:
     if isinstance(expr, sympy.Basic):
         # solveset(sin(x)) click More Digits
         expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
-    return sympy.latex(expr)
+    return sympy.latex(expr, ln_notation=True)
 
 
 def is_approximatable_constant(input_evaluated):

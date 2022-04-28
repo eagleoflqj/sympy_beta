@@ -29,7 +29,7 @@ cases = [
       'type': 'MultiResult'}),
     (('integral_alternate_fake', 'integrate(tan(x))', 'x', None),
      {'results': [{'input': 'integrate(tan(x), x)',
-                   'output': {'tex': '- \\log{\\left(\\cos{\\left(x \\right)} \\right)}', 'type': 'Tex'}}],
+                   'output': {'tex': R'- \ln{\left(\cos{\left(x \right)} \right)}', 'type': 'Tex'}}],
       'type': 'MultiResult'}),
     (('truth_table', '(x | y) & (x | ~y) & (~x | y)', 'y', None),
      {'rows': [['True', 'True', 'True'],
