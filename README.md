@@ -16,19 +16,8 @@ Since 0.5.0, the Pyodide Shell is added (and jQuery is back for using jQuery Ter
 Since 0.6.0, extra functionalities are added to the kernel. See [kernel extension](kernel/extension)
 
 SymPy Beta is NOT an official SymPy project.
-# Debug
-```sh
-npm i
-npm run dev
-```
-Then open http://localhost:3000
-# Run
-```sh
-npm i
-npm run build
-python -m http.server -d dist
-```
-Then open http://localhost:8000
+# Document
+See [doc](doc).
 # License
 AGPL 3.0 or later, with the exception of
 * kernel/gamma derived from SymPy Gamma, which remains 3-clause BSD License from SymPy Gamma

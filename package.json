@@ -1,6 +1,6 @@
 {
   "name": "sympy_beta",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "kernelName": "sympy_beta_kernel",
   "kernelVersion": "1.0.0",
   "homepage": "https://github.com/eagleoflqj/sympy_beta",
@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "vite --host",
     "lint": "eslint --ext .mjs,.js,.vue --fix public scripts src",
-    "build": "node scripts/download_vocabulary.js && node scripts/build_antlr.mjs && node scripts/build_wheel.js && vite build",
+    "build": "node scripts/download_vocabulary.mjs && node scripts/build_antlr.mjs && node scripts/build_wheel.mjs && vite build",
     "serve": "vite preview --host"
   },
   "dependencies": {

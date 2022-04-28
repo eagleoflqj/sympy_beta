@@ -13,7 +13,7 @@ chdir('antlr4-python3-runtime-4.7')
 const inStr = readFileSync('setup.py', { encoding: 'utf-8' })
 const outStr = inStr.replace('distutils.core', 'setuptools')
 writeFileSync('setup.py', outStr)
-spawnSync('python3', ['setup.py', 'bdist_wheel'],
+spawnSync('python', ['setup.py', 'bdist_wheel'],
   { env: { ...process.env, SOURCE_DATE_EPOCH: 315532800 } })
 const wheel = 'antlr4_python3_runtime-4.7-py3-none-any.whl'
 renameSync(`dist/${wheel}`, `../public/${wheel}`)
