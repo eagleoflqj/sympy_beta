@@ -1,6 +1,8 @@
+import re
 import traceback
 from typing import Callable
 
+from sympy import Basic, Symbol
 from sympy.parsing.latex import parse_latex
 
 from gamma.dispatch import DICT
@@ -21,10 +23,14 @@ def eval_input(raw_input: str, variable: str | None = None):
     return SymPyGamma(raw_input, variable).eval()
 
 
+_braces_pattern = re.compile(r'(\w+)_\{(\d+)}')
+
+
 @catch
 def eval_latex_input(raw_input: str):
-    expr = parse_latex(raw_input)
-    return {'result': str(expr)}
+    sp_obj: Basic = parse_latex(raw_input)  # type: ignore
+    sp_obj = sp_obj.replace(lambda x: x.is_Symbol, lambda x: Symbol(_braces_pattern.sub(R'\1_\2', x.name)))
+    return {'result': str(sp_obj)}
 
 
 @catch
