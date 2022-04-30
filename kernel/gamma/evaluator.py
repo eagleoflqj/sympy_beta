@@ -22,7 +22,7 @@ SYNONYMS = {
 }
 
 
-def synonyms(tokens, local_dict, global_dict):
+def synonyms(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT):
     """Make some names synonyms for others.
 
     This is done at the token level so that the "stringified" output that
@@ -32,9 +32,11 @@ def synonyms(tokens, local_dict, global_dict):
 
     result = []
     for token in tokens:
-        if token[0] == NAME:
-            if token[1] in SYNONYMS:
-                result.append((NAME, SYNONYMS[token[1]]))
+        token_type, token_value = token
+        if token_type == NAME:
+            synonym = SYNONYMS.get(token_value.lower())
+            if synonym is not None:
+                result.append((NAME, synonym))
                 continue
         result.append(token)
     return result
