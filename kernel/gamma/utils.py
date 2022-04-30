@@ -38,7 +38,7 @@ class LatexVisitor(ast.NodeVisitor):
         # Only apply to lowercase names (i.e. functions, not classes)
         if fname in self.__class__.EXCEPTIONS:
             func.id = self.__class__.EXCEPTIONS[fname].__name__
-            self.latex = sympy.latex(eval_node(node))
+            self.latex = latex(eval_node(node))
         else:
             result = self.format(fname, node)
             if result:
@@ -52,21 +52,21 @@ class LatexVisitor(ast.NodeVisitor):
                     if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name) and arg.func.id[0].islower():
                         latexes.append(self.visit_Call(arg))
                     else:
-                        latexes.append(sympy.latex(eval_node(arg)))
+                        latexes.append(latex(eval_node(arg)))
 
                 buffer.append(', '.join(latexes))
                 buffer.append(')')
 
                 self.latex = ''.join(buffer)
             else:
-                self.latex = sympy.latex(eval_node(node))
+                self.latex = latex(eval_node(node))
         return self.latex
 
 
 @LatexVisitor.formats_function('solve')
 def format_solve(node):
     expr = eval_node(node.args[0])
-    buffer = [r'\mathrm{solve}\;', sympy.latex(expr)]
+    buffer = [r'\mathrm{solve}\;', latex(expr)]
 
     if not isinstance(expr, Relational):
         buffer.append('=0')
@@ -74,7 +74,7 @@ def format_solve(node):
     if len(node.args) > 1:
         buffer.append(r'\;\mathrm{for}\;')
     for arg in node.args[1:]:
-        buffer.append(sympy.latex(eval_node(arg)))
+        buffer.append(latex(eval_node(arg)))
         buffer.append(r',\, ')
     if len(node.args) > 1:
         buffer.pop()
@@ -85,13 +85,13 @@ def format_solve(node):
 @LatexVisitor.formats_function('limit')
 def format_limit(node):
     if len(node.args) >= 3:
-        return sympy.latex(
+        return latex(
             sympy.Limit(*[eval_node(arg) for arg in node.args]))
 
 
 @LatexVisitor.formats_function('prime')
 def format_prime(node):
-    number = sympy.latex(eval_node(node.args[0]))
+    number = latex(eval_node(node.args[0]))
     return ''.join([number,
                     r'^\mathrm{',
                     ordinal(int(number)),
@@ -100,25 +100,25 @@ def format_prime(node):
 
 @LatexVisitor.formats_function('isprime')
 def format_isprime(node):
-    number = sympy.latex(eval_node(node.args[0]))
+    number = latex(eval_node(node.args[0]))
     return ''.join([r'\mathrm{Is~}', number, r'\mathrm{~prime?}'])
 
 
 @LatexVisitor.formats_function('nextprime')
 def format_nextprime(node):
-    number = sympy.latex(eval_node(node.args[0]))
+    number = latex(eval_node(node.args[0]))
     return r'\mathrm{Least~prime~greater~than~}' + number
 
 
 @LatexVisitor.formats_function('factorint')
 def format_factorint(node):
-    number = sympy.latex(eval_node(node.args[0]))
+    number = latex(eval_node(node.args[0]))
     return r'\mathrm{Prime~factorization~of~}' + number
 
 
 @LatexVisitor.formats_function('factor')
 def format_factor(node):
-    expression = sympy.latex(eval_node(node.args[0]))
+    expression = latex(eval_node(node.args[0]))
     return r'\mathrm{Factorization~of~}' + expression
 
 
@@ -131,29 +131,29 @@ def format_solve_poly_system(node):
         variables = variables[0]
 
     return ''.join([r'\mathrm{Solve~} \begin{cases} ',
-                    r'\\'.join(map(sympy.latex, equations)),
+                    r'\\'.join(map(latex, equations)),
                     r'\end{cases} \mathrm{~for~}',
-                    sympy.latex(variables)])
+                    latex(variables)])
 
 
 @LatexVisitor.formats_function('plot')
 def format_plot(node):
     if node.args:
-        function = sympy.latex(eval_node(node.args[0]))
+        function = latex(eval_node(node.args[0]))
     else:
         keywords = {}
         for keyword in node.keywords:
             keywords[keyword.arg] = eval_node(keyword.value)
-        function = sympy.latex(keywords)
+        function = latex(keywords)
     return r'\mathrm{Plot~}' + function
 
 
 @LatexVisitor.formats_function('rsolve')
 def format_rsolve(node):
-    recurrence = sympy.latex(sympy.Eq(eval_node(node.args[0]), 0, evaluate=False))
+    recurrence = latex(sympy.Eq(eval_node(node.args[0]), 0, evaluate=False))
     if len(node.args) == 3:
         conds = eval_node(node.args[2])
-        initconds = '\\\\\n'.join('&' + sympy.latex(sympy.Eq(eqn, val, evaluate=False)) for eqn, val in conds.items())
+        initconds = '\\\\\n'.join('&' + latex(sympy.Eq(eqn, val, evaluate=False)) for eqn, val in conds.items())
         text = r'&\mathrm{Solve~the~recurrence~}' + recurrence + r'\\'
         condstext = r'&\mathrm{with~initial~conditions}\\'
         return r'\begin{align}' + text + condstext + initconds + r'\end{align}'
@@ -171,7 +171,7 @@ def format_diophantine(node):
     symbols = None
     if isinstance(expression, sympy.Basic):
         symbols = sorted(expression.free_symbols, key=str)
-    equation = sympy.latex(sympy.Eq(expression, 0, evaluate=False))
+    equation = latex(sympy.Eq(expression, 0, evaluate=False))
 
     result = r'\mathrm{Solve~the~diophantine~equation~}' + equation
     if symbols:
@@ -186,7 +186,7 @@ def format_sum_product(node):
         klass = sympy.Sum
     else:
         klass = sympy.Product
-    return sympy.latex(klass(*list(map(eval_node, node.args))))
+    return latex(klass(*list(map(eval_node, node.args))))
 
 
 @LatexVisitor.formats_function('help')
@@ -226,14 +226,14 @@ def removeSymPy(string):
         return string
 
 
-def latex(expr: sympy.Basic | str | int) -> str:
+def latex(expr) -> str:
     # sympy.latex('') == '\\mathtt{\\text{}}'
     if expr == '':
         return ''
     if isinstance(expr, sympy.Basic):
         # solveset(sin(x)) click More Digits
         expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
-    return sympy.latex(expr, ln_notation=True)
+    return sympy.latex(expr, ln_notation=True, itex=True)
 
 
 def is_approximatable_constant(input_evaluated):
