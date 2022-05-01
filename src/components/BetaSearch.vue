@@ -8,10 +8,24 @@ import { Math } from '@vicons/tabler'
 const input = ref()
 const defaultInputType = 'Python'
 const inputType = ref(defaultInputType)
+const clickedPythonInput = ref(false)
 const router = useRouter()
+
 function submit () {
+  clickedPythonInput.value = false
   if (input.value) {
     router.push({ name: 'Result', params: { expr: input.value, inputType: inputType.value } })
+  }
+}
+
+/**
+ * \, _{ and ^{ are LaTex patterns that are meaningless as Python input,
+ * so automatically switch to LaTex input.
+ * But if a user explicitly chooses Python input, don't switch.
+*/
+function checkSwitchToLaTex () {
+  if (inputType.value === 'Python' && !clickedPythonInput.value && /\\|_\{|^\{/.test(input.value)) {
+    inputType.value = 'LaTex'
   }
 }
 
@@ -44,6 +58,7 @@ watchEffect(() => {
           clearable
           style="font-family: 'Droid Sans Mono', monospace"
           @keyup.enter="submit"
+          @input="checkSwitchToLaTex"
         />
         <n-popover>
           <template #trigger>
@@ -58,7 +73,10 @@ watchEffect(() => {
         </n-popover>
       </n-input-group>
       <n-radio-group v-model:value="inputType">
-        <n-radio-button value="Python">
+        <n-radio-button
+          value="Python"
+          @click="clickedPythonInput = true"
+        >
           <n-icon :component="Python" />
           Python input
         </n-radio-button>
