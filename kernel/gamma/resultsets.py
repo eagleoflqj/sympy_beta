@@ -513,6 +513,7 @@ all_cards: dict[str, ResultCard] = {
     'rational': load_with_source('extension.elementary.rational'),
     'pie_chart': load_with_source('extension.elementary.pie_chart'),
     'continued_fraction': load_with_source('extension.ntheory.continued_fraction'),
+    'plot_3d': load_with_source('extension.plot.plot_3d'),
 }
 
 

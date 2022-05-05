@@ -92,11 +92,11 @@ def Text(text: str):
 
 class _Svg(Dict):
     svg: str
-    name: str
+    category: str
 
 
-def Svg(svg: str, name: str):
-    return _Svg(type='Svg', svg=svg, name=name)
+def Svg(svg: str, category: str):
+    return _Svg(type='Svg', svg=svg, category=category)
 
 
 class _ContinuedFraction(Dict):

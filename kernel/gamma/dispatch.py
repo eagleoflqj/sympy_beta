@@ -49,10 +49,22 @@ def is_trig(input_evaluated):
                 for func in (sympy.sin, sympy.cos, sympy.tan, sympy.csc, sympy.sec, sympy.cot))
 
 
-def is_not_constant_basic(input_evaluated):
+def is_not_constant_expr(input_evaluated):
     return not is_constant(input_evaluated) \
-        and isinstance(input_evaluated, sympy.Basic) \
+        and isinstance(input_evaluated, sympy.Expr) \
         and not is_logic(input_evaluated)
+
+
+def is_unary_function(input_evaluated):
+    return is_not_constant_expr(input_evaluated) and len(input_evaluated.free_symbols) == 1
+
+
+def is_binary_function(input_evaluated):
+    return is_not_constant_expr(input_evaluated) and len(input_evaluated.free_symbols) == 2
+
+
+def is_n_ary_function(input_evaluated):
+    return is_not_constant_expr(input_evaluated) and len(input_evaluated.free_symbols) >= 3
 
 
 def is_uncalled_function(input_evaluated):
@@ -236,7 +248,9 @@ exclusive_predicates: list[tuple[Callable[[Any], bool], tuple[str, ...]]] = [
 
 inclusive_predicates = [
     (is_trig, ('trig_alternate',)),
-    (is_not_constant_basic, ('plot', 'roots', 'diff', 'integral_alternate', 'series'))
+    (is_unary_function, ('plot', 'roots', 'diff', 'integral_alternate', 'series')),
+    (is_binary_function, ('plot_3d', 'diff', 'integral_alternate', 'series')),
+    (is_n_ary_function, ('diff', 'integral_alternate', 'series')),
 ]
 
 

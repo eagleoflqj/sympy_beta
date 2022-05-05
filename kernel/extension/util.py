@@ -11,6 +11,7 @@ from gamma.dispatch import DICT
 from gamma.result_card import ResultCard
 
 matplotlib.use('SVG')
+matplotlib.rcParams['svg.hashsalt'] = 'fixed'
 
 
 def t(text: str) -> str:
@@ -57,12 +58,12 @@ def format_text(text: str):
 
 
 def format_figure(output: tuple[Figure, str]):
-    figure, name = output
+    figure, category = output
     buf = io.BytesIO()
     figure.savefig(buf, format='svg', metadata={'Date': None})
     buf.seek(0)
     svg = base64.b64encode(buf.read()).decode()
-    return Svg(svg=svg, name=name)
+    return Svg(svg=svg, category=category)
 
 
 def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:

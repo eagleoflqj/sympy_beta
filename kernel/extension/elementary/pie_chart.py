@@ -30,7 +30,7 @@ def plot_pie_chart(components: DICT, parameters=None) -> tuple[Figure, str]:
         axe_int.text(0, 0, f'×{n}' if n > 1 else '', color='white', ha='center', va='center').set_fontsize(FONT_SIZE)
         axe_frac = fig.add_axes([0.25, 0, 1, 1])
     axe_frac.pie([frac, 1-frac])
-    return fig, 'pie_chart.svg'
+    return fig, 'pie_chart'
 
 
 pie_chart_card = ResultCard('Pie chart', None, eval_method=plot_pie_chart, format_output=format_figure,

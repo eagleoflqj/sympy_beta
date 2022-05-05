@@ -10,6 +10,7 @@ const props = defineProps({
 })
 
 const img = ref(null)
+const name = `${props.card.category}.svg`
 
 onMounted(() => {
   img.value.src = `data:image/svg+xml;base64,${props.card.svg}`
@@ -20,11 +21,22 @@ onMounted(() => {
   <div style="text-align: right">
     <beta-download-image-button
       :img="img"
-      :name="card.name"
+      :name="name"
     />
   </div>
   <img
     ref="img"
-    style="height: 50px"
+    :class="card.category"
   >
 </template>
+
+<style scoped>
+.pie_chart {
+  height: 50px;
+}
+
+.plot_3d {
+  width: 100%;
+  max-width: 500px;
+}
+</style>
