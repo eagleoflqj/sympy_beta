@@ -14,7 +14,7 @@ const router = useRouter()
 function submit () {
   clickedPythonInput.value = false
   if (input.value) {
-    router.push({ name: 'Result', params: { expr: input.value, inputType: inputType.value } })
+    router.push({ name: inputType.value, params: { expr: input.value } })
   }
 }
 
@@ -32,7 +32,7 @@ function checkSwitchToLaTex () {
 const route = useRoute()
 watchEffect(() => {
   input.value = route.params.expr || ''
-  inputType.value = route.params.inputType || defaultInputType
+  inputType.value = route.name === 'LaTex' ? 'LaTex' : defaultInputType
 })
 </script>
 

@@ -18,7 +18,7 @@ watchEffect(async () => {
     return
   }
   cards.splice(0)
-  if (route.params.inputType === 'LaTex') {
+  if (route.name === 'LaTex') {
     const { result, error } = await evalLatexInput(routeExpr)
     if (error) {
       cards.push({ error })

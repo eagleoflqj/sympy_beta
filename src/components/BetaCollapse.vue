@@ -26,7 +26,7 @@ defineProps({
                 />
                 <span v-else-if="example.name">{{ example.name }}</span>
                 <router-link
-                  :to="{ name: 'Result', params: { expr: example.expression } }"
+                  :to="{ name: 'Python', params: { expr: example.expression } }"
                 >
                   <n-a>{{ example.expression }}</n-a>
                 </router-link>
