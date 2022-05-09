@@ -41,36 +41,26 @@ class IntegralPrinter(JSONPrinter):
         self.u = self.du = None
 
     def print_rule(self, rule):
-        if isinstance(rule, ConstantRule):
-            self.print_Constant(rule)
-        elif isinstance(rule, ConstantTimesRule):
-            self.print_ConstantTimes(rule)
-        elif isinstance(rule, PowerRule):
-            self.print_Power(rule)
-        elif isinstance(rule, AddRule):
-            self.print_Add(rule)
-        elif isinstance(rule, URule):
-            self.print_U(rule)
-        elif isinstance(rule, PartsRule):
-            self.print_Parts(rule)
-        elif isinstance(rule, CyclicPartsRule):
-            self.print_CyclicParts(rule)
-        elif isinstance(rule, TrigRule):
-            self.print_Trig(rule)
-        elif isinstance(rule, ExpRule):
-            self.print_Exp(rule)
-        elif isinstance(rule, ReciprocalRule):
-            self.print_Log(rule)
-        elif isinstance(rule, ArctanRule):
-            self.print_Arctan(rule)
-        elif isinstance(rule, AlternativeRule):
-            self.print_Alternative(rule)
-        elif isinstance(rule, DontKnowRule):
-            self.print_DontKnow(rule)
-        elif isinstance(rule, RewriteRule):
-            self.print_Rewrite(rule)
-        elif isinstance(rule, PiecewiseRule):
-            self.print_Piecewise(rule)
+        handlers = {
+            ConstantRule: self.print_Constant,
+            ConstantTimesRule: self.print_ConstantTimes,
+            PowerRule: self.print_Power,
+            AddRule: self.print_Add,
+            URule: self.print_U,
+            PartsRule: self.print_Parts,
+            CyclicPartsRule: self.print_CyclicParts,
+            TrigRule: self.print_Trig,
+            ExpRule: self.print_Exp,
+            ReciprocalRule: self.print_Log,
+            ArctanRule: self.print_Arctan,
+            AlternativeRule: self.print_Alternative,
+            DontKnowRule: self.print_DontKnow,
+            RewriteRule: self.print_Rewrite,
+            PiecewiseRule: self.print_Piecewise,
+        }
+        handler = handlers.get(type(rule), None)
+        if handler:
+            handler(rule)
         else:
             self.append(repr(rule))
 
