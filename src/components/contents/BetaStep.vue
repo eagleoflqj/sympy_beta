@@ -49,7 +49,4 @@ defineProps({
   <h2 v-else-if="content.header">
     {{ content.header }}
   </h2>
-  <template v-else>
-    not covered {{ content }}
-  </template>
 </template>

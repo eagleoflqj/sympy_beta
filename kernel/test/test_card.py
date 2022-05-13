@@ -90,13 +90,19 @@ def test_plot():
 
 
 integrate_step_cases = [
-    ('tan(x)', b'P\x06z2\xb3&\xc4\x8eJ\x11\xc2\x01)\x8bG\x01'),  # todo: fix sympy#23348
-    ('exp(x)/(1+exp(2*x))', b'\xa1\xe0\x93\xc1\xb6\xb9Ei\xb3g%\x1c\xd5\x97TG'),
-    ('1/(x*(x+1))', b'\x81\xbel\xf3\x10T\xdf[\xb9\xb5[\x01\x04{j['),
+    ('tan(x)', b':og0\xb2\xe4)\xac\xbd\x15p\x05Z\x8c\x8c\x04'),  # todo: fix sympy#23348
+    ('exp(x)/(1+exp(2*x))', b'\xdby/4|\xe9\x8a\xb3x=1I\xd8\xf5o\x14'),
+    ('1/(x*(x+1))', b'y{\xbd\xb8\x8eP\x1029\xcf,\xa6\x84\xfeT\xc6'),
+    ('1/sqrt(1-x**2)', b'\xc7\xc9\xb3\xa4\xd1\xd9\xc9%!\x86\xe0\x83%\x04\r3'),
+    ('1/(x**2+1)', b'A\x9d\xde\x8f\xbc_\xcc\xc7t0\xa1\xb1\xc7\xa6\xd3\x91'),
+    ('1/sqrt(x**2+1)', b'\xdf\xb0*\\\xf5M\xe6\x00 \xa7O\xa4\xe2\xf7\xba\xe7'),
+    ('Derivative(f(x), x)', b',eaB\x9c\x10\xed|\xa0\xcdk:\xe6X\x8aN'),
+    ('Heaviside(x)', b'\x9c\x86\x91es\xb8\xa5/y\xd3\xa2T\x11u\x83\xe2'),
+    ('(x**2+1)**(-3/2)', b'~\x99\x9f:\xb7a\x93%\xf7R\x7f\xe2\xb3\x8c!\x9d'),
 ]
 
 
 @pytest.mark.parametrize('expr, expected', integrate_step_cases)
 def test_integrate_step(expr: str, expected: bytes):
-    actual = eval_card('intsteps', expr, 'x', None)
+    actual = eval_card('intsteps', f'integrate({expr})', 'x', None)
     assert hashlib.md5(json.dumps(actual).encode()).digest() == expected

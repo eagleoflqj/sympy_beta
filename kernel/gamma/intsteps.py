@@ -1,10 +1,10 @@
 import sympy
-from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, ArctanRule, ConstantRule, ConstantTimesRule,
-                                             CyclicPartsRule, DontKnowRule, ExpRule, PartsRule, PiecewiseRule,
-                                             PowerRule, ReciprocalRule, RewriteRule, TrigRule, URule, _manualintegrate,
-                                             integral_steps)
+from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, ConstantRule, ConstantTimesRule, CyclicPartsRule,
+                                             DontKnowRule, ExpRule, PartsRule, PowerRule, RewriteRule, TrigRule,
+                                             TrigSubstitutionRule, URule, _manualintegrate, integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
+from gamma.utils import latex
 
 
 def contains_dont_know(rule):
@@ -51,18 +51,13 @@ class IntegralPrinter(JSONPrinter):
             CyclicPartsRule: self.print_CyclicParts,
             TrigRule: self.print_Trig,
             ExpRule: self.print_Exp,
-            ReciprocalRule: self.print_Log,
-            ArctanRule: self.print_Arctan,
             AlternativeRule: self.print_Alternative,
             DontKnowRule: self.print_DontKnow,
             RewriteRule: self.print_Rewrite,
-            PiecewiseRule: self.print_Piecewise,
+            TrigSubstitutionRule: self.print_TrigSubstitution,
         }
-        handler = handlers.get(type(rule), None)
-        if handler:
-            handler(rule)
-        else:
-            self.append(repr(rule))
+        handler = handlers.get(type(rule), self.print_simple)
+        handler(rule)
 
     def print_Constant(self, rule):
         with self.new_step():
@@ -110,7 +105,7 @@ class IntegralPrinter(JSONPrinter):
     def print_U(self, rule):
         with self.new_step(), self.new_u_vars() as (u, du):
             # commutative always puts the symbol at the end when printed
-            dx = sympy.Symbol('d' + rule.symbol.name, commutative=0)
+            dx = sympy.Symbol('d' + rule.symbol.name, commutative=False)
             self.append(self.format_text("Let "),
                         self.format_math(sympy.Eq(u, rule.u_func, evaluate=False)),
                         self.format_text(', then '),
@@ -222,17 +217,10 @@ class IntegralPrinter(JSONPrinter):
                                                           _manualintegrate(rule),
                                                           evaluate=False)))
 
-    def print_Log(self, rule):
+    def print_simple(self, rule):
         with self.new_step():
             self.append(self.format_text("The integral of "),
-                        self.format_math(1 / rule.func),
-                        self.format_text(" is "),
-                        self.format_math(_manualintegrate(rule)))
-
-    def print_Arctan(self, rule):
-        with self.new_step():
-            self.append(self.format_text("The integral of "),
-                        self.format_math(1 / (1 + rule.symbol ** 2)),
+                        self.format_math(rule.context),
                         self.format_text(" is "),
                         self.format_math(_manualintegrate(rule)))
 
@@ -268,32 +256,46 @@ class IntegralPrinter(JSONPrinter):
                         with self.new_level():
                             self.print_rule(r)
 
-    def print_Piecewise(self, rule):
+    def print_TrigSubstitution(self, rule):
         with self.new_step():
-            self.append(self.format_text("The integral of "),
-                        self.format_math(rule.context),
-                        self.format_text(" is "),
-                        self.format_math(_manualintegrate(rule)))
+            d_x = R'\mathrm{d}' + latex(rule.symbol)
+            d_theta = R'\mathrm{d}' + latex(rule.theta)
+            deriv = sympy.diff(rule.func, rule.theta)
+            deriv_latex = latex(deriv)
+            if deriv.is_Add:
+                deriv_latex = f'({deriv_latex})'
+            self.append(self.format_text("Let "),
+                        self.format_math(sympy.Eq(rule.symbol, rule.func, evaluate=False)),
+                        self.format_text(', then '),
+                        self.format_math(f'{d_x}={deriv_latex}{d_theta}'))
+            self.append(self.format_text('Substitute:'))
+            self.append(self.format_math_display(sympy.Integral(rule.substep.context, rule.substep.symbol)))
+            with self.new_level():
+                self.print_rule(rule.substep)
 
     def format_math_constant(self, math):
-        return self.format_math_display(sympy.latex(math) + r"+ \mathrm{constant}")
+        return self.format_math_display(latex(math) + R"+ \mathrm{C}")
 
     def finalize(self):
         rule = filter_unknown_alternatives(self.rule)
-        answer = _manualintegrate(rule)
-        if answer:
-            simp = sympy.simplify(sympy.trigsimp(answer))
-            if simp != answer:
-                answer = simp
+        result = _manualintegrate(rule)
+        if result:
+            simp = sympy.simplify(sympy.trigsimp(result))
+            if simp != result:
+                result = simp
                 with self.new_step():
                     self.append(self.format_text("Now simplify:"))
                     self.append(self.format_math_display(simp))
             with self.new_step():
                 self.append(self.format_text("Add the constant of integration:"))
-                self.append(self.format_math_constant(answer))
+                answer = self.format_math_constant(result)
+                self.append(answer)
+                answer = answer.copy()  # pyodide#2530
+        else:
+            answer = None
         return {
             'content': {'level': self.stack},
-            'answer': self.format_math_display(answer)
+            'answer': answer
         }
 
 

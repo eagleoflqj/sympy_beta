@@ -4,6 +4,8 @@ from contextlib import contextmanager
 
 import sympy
 
+from gamma.utils import latex
+
 
 def Rule(name, props=""):
     # GOTCHA: namedtuple class name not considered!
@@ -63,11 +65,13 @@ class JSONPrinter:
         return {'text': text}
 
     def format_math(self, math):
-        return {'inline': sympy.latex(math)}
+        if not isinstance(math, str):
+            math = latex(math)
+        return {'inline': math}
 
     def format_math_display(self, math):
         if not isinstance(math, str):
-            math = sympy.latex(math)
+            math = latex(math)
         return {'block': math}
 
     @contextmanager
