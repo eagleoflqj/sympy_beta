@@ -1,17 +1,22 @@
 import base64
 import importlib
 import io
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Iterable, cast
 
 import matplotlib
 from matplotlib.figure import Figure
+from sympy import Basic, Symbol
+from sympy.core.function import Function, UndefinedFunction
 
 from api.data_type import Svg, Tex, Text, _Tex
-from gamma.dispatch import DICT
-from gamma.result_card import ResultCard
+
+if TYPE_CHECKING:
+    from gamma.result_card import ResultCard
 
 matplotlib.use('SVG')
 matplotlib.rcParams['svg.hashsalt'] = 'fixed'
+
+DICT = dict[str, Any]
 
 
 def t(text: str) -> str:
@@ -72,10 +77,24 @@ def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:
     return wrapper
 
 
-def load_with_source(module_name: str) -> ResultCard:
+def load_with_source(module_name: str) -> 'ResultCard':
     module = importlib.import_module(module_name)
     dirs = module_name.split('.')
     card_name = f'{dirs[-1]}_card'
     card: ResultCard = module.__getattribute__(card_name)
     card.source = '/'.join(dirs) + '.py'
     return card
+
+
+def no_undefined_function(components: DICT) -> bool:
+    def helper(obj):
+        if isinstance(obj, Basic):
+            return not any(isinstance(type(fx), UndefinedFunction) for fx in obj.find(Function))
+        if isinstance(obj, Iterable):
+            return all(helper(item) for item in (obj.values() if isinstance(obj, dict) else obj))
+        return True
+    return helper(components['input_evaluated'])
+
+
+def sorted_free_symbols(obj: Basic) -> list[Symbol]:
+    return sorted(cast(set[Symbol], obj.free_symbols), key=lambda s: s.name)

@@ -6,7 +6,8 @@ from sympy.core.function import FunctionClass
 from sympy.parsing.sympy_parser import eval_expr, stringify_expr
 
 from api.data_type import Tex
-from gamma.dispatch import DICT, find_result_set
+from extension.util import DICT
+from gamma.dispatch import find_result_set
 from gamma.evaluator import namespace, transformations
 from gamma.resultsets import find_learn_more_set, format_by_type, get_card
 from gamma.utils import OTHER_SYMPY_FUNCTIONS, is_approximatable_constant, latexify, mathjax_latex, removeSymPy

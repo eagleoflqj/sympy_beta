@@ -5,7 +5,7 @@ from typing import Callable
 from sympy import Basic, Symbol
 from sympy.parsing.latex import parse_latex
 
-from gamma.dispatch import DICT
+from extension.util import DICT
 from gamma.logic import SymPyGamma
 
 

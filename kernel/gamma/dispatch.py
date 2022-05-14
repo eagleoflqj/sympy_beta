@@ -2,6 +2,7 @@ from typing import Any, Callable
 
 import sympy
 
+from extension.util import sorted_free_symbols
 from gamma.evaluator import eval_node
 
 DICT = dict[str, Any]
@@ -90,7 +91,7 @@ def is_product(input_evaluated):
 # Functions to convert input and extract variable used
 
 def default_variable(top_node, evaluated) -> DICT:
-    variables = list(evaluated.free_symbols) if isinstance(evaluated, sympy.Basic) else []
+    variables = sorted_free_symbols(evaluated) if isinstance(evaluated, sympy.Basic) else []
     return {
         'variables': variables,
         'variable': variables[0] if variables else None,
@@ -131,7 +132,7 @@ def extract_integral(top_node, evaluated) -> DICT:
 def extract_derivative(top_node, evaluated) -> DICT:
     args = [eval_node(arg) for arg in top_node.args]
     expr = args[0]
-    free_variables = sorted(expr.free_symbols, key=str)
+    free_variables = sorted_free_symbols(expr)
 
     if len(args) > 1:
         free_variables.remove(args[1])

@@ -1,7 +1,6 @@
 from sympy import Integer
 
-from extension.util import format_latex, take_int_input
-from gamma.dispatch import DICT
+from extension.util import DICT, format_latex, take_int_input
 from gamma.result_card import ResultCard
 
 roman_chars = ['I', 'V', 'X', 'L', 'C', 'D', 'M', '', '']

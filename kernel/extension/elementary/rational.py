@@ -1,7 +1,6 @@
 from sympy import Rational, latex
 
-from extension.util import format_latex
-from gamma.dispatch import DICT
+from extension.util import DICT, format_latex
 from gamma.result_card import ResultCard
 
 

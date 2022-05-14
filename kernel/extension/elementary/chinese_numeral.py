@@ -1,8 +1,7 @@
 from sympy import Integer
 
 from api.data_type import ChineseNumeral
-from extension.util import take_int_input
-from gamma.dispatch import DICT
+from extension.util import DICT, take_int_input
 from gamma.result_card import ResultCard
 
 normal_chars = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']

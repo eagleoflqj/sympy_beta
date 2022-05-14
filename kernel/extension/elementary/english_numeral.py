@@ -8,8 +8,7 @@ from typing import Union
 
 from sympy import Integer
 
-from extension.util import format_text, take_int_input
-from gamma.dispatch import DICT
+from extension.util import DICT, format_text, take_int_input
 from gamma.result_card import ResultCard
 
 TEMP = list[Union[tuple[str, int], 'TEMP']]

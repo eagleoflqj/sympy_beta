@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from extension.util import format_figure
-from gamma.dispatch import DICT
+from extension.util import DICT, format_figure
 from gamma.result_card import ResultCard
 
 FONT_SIZE = 32

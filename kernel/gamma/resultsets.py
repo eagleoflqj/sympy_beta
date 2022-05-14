@@ -11,7 +11,7 @@ from sympy.integrals.manualintegrate import manualintegrate
 import gamma.diffsteps
 import gamma.intsteps
 from api.data_type import Document, FactorDiagram, List, Plot, Reference, Table, TruthTable
-from extension.util import load_with_source
+from extension.util import load_with_source, no_undefined_function
 from gamma.evaluator import eval_node
 from gamma.result_card import MultiResultCard, ResultCard
 from gamma.utils import mathjax_latex
@@ -328,6 +328,7 @@ all_cards: dict[str, ResultCard] = {
         "Roots",
         "solve(%s, {_var})",
         lambda statement, var, *args: var,
+        applicable=no_undefined_function,
         format_output=format_list),
 
     'integral': ResultCard(
@@ -375,7 +376,9 @@ all_cards: dict[str, ResultCard] = {
 
     'series': ResultCard(
         "Series expansion around 0",
-        "series(%s, {_var}, 0, 10)"),
+        "series(%s, {_var}, 0, 10)",
+        applicable=no_undefined_function
+    ),
 
     'digits': ResultCard(
         "Digits in base-10 expansion of number",
@@ -447,6 +450,7 @@ all_cards: dict[str, ResultCard] = {
         "plot(%s)",
         format_input=format_plot_input,
         format_output=format_plot,
+        applicable=no_undefined_function,
         eval_method=eval_plot,
         parameters=['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax']),
 

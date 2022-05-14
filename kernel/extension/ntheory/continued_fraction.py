@@ -1,7 +1,7 @@
 from sympy import Integer, continued_fraction, continued_fraction_iterator, sympify
 
 from api.data_type import ContinuedFraction
-from gamma.dispatch import DICT
+from extension.util import DICT
 from gamma.result_card import ResultCard
 
 

@@ -6,6 +6,7 @@ import sympy
 from sympy.core.relational import Relational
 
 from api.data_type import Tex
+from extension.util import sorted_free_symbols
 from gamma.evaluator import eval_node
 
 OTHER_SYMPY_FUNCTIONS = ('sqrt',)
@@ -170,7 +171,7 @@ def format_diophantine(node):
     expression = eval_node(node.args[0])
     symbols = None
     if isinstance(expression, sympy.Basic):
-        symbols = sorted(expression.free_symbols, key=str)
+        symbols = sorted_free_symbols(expression)
     equation = latex(sympy.Eq(expression, 0, evaluate=False))
 
     result = r'\mathrm{Solve~the~diophantine~equation~}' + equation

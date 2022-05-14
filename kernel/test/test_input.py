@@ -157,6 +157,23 @@ cases = [
        'wiki': 'Continued_fraction'}]),
     ('sqrt(9)',
      [{'title': 'SymPy', 'input': 'sqrt(9)', 'output': {'type': 'Tex', 'tex': '3'}}]),
+    ('x+y',
+     [{'title': 'SymPy', 'input': 'x+y', 'output': {'type': 'Tex', 'tex': 'x + y'}},
+      {'name': 'plot_3d', 'title': '3D Plot', 'variable': 'x', 'source': 'extension/plot/plot_3d.py'},
+      {'name': 'diff', 'title': 'Derivative', 'input': 'diff(x + y, x)', 'variable': 'x',
+       'pre_output': R'\frac{\partial}{\partial x} \left(x + y\right)'},
+      {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''},
+      {'name': 'series', 'title': 'Series expansion around 0', 'input': 'series(x + y, x, 0, 10)', 'variable': 'x'}]),
+    ('f(x)',
+     [{'title': 'SymPy', 'input': "Function('f')(x)", 'output': {'type': 'Tex', 'tex': R'f{\left(x \right)}'}},
+      {'name': 'diff', 'title': 'Derivative', 'input': 'diff(f(x), x)', 'variable': 'x',
+       'pre_output': R'\frac{d}{d x} f{\left(x \right)}'},
+      {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''}]),
+    ('f(x)+y',
+     [{'title': 'SymPy', 'input': "Function('f')(x)+y", 'output': {'type': 'Tex', 'tex': R'y + f{\left(x \right)}'}},
+      {'name': 'diff', 'title': 'Derivative', 'input': 'diff(y + f(x), x)', 'variable': 'x',
+       'pre_output': R'\frac{\partial}{\partial x} \left(y + f{\left(x \right)}\right)'},
+      {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''}]),
 ]
 
 

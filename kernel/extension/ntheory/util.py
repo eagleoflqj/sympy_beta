@@ -1,6 +1,6 @@
 from sympy import Integer, Pow, latex
 
-from gamma.dispatch import DICT
+from extension.util import DICT
 
 
 def is_positive_integer(components: DICT) -> bool:
