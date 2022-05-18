@@ -12,7 +12,6 @@ function notifyLoading () {
     type: 'info',
     title: 'Setting up runtime',
     content: baseContent + ' ' + '.'.repeat(count),
-    closable: false,
     onAfterEnter: () => {
       const plusCount = () => {
         count = count % 3 + 1

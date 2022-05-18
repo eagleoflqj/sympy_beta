@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { NSwitch, NIcon, NCheckbox, NSpace, darkTheme, useOsTheme } from 'naive-ui'
-import { useBreakpoint, useMemo } from 'vooks'
 import { Moon, Sun } from '@vicons/tabler'
+import { isMobile } from '@/js/util.js'
 import BetaShowMenu from '@/components/BetaShowMenu.vue'
 
 const props = defineProps({
@@ -11,13 +11,6 @@ const props = defineProps({
     required: true
   }
 })
-
-const isMobile = (() => {
-  const breakpointRef = useBreakpoint()
-  return useMemo(() => {
-    return breakpointRef.value === 'xs'
-  })
-})() // copied from naive-ui (MIT)
 
 const osThemeRef = useOsTheme()
 const followSystem = ref(true)

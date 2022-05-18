@@ -2,6 +2,7 @@
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { NConfigProvider, NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop, NMessageProvider } from 'naive-ui'
+import { isMobile } from '@/js/util.js'
 import BetaHeader from '@/components/BetaHeader.vue'
 import BetaFooter from '@/components/BetaFooter.vue'
 import RuntimeLoader from '@/components/RuntimeLoader.vue'
@@ -23,7 +24,7 @@ watchEffect(() => {
 
 <template>
   <n-config-provider :theme="theme">
-    <n-notification-provider>
+    <n-notification-provider :placement="isMobile ? 'top' : 'top-right'">
       <reload-prompt />
       <runtime-loader />
     </n-notification-provider>
