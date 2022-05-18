@@ -7,17 +7,18 @@ import categorys from '@/js/categorys.js'
 
 const router = useRouter()
 
-function randomExample () {
-  const examples = []
-  for (const category of categorys) {
-    for (const subCategory of category.sub_categorys) {
-      for (const example of subCategory.examples) {
-        examples.push(example.expression)
-      }
+const examples = []
+for (const category of categorys) {
+  for (const subCategory of category.sub_categorys) {
+    for (const example of subCategory.examples) {
+      examples.push(example.expression)
     }
   }
+}
+
+function randomExample () {
   const example = examples[Math.floor(Math.random() * examples.length)]
-  router.push({ name: 'Result', params: { expr: example } })
+  router.push({ name: 'Python', params: { expr: example } })
 }
 </script>
 
