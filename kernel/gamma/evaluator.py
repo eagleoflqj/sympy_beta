@@ -173,7 +173,32 @@ namespace.update({
     'str': str,
 })
 
-transformations = [synonyms, *standard_transformations, convert_xor, custom_implicit_transformation]
+function_map = {
+    'delta': 'DiracDelta',
+    'theta': 'Heaviside',
+}
+
+
+def transform_function(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT) -> list[TOKEN]:
+    """
+    map theta(x) to Heaviside(x)
+    """
+    result: list[TOKEN] = []
+    i = 0
+    while i < len(tokens):
+        if tokens[i] == (NAME, 'Function'):
+            name = tokens[i+2][1][1:-1]
+            func = function_map.get(name)
+            if func:
+                result.append((NAME, func))
+                i += 4
+                continue
+        result.append(tokens[i])
+        i += 1
+    return result
+
+
+transformations = [synonyms, *standard_transformations, transform_function, convert_xor, custom_implicit_transformation]
 
 
 def eval_node(node):
