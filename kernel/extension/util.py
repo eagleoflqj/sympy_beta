@@ -77,7 +77,8 @@ def take_int_input(inner: Callable[[int], Any]) -> Callable[[DICT, Any], Any]:
     return wrapper
 
 
-def load_with_source(module_name: str) -> 'ResultCard':
+def load_with_source(sub_module_name: str) -> 'ResultCard':
+    module_name = f'extension.{sub_module_name}'
     module = importlib.import_module(module_name)
     dirs = module_name.split('.')
     card_name = f'{dirs[-1]}_card'

@@ -324,13 +324,6 @@ def eval_approximator(components, parameters=None):
 
 all_cards: dict[str, ResultCard] = {
     'result': ResultCard('Result', None, None, format_input=lambda line, result, components: components['expression']),
-    'roots': ResultCard(
-        "Roots",
-        "solve(%s, {_var})",
-        lambda statement, var, *args: var,
-        applicable=no_undefined_function,
-        format_output=format_list),
-
     'integral': ResultCard(
         "Integral",
         "integrate(%s, {_var})",
@@ -505,19 +498,20 @@ all_cards: dict[str, ResultCard] = {
         eval_method=eval_approximator,
         format_output=format_approximator
     ),
-    'is_prime': load_with_source('extension.ntheory.is_prime'),
-    'totient': load_with_source('extension.ntheory.totient'),
-    'roman_numeral': load_with_source('extension.elementary.roman_numeral'),
-    'binary_form': load_with_source('extension.elementary.binary_form'),
-    'chinese_numeral': load_with_source('extension.elementary.chinese_numeral'),
-    'modulo': load_with_source('extension.ntheory.modulo'),
-    'quadratic_residue': load_with_source('extension.ntheory.quadratic_residue'),
-    'english_numeral': load_with_source('extension.elementary.english_numeral'),
-    'primitive_root': load_with_source('extension.ntheory.primitive_root'),
-    'rational': load_with_source('extension.elementary.rational'),
-    'pie_chart': load_with_source('extension.elementary.pie_chart'),
-    'continued_fraction': load_with_source('extension.ntheory.continued_fraction'),
-    'plot_3d': load_with_source('extension.plot.plot_3d'),
+    'is_prime': load_with_source('ntheory.is_prime'),
+    'totient': load_with_source('ntheory.totient'),
+    'roman_numeral': load_with_source('elementary.roman_numeral'),
+    'binary_form': load_with_source('elementary.binary_form'),
+    'chinese_numeral': load_with_source('elementary.chinese_numeral'),
+    'modulo': load_with_source('ntheory.modulo'),
+    'quadratic_residue': load_with_source('ntheory.quadratic_residue'),
+    'english_numeral': load_with_source('elementary.english_numeral'),
+    'primitive_root': load_with_source('ntheory.primitive_root'),
+    'rational': load_with_source('elementary.rational'),
+    'pie_chart': load_with_source('elementary.pie_chart'),
+    'continued_fraction': load_with_source('ntheory.continued_fraction'),
+    'plot_3d': load_with_source('plot.plot_3d'),
+    'root': load_with_source('equation.single_variable_equation'),
 }
 
 

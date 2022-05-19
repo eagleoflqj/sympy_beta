@@ -19,7 +19,8 @@ def is_integral(input_evaluated):
 
 
 def is_real(input_evaluated):
-    return isinstance(input_evaluated, sympy.Expr) and input_evaluated.is_real  # type: ignore
+    return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols and \
+        input_evaluated.is_real  # type: ignore
 
 
 def is_numbersymbol(input_evaluated):
@@ -249,7 +250,7 @@ exclusive_predicates: list[tuple[Callable[[Any], bool], tuple[str, ...]]] = [
 
 inclusive_predicates = [
     (is_trig, ('trig_alternate',)),
-    (is_unary_function, ('plot', 'roots', 'diff', 'integral_alternate', 'series')),
+    (is_unary_function, ('plot', 'root', 'diff', 'integral_alternate', 'series')),
     (is_binary_function, ('plot_3d', 'diff', 'integral_alternate', 'series')),
     (is_n_ary_function, ('diff', 'integral_alternate', 'series')),
 ]

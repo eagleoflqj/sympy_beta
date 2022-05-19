@@ -19,7 +19,8 @@ setup(
     url=f'{homepage}/tree/master/kernel',
     author=f'{author_name}, SymPy Development Team',
     author_email=author_email,
-    packages=['api', 'gamma', 'extension', 'extension/elementary', 'extension/ntheory', 'extension/plot'],
+    packages=['api', 'gamma', 'extension', 'extension/elementary', 'extension/equation', 'extension/ntheory',
+              'extension/plot'],
     license=project_license,
     platforms=['any'],
 )

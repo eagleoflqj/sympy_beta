@@ -55,7 +55,7 @@ cases = [
       {'name': 'trig_alternate', 'variable': 'x', 'title': 'Alternate forms', 'pre_output': ''},
       {'name': 'plot', 'variable': 'x', 'title': 'Plot',
        'parameters': ['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax']},
-      {'name': 'roots', 'variable': 'x', 'title': 'Roots', 'input': 'solve(sin(2*x), x)', 'pre_output': 'x'},
+      {'name': 'root', 'variable': 'x', 'title': 'Root', 'source': 'extension/equation/single_variable_equation.py'},
       {'name': 'diff', 'variable': 'x', 'title': 'Derivative', 'input': 'diff(sin(2*x), x)',
        'pre_output': '\\frac{d}{d x} \\sin{\\left(2 x \\right)}'},
       {'name': 'integral_alternate', 'variable': 'x', 'title': 'Antiderivative forms', 'pre_output': ''},
@@ -174,6 +174,16 @@ cases = [
       {'name': 'diff', 'title': 'Derivative', 'input': 'diff(y + f(x), x)', 'variable': 'x',
        'pre_output': R'\frac{\partial}{\partial x} \left(y + f{\left(x \right)}\right)'},
       {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''}]),
+    ('theta(x)',
+     [{'title': 'SymPy', 'input': 'Heaviside(x)', 'output': {'type': 'Tex', 'tex': R'\theta\left(x\right)'}},
+      {'name': 'plot', 'title': 'Plot', 'variable': 'x',
+       'parameters': ['xmin', 'xmax', 'tmin', 'tmax', 'pmin', 'pmax']},
+      {'name': 'root', 'title': 'Root', 'variable': 'x', 'source': 'extension/equation/single_variable_equation.py'},
+      {'name': 'diff', 'title': 'Derivative', 'input': 'diff(Heaviside(x), x)', 'variable': 'x',
+       'pre_output': R'\frac{d}{d x} \theta\left(x\right)'},
+      {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''},
+      {'name': 'series', 'title': 'Series expansion around 0', 'input': 'series(Heaviside(x), x, 0, 10)',
+       'variable': 'x'}]),
 ]
 
 
