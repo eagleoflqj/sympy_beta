@@ -63,9 +63,11 @@ def format_text(text: str):
 
 
 def format_figure(output: tuple[Figure, str]):
+    import matplotlib.pyplot as plt  # must appear after switching backend, see pyodide#442
     figure, category = output
     buf = io.BytesIO()
     figure.savefig(buf, format='svg', metadata={'Date': None})
+    plt.close(figure)
     buf.seek(0)
     svg = base64.b64encode(buf.read()).decode()
     return Svg(svg=svg, category=category)
