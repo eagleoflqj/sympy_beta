@@ -28,21 +28,22 @@ def is_numbersymbol(input_evaluated):
 
 
 def is_constant(input_evaluated):
-    # is_constant reduces trig identities (even with simplify=False?) so we
-    # check free_symbols instead
-    return hasattr(input_evaluated, 'free_symbols') \
-        and not input_evaluated.free_symbols
+    return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols
 
 
 def is_rational(input_evaluated):
     return isinstance(input_evaluated, sympy.Rational)
 
 
-def is_complex(input_evaluated):
+def has_complex(input_evaluated):
     try:
-        return sympy.I in input_evaluated.atoms()
+        return sympy.I in input_evaluated.evalf().atoms()
     except (AttributeError, TypeError):
         return False
+
+
+def is_complex(input_evaluated):
+    return is_constant(input_evaluated) and has_complex(input_evaluated)
 
 
 def is_trig(input_evaluated):
@@ -59,6 +60,17 @@ def is_not_constant_expr(input_evaluated):
 
 def is_unary_function(input_evaluated):
     return is_not_constant_expr(input_evaluated) and len(input_evaluated.free_symbols) == 1
+
+
+def is_unary_complex_function(input_evaluated):
+    if not is_unary_function(input_evaluated):
+        return False
+    z: sympy.Symbol = list(input_evaluated.free_symbols)[0]
+    return z.name == 'z' or has_complex(input_evaluated)
+
+
+def is_unary_real_function(input_evaluated):
+    return is_unary_function(input_evaluated) and not is_unary_complex_function(input_evaluated)
 
 
 def is_binary_function(input_evaluated):
@@ -250,7 +262,8 @@ exclusive_predicates: list[tuple[Callable[[Any], bool], tuple[str, ...]]] = [
 
 inclusive_predicates = [
     (is_trig, ('trig_alternate',)),
-    (is_unary_function, ('plot', 'root', 'diff', 'integral_alternate', 'series')),
+    (is_unary_real_function, ('plot', 'root', 'diff', 'integral_alternate', 'series')),
+    (is_unary_complex_function, ('plot_complex', 'root', 'diff', 'integral_alternate', 'series')),
     (is_binary_function, ('plot_3d', 'diff', 'integral_alternate', 'series')),
     (is_n_ary_function, ('diff', 'integral_alternate', 'series')),
 ]
