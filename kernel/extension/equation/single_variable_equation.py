@@ -20,7 +20,7 @@ def solve_single_var(components: DICT, parameters=None) -> tuple[Set, Symbol, bo
 def format_solution(output: tuple[Set, Symbol, bool]):
     result, x, is_complex = output
     pre_output = f'{"Complex" if is_complex else "Real"} root: '
-    return format_latex(Latex().t(pre_output).a(R'x \in', latex(result)).f())
+    return format_latex(Latex().t(pre_output).a(latex(x), R' \in', latex(result)).f())
 
 
 single_variable_equation_card = ResultCard('Root', None, eval_method=solve_single_var, format_output=format_solution,
