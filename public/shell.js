@@ -1,6 +1,4 @@
-const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/'
-
-importScripts(`${pyodideURL}pyodide.js`)
+importScripts('https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js')
 
 let awaitFut = null
 let pyconsole = null
@@ -8,9 +6,7 @@ let reprShorten = null
 let clearConsole = null
 
 async function loadPyodideAndPackages () {
-  self.pyodide = await loadPyodide({
-    indexURL: pyodideURL
-  })
+  self.pyodide = await loadPyodide()
   await self.pyodide.loadPackage(['micropip', 'sympy'])
   const namespace = self.pyodide.globals.get('dict')()
   await self.pyodide.runPythonAsync(`

@@ -1,19 +1,16 @@
 // blocker: Firefox https://stackoverflow.com/questions/44118600/web-workers-how-to-import-modules
 // import { pyodideURL, kernelVersion } from '/package.json'
-const pyodideURL = 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/'
 const kernelName = 'sympy_beta_kernel'
 const kernelVersion = '1.0.0'
 const useDevSymPy = false
 
-importScripts(`${pyodideURL}pyodide.js`)
+importScripts('https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js')
 
 async function loadPyodideAndPackages () {
   let errorMsg
   const pkgs = ['micropip', 'docutils', 'matplotlib', 'numpy', 'nltk', 'typing-extensions',
     useDevSymPy ? 'mpmath' : 'sympy']
-  self.pyodide = await loadPyodide({
-    indexURL: pyodideURL
-  })
+  self.pyodide = await loadPyodide()
   self.postMessage({ stage: 'PYODIDE_DOWNLOADED' })
   await self.pyodide.loadPackage(pkgs,
     console.log, msg => {
