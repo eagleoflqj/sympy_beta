@@ -4,7 +4,7 @@ from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, ConstantR
                                              TrigSubstitutionRule, URule, _manualintegrate, integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
-from gamma.utils import latex
+from gamma.utils import DerivExpr, latex
 
 
 def contains_dont_know(rule):
@@ -105,7 +105,7 @@ class IntegralPrinter(JSONPrinter):
     def print_U(self, rule):
         with self.new_step(), self.new_u_vars() as (u, du):
             # commutative always puts the symbol at the end when printed
-            dx = sympy.Symbol('d' + rule.symbol.name, commutative=False)
+            dx = DerivExpr(rule.symbol.name)
             self.append(self.format_text("Let "),
                         self.format_math(sympy.Eq(u, rule.u_func, evaluate=False)),
                         self.format_text(', then '),
@@ -258,16 +258,13 @@ class IntegralPrinter(JSONPrinter):
 
     def print_TrigSubstitution(self, rule):
         with self.new_step():
-            d_x = R'\mathrm{d}' + latex(rule.symbol)
-            d_theta = R'\mathrm{d}' + latex(rule.theta)
+            d_x = DerivExpr(rule.symbol.name)
+            d_theta = DerivExpr(rule.theta.name)
             deriv = sympy.diff(rule.func, rule.theta)
-            deriv_latex = latex(deriv)
-            if deriv.is_Add:
-                deriv_latex = f'({deriv_latex})'
             self.append(self.format_text("Let "),
                         self.format_math(sympy.Eq(rule.symbol, rule.func, evaluate=False)),
                         self.format_text(', then '),
-                        self.format_math(f'{d_x}={deriv_latex}{d_theta}'))
+                        self.format_math(sympy.Eq(d_x, deriv*d_theta, evaluate=False)))
             self.append(self.format_text('Substitute:'))
             self.append(self.format_math_display(sympy.Integral(rule.substep.context, rule.substep.symbol)))
             with self.new_level():

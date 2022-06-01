@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 import sympy
 
-from gamma.utils import latex
+from gamma.utils import DerivExpr, latex
 
 
 def Rule(name, props=""):
@@ -97,7 +97,7 @@ class JSONPrinter:
 
     @contextmanager
     def new_u_vars(self):
-        self.u, self.du = sympy.Symbol('u'), sympy.Symbol('du')
+        self.u, self.du = sympy.Symbol('u'), DerivExpr('u')
         yield self.u, self.du
 
     def append(self, *contents):

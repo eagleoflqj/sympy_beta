@@ -4,6 +4,7 @@ from typing import cast
 
 import sympy
 from sympy.core.relational import Relational
+from sympy.printing.latex import LatexPrinter
 
 from api.data_type import Tex
 from extension.util import sorted_free_symbols
@@ -227,6 +228,19 @@ def removeSymPy(string):
         return string
 
 
+class DerivExpr(sympy.Symbol):
+    def __new__(cls, name: str):
+        return sympy.Symbol.__new__(cls, name, commutative=False)
+
+
+class BetaLatexPrinter(LatexPrinter):
+    def _print_DerivExpr(self, expr: DerivExpr):
+        return R'\mathrm{d}' + self._print_Symbol(expr)
+
+
+printer = BetaLatexPrinter({'ln_notation': True})
+
+
 def latex(expr) -> str:
     # sympy.latex('') == '\\mathtt{\\text{}}'
     if expr == '':
@@ -234,7 +248,7 @@ def latex(expr) -> str:
     if isinstance(expr, sympy.Basic):
         # solveset(sin(x)) click More Digits
         expr = expr.replace(sympy.Symbol('_n'), sympy.Dummy('n'))  # type: ignore
-    result = sympy.latex(expr, ln_notation=True)
+    result = printer.doprint(expr)
     return result.replace(R'\int\limits', R'\int')
 
 
