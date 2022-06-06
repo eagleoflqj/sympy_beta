@@ -4,16 +4,25 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js latest
         uses: actions/setup-node@v2
         with:
-          node-version: 17.x
+          node-version: 18.x
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
       - name: Install dependencies
         run: |
           npm i
+          pip install wheel
       - name: Run lint
         run: |
           npm run lint
