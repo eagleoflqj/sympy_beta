@@ -1,19 +1,20 @@
 import { spawnSync } from 'child_process'
 import { renameSync, readFileSync, writeFileSync } from 'fs'
-import { chdir, exit } from 'process'
+import { chdir } from 'process'
+import { SOURCE_DATE_EPOCH, ensure, encoding } from './util.mjs'
 
-const { status } = spawnSync('pip', ['download', 'antlr4-python3-runtime==4.7'])
-if (status !== 0) {
-  console.error('Fail to download antlr4.')
-  exit(status)
-}
+ensure(spawnSync('pip', ['download', 'antlr4-python3-runtime==4.7'], { encoding }), 'Fail to download antlr4.')
 
-spawnSync('tar', ['xzf', 'antlr4-python3-runtime-4.7.tar.gz'])
+ensure(spawnSync('tar', ['xzf', 'antlr4-python3-runtime-4.7.tar.gz'], { encoding }), 'Fail to extract antlr4.')
+
 chdir('antlr4-python3-runtime-4.7')
-const inStr = readFileSync('setup.py', { encoding: 'utf-8' })
+
+const inStr = readFileSync('setup.py', { encoding })
 const outStr = inStr.replace('distutils.core', 'setuptools')
 writeFileSync('setup.py', outStr)
-spawnSync('python', ['setup.py', 'bdist_wheel'],
-  { env: { ...process.env, SOURCE_DATE_EPOCH: 315532800 } })
+
+ensure(spawnSync('python', ['setup.py', 'bdist_wheel'],
+  { encoding, env: { ...process.env, SOURCE_DATE_EPOCH } }), 'Fail to build antlr4.')
+
 const wheel = 'antlr4_python3_runtime-4.7-py3-none-any.whl'
 renameSync(`dist/${wheel}`, `../public/${wheel}`)
