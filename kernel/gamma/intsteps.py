@@ -125,14 +125,13 @@ class IntegralPrinter(JSONPrinter):
     def print_Parts(self, rule):
         with self.new_step():
             self.append(self.format_text("Use integration by parts:"))
-
-            u, v, du, dv = [sympy.Function(f)(rule.symbol) for f in 'u v du dv'.split()]
-            dx = sympy.Symbol(f"d{rule.symbol}", commutative=False)
-            self.append(self.format_math_display(r"\int u \operatorname{d}v = uv - \int v \operatorname{d}u"))
+            u, v = sympy.Function('u')(rule.symbol), sympy.Function('v')(rule.symbol)
+            du, dv, dx = DerivExpr('u'), DerivExpr('v'), DerivExpr('x')
+            self.append(self.format_math_display(R"\int u \mathrm{d}v = uv - \int v \mathrm{d}u"))
 
             self.append(self.format_text("Let "),
                         self.format_math(sympy.Eq(u, rule.u, evaluate=False)),
-                        self.format_text(" and let "),
+                        self.format_text(" and "),
                         self.format_math(sympy.Eq(dv, rule.dv * dx, evaluate=False)))
             self.append(self.format_text("Then "),
                         self.format_math(sympy.Eq(du, rule.u.diff(rule.symbol) * dx, evaluate=False)))
@@ -151,9 +150,8 @@ class IntegralPrinter(JSONPrinter):
         with self.new_step():
             self.append(self.format_text("Use integration by parts, noting that the integrand"
                                          " eventually repeats itself."))
-
-            u, v, du, dv = [sympy.Function(f)(rule.symbol) for f in 'u v du dv'.split()]
-            dx = sympy.Symbol(f"d{rule.symbol}", commutative=False)
+            u = sympy.Function('u')(rule.symbol)
+            dv, dx = DerivExpr('v'), DerivExpr('x')
             current_integrand = rule.context
             total_result = sympy.S.Zero
             with self.new_level():
@@ -165,7 +163,7 @@ class IntegralPrinter(JSONPrinter):
                                     self.format_text(":"))
                         self.append(self.format_text("Let "),
                                     self.format_math(sympy.Eq(u, rl.u, evaluate=False)),
-                                    self.format_text(" and let "),
+                                    self.format_text(" and "),
                                     self.format_math(sympy.Eq(dv, rl.dv * dx, evaluate=False)))
 
                         v_f, du_f = _manualintegrate(rl.v_step), rl.u.diff(rule.symbol)
