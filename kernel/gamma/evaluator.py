@@ -95,7 +95,8 @@ def _implicit_multiplication(tokens: list[TOKEN | AppliedFunction], local_dict: 
                     result.append((OP, '*'))
                 elif nextTok == (OP, '('):
                     # Close parenthesis followed by an open parenthesis
-                    result.append((OP, '*'))
+                    if result[-4] != (NAME, 'Function'):
+                        result.append((OP, '*'))  # modify: (x*f(x))
             elif tok[0] == NAME and not _token_callable(tok, local_dict, global_dict):
                 if isinstance(nextTok, AppliedFunction) or \
                         (nextTok[0] == NAME and _token_callable(nextTok, local_dict, global_dict)):
