@@ -61,6 +61,10 @@ cases = [
       {'name': 'integral_alternate', 'variable': 'x', 'title': 'Antiderivative forms', 'pre_output': ''},
       {'name': 'series', 'variable': 'x', 'title': 'Series expansion around 0', 'input': 'series(sin(2*x), x, 0, 10)'}
       ]),
+    ('limit(tan(x), x, pi/2)',
+     [{'title': 'SymPy', 'input': 'limit(tan(x),x,pi/2)',
+       'output': {'type': 'Tex', 'tex': R'\lim_{x \to \frac{\pi}{2}} \tan{\left(x \right)}'}},
+      {'title': 'Result', 'input': 'limit(tan(x),x,pi/2)', 'output': {'type': 'Tex', 'tex': R'\tilde{\infty}'}}]),
     ('diff(f(x)*g(x)*h(x))',
      [{'input': "diff(Function('f')(x)*Function('g')(x)*Function('h')(x))", 'title': 'SymPy',
        'output': {'tex': '\\frac{d}{d x} f{\\left(x \\right)} g{\\left(x \\right)} h{\\left(x \\right)}',
@@ -184,6 +188,11 @@ cases = [
       {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''},
       {'name': 'series', 'title': 'Series expansion around 0', 'input': 'series(Heaviside(x), x, 0, 10)',
        'variable': 'x'}]),
+    ('Limit(tan(x), x, pi/2)',
+     [{'title': 'SymPy', 'input': 'Limit(tan(x),x,pi/2)',
+       'output': {'type': 'Tex', 'tex': R'\lim_{x \to \frac{\pi}{2}} \tan{\left(x \right)}'}},
+      {'title': 'Simplification', 'input': 'zoo', 'output': {'type': 'Tex', 'tex': R'\tilde{\infty}'}},
+      {'name': 'trig_alternate', 'title': 'Alternate forms', 'pre_output': ''}]),
 ]
 
 

@@ -86,9 +86,10 @@ def format_solve(node):
 
 @LatexVisitor.formats_function('limit')
 def format_limit(node):
-    if len(node.args) >= 3:
-        return latex(
-            sympy.Limit(*[eval_node(arg) for arg in node.args]))
+    args = [eval_node(arg) for arg in node.args]
+    if len(args) == 3:
+        args.append('+-')
+    return latex(sympy.Limit(*args))
 
 
 @LatexVisitor.formats_function('prime')

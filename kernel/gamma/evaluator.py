@@ -1,8 +1,9 @@
 import ast
 import re
 from tokenize import NAME, OP
-from typing import Any
+from typing import Any, Literal
 
+import sympy
 from nltk.corpus import words
 from sympy.parsing.sympy_parser import (AppliedFunction, _apply_functions, _flatten, _group_parentheses,
                                         _token_callable, convert_xor, function_exponentiation, implicit_application,
@@ -167,11 +168,21 @@ def plot(f=None, **kwargs):
     pass
 
 
+def limit(e: sympy.Expr, z: sympy.Symbol, z0: sympy.Expr, dir: Literal['+', '-', '+-'] = '+-'):
+    return sympy.limit(e, z, z0, dir)
+
+
+def Limit(e: sympy.Expr, z: sympy.Symbol, z0: sympy.Expr, dir: Literal['+', '-', '+-'] = '+-'):
+    return sympy.Limit(e, z, z0, dir)
+
+
 namespace.update({
     'plot': plot,  # prevent textplot from printing stuff
     'help': lambda f: f,
     'len': len,
     'str': str,
+    'limit': limit,
+    'Limit': Limit,
 })
 
 function_map = {
