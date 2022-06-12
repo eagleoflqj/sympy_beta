@@ -238,7 +238,7 @@ class BetaLatexPrinter(LatexPrinter):
         return R'\mathrm{d}' + self._print_Symbol(expr)
 
 
-printer = BetaLatexPrinter({'ln_notation': True})
+printer = BetaLatexPrinter({'ln_notation': True, 'inv_trig_style': 'full'})
 
 
 def latex(expr) -> str:
