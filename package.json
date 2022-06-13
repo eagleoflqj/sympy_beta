@@ -1,6 +1,6 @@
 {
   "name": "sympy_beta",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "kernelName": "sympy_beta_kernel",
   "kernelVersion": "1.0.0",
   "homepage": "https://github.com/eagleoflqj/sympy_beta",
@@ -17,26 +17,26 @@
     "serve": "vite preview --host"
   },
   "dependencies": {
-    "jquery.terminal": "^2.32.1",
+    "jquery.terminal": "^2.33.3",
     "markdown-escape": "^1.1.0",
-    "vue": "^3.2.33",
+    "vue": "^3.2.37",
     "vue-mathjax-next": "0.0.4",
-    "vue-router": "^4.0.14"
+    "vue-router": "^4.0.16"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^4.0.0",
     "@vicons/fa": "^0.12.0",
     "@vicons/material": "^0.12.0",
     "@vicons/tabler": "^0.12.0",
-    "@vitejs/plugin-vue": "^2.3.1",
-    "eslint": "^8.14.0",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "eslint": "^8.17.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-vue": "^8.7.1",
-    "naive-ui": "^2.29.0",
-    "vite": "^2.9.5",
+    "eslint-plugin-vue": "^9.1.1",
+    "naive-ui": "^2.30.3",
+    "vite": "^2.9.12",
     "vite-plugin-pwa": "^0.12.0",
     "vite-plugin-rewrite-all": "^0.1.2"
   }
