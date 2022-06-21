@@ -164,6 +164,7 @@ cases = [
     ('x+y',
      [{'title': 'SymPy', 'input': 'x+y', 'output': {'type': 'Tex', 'tex': 'x + y'}},
       {'name': 'plot_3d', 'title': '3D Plot', 'variable': 'x', 'source': 'extension/plot/plot_3d.py'},
+      {'name': 'plot_contour', 'title': 'Contour Plot', 'variable': 'x', 'source': 'extension/plot/plot_contour.py'},
       {'name': 'diff', 'title': 'Derivative', 'input': 'diff(x + y, x)', 'variable': 'x',
        'pre_output': R'\frac{\partial}{\partial x} \left(x + y\right)'},
       {'name': 'integral_alternate', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''},

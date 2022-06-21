@@ -13,7 +13,7 @@ def plot_complex(components: DICT, parameters=None) -> tuple[Figure, str]:
     func: Expr = components['input_evaluated']
     z: Symbol = list(cast(set[Symbol], func.free_symbols))[0]
     cplot.plot(lambdify(z, func, 'numpy'), (-10, 10, 200), (-10, 10, 200))
-    return plt.gcf(), 'plot_3d'
+    return plt.gcf(), 'plot_complex'
 
 
 plot_complex_card = ResultCard('Complex Plot', None, eval_method=plot_complex, format_output=format_figure,

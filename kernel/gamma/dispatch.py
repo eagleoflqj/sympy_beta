@@ -264,7 +264,7 @@ inclusive_predicates = [
     (is_trig, ('trig_alternate',)),
     (is_unary_real_function, ('plot', 'root', 'diff', 'integral_alternate', 'series')),
     (is_unary_complex_function, ('plot_complex', 'root', 'diff', 'integral_alternate', 'series')),
-    (is_binary_function, ('plot_3d', 'diff', 'integral_alternate', 'series')),
+    (is_binary_function, ('plot_3d', 'plot_contour', 'diff', 'integral_alternate', 'series')),
     (is_n_ary_function, ('diff', 'integral_alternate', 'series')),
 ]
 

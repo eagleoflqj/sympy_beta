@@ -513,6 +513,7 @@ all_cards: dict[str, ResultCard] = {
     'plot_3d': load_with_source('plot.plot_3d'),
     'root': load_with_source('equation.single_variable_equation'),
     'plot_complex': load_with_source('plot.plot_complex'),
+    'plot_contour': load_with_source('plot.plot_contour'),
 }
 
 

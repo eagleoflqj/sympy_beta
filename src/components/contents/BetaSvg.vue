@@ -35,7 +35,7 @@ onMounted(() => {
   height: 50px;
 }
 
-.plot_3d {
+.plot_3d, .plot_complex, .plot_contour {
   width: 100%;
   max-width: 500px;
 }
