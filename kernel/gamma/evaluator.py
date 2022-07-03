@@ -185,6 +185,29 @@ namespace.update({
     'Limit': Limit,
 })
 
+
+def transform_e(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT) -> list[TOKEN]:
+    """
+    transform e to E if there's no a,b,c,d
+    """
+    symbols: set[str] = set()
+    for i in range(len(tokens)):
+        if tokens[i] == (NAME, 'Symbol'):
+            symbols.add(tokens[i+2][1][1:-1])
+    if 'e' not in symbols or symbols.issuperset({'a', 'b', 'c', 'd'}):
+        return tokens
+    result: list[TOKEN] = []
+    i = 0
+    while i < len(tokens):
+        if tokens[i] == (NAME, 'Symbol') and tokens[i+2][1][1:-1] == 'e':
+            result.append((NAME, 'E'))
+            i += 4
+            continue
+        result.append(tokens[i])
+        i += 1
+    return result
+
+
 function_map = {
     'delta': 'DiracDelta',
     'theta': 'Heaviside',
@@ -210,7 +233,10 @@ def transform_function(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT)
     return result
 
 
-transformations = [synonyms, *standard_transformations, transform_function, convert_xor, custom_implicit_transformation]
+transformations = [synonyms, *standard_transformations,
+                   transform_e,
+                   transform_function,
+                   convert_xor, custom_implicit_transformation]
 
 
 def eval_node(node):
