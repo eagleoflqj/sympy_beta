@@ -186,7 +186,7 @@ namespace.update({
 })
 
 
-def transform_e(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT) -> list[TOKEN]:
+def transform_e_i(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT) -> list[TOKEN]:
     """
     transform e to E if there's no a,b,c,d
     """
@@ -194,15 +194,17 @@ def transform_e(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT) -> lis
     for i in range(len(tokens)):
         if tokens[i] == (NAME, 'Symbol'):
             symbols.add(tokens[i+2][1][1:-1])
-    if 'e' not in symbols or symbols.issuperset({'a', 'b', 'c', 'd'}):
+    if 'i' not in symbols and ('e' not in symbols or symbols.issuperset({'a', 'b', 'c', 'd'})):
         return tokens
     result: list[TOKEN] = []
     i = 0
     while i < len(tokens):
-        if tokens[i] == (NAME, 'Symbol') and tokens[i+2][1][1:-1] == 'e':
-            result.append((NAME, 'E'))
-            i += 4
-            continue
+        if tokens[i] == (NAME, 'Symbol'):
+            s = tokens[i+2][1][1:-1]
+            if s in ('e', 'i'):
+                result.append((NAME, s.upper()))
+                i += 4
+                continue
         result.append(tokens[i])
         i += 1
     return result
@@ -234,7 +236,7 @@ def transform_function(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT)
 
 
 transformations = [synonyms, *standard_transformations,
-                   transform_e,
+                   transform_e_i,
                    transform_function,
                    convert_xor, custom_implicit_transformation]
 
