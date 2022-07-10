@@ -408,8 +408,8 @@ all_cards: dict[str, ResultCard] = {
 
     'polar_angle': ResultCard(
         "Angle in the complex plane",
-        "atan2(*(%s).as_real_imag()).evalf()",
-        lambda s, *args: sympy.atan2(*s.as_real_imag())),
+        "atan2(*(%s).as_real_imag()[::-1]).evalf()",
+        lambda s, *args: sympy.atan2(*s.as_real_imag()[::-1])),
 
     'conjugate': ResultCard(
         "Complex conjugate",

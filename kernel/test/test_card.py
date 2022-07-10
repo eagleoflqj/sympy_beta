@@ -36,6 +36,8 @@ cases = [
                ['True', 'False', 'False'],
                ['False', 'True', 'False'],
                ['False', 'False', 'False']], 'titles': ['x', 'y', 'Values'], 'type': 'TruthTable'}),
+    (('polar_angle',  'sqrt(3)+i', None, None),
+     {'tex': '0.523598775598299', 'type': 'Tex'}),
     (('function_docs', 'factorial2', None, None),
      {'type': 'Document',
       'html': '<div class="document">\n<p>The double factorial <cite>n!!</cite>, not to be confused with <cite>(n!)!'
