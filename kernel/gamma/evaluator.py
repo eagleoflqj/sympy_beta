@@ -211,6 +211,8 @@ def transform_e_i(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT) -> l
 
 
 function_map = {
+    'Beta': 'beta',
+    'Gamma': 'gamma',
     'delta': 'DiracDelta',
     'theta': 'Heaviside',
 }
