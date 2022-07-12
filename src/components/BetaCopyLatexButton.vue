@@ -14,6 +14,6 @@ defineProps({
   <beta-copy-button
     :copied="tex"
     :icon-component="Math"
-    popover-text="Copy LaTex"
+    popover-text="Copy LaTeX"
   />
 </template>

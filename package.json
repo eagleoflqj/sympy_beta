@@ -13,12 +13,13 @@
   "scripts": {
     "dev": "vite --host",
     "lint": "eslint --ext .mjs,.js,.vue --fix public scripts src",
-    "build": "node scripts/download_vocabulary.mjs && node scripts/build_antlr.mjs && node scripts/build_wheel.mjs && vite build",
+    "build": "node scripts/download_vocabulary.mjs && node scripts/build_antlr.mjs && node scripts/build_wheel.mjs && cp -r node_modules/mathlive/dist/fonts public && vite build",
     "serve": "vite preview --host"
   },
   "dependencies": {
     "jquery.terminal": "^2.33.3",
     "markdown-escape": "^1.1.0",
+    "mathlive": "^0.77.0",
     "vue": "^3.2.37",
     "vue-mathjax-next": "0.0.4",
     "vue-router": "^4.0.16"

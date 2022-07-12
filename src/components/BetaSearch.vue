@@ -1,9 +1,10 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NInputGroup, NInput, NButton, NH1, NA, NPopover, NRadioGroup, NRadioButton, NIcon, NSpace, NCard, NScrollbar } from 'naive-ui'
+import { NInputGroup, NInput, NButton, NH1, NA, NPopover, NRadioGroup, NRadioButton, NIcon, NSpace } from 'naive-ui'
 import { Python } from '@vicons/fa'
 import { Math } from '@vicons/tabler'
+import BetaMathLive from '@/components/BetaMathLive.vue'
 
 const input = ref()
 const defaultInputType = 'Python'
@@ -19,21 +20,25 @@ function submit () {
 }
 
 /**
- * \, _{ and ^{ are LaTex patterns that are meaningless as Python input,
- * so automatically switch to LaTex input.
+ * \, _{ and ^{ are LaTeX patterns that are meaningless as Python input,
+ * so automatically switch to LaTeX input.
  * But if a user explicitly chooses Python input, don't switch.
 */
-function checkSwitchToLaTex () {
+function checkSwitchToLaTeX () {
   if (inputType.value === 'Python' && !clickedPythonInput.value && /\\|_\{|^\{/.test(input.value)) {
-    inputType.value = 'LaTex'
+    inputType.value = 'LaTeX'
   }
 }
 
 const route = useRoute()
 watchEffect(() => {
   input.value = route.params.expr || ''
-  inputType.value = route.name === 'LaTex' ? 'LaTex' : defaultInputType
+  inputType.value = route.name === 'LaTeX' ? 'LaTeX' : defaultInputType
 })
+
+function mathliveInputCallback (value) {
+  input.value = value
+}
 </script>
 
 <template>
@@ -58,7 +63,7 @@ watchEffect(() => {
           clearable
           style="font-family: 'Droid Sans Mono', monospace"
           @keyup.enter="submit"
-          @input="checkSwitchToLaTex"
+          @input="checkSwitchToLaTeX"
         />
         <n-popover>
           <template #trigger>
@@ -80,18 +85,17 @@ watchEffect(() => {
           <n-icon :component="Python" />
           Python input
         </n-radio-button>
-        <n-radio-button value="LaTex">
+        <n-radio-button value="LaTeX">
           <n-icon :component="Math" />
-          LaTex input
+          LaTeX input
         </n-radio-button>
       </n-radio-group>
-      <n-card v-if="inputType === 'LaTex'">
-        <n-scrollbar x-scrollable>
-          <vue-mathjax
-            :formula="'$$' + input + '$$'"
-          />
-        </n-scrollbar>
-      </n-card>
+      <beta-math-live
+        v-show="inputType === 'LaTeX'"
+        :input="input"
+        :input-callback="mathliveInputCallback"
+        :enter-callback="submit"
+      />
     </n-space>
   </div>
 </template>

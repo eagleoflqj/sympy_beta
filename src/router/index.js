@@ -6,7 +6,7 @@ import TerminalView from '@/views/TerminalView.vue'
 const routes = [
   { path: '/', name: 'Main', component: MainView },
   { path: '/terminal', name: 'Terminal', component: TerminalView },
-  { path: '/latex/:expr', name: 'LaTex', component: ResultView },
+  { path: '/latex/:expr', name: 'LaTeX', component: ResultView },
   { path: '/input/:expr', name: 'Python', component: ResultView }
 ]
 
