@@ -13,6 +13,7 @@ Then run
 npm run build
 ```
 and everything you need is in `dist` directory.
+## Serve
 Now you can either run
 ```sh
 python -m http.server -d dist
@@ -25,7 +26,7 @@ and open http://localhost:4173.
 ## Vercel
 SymPy Beta is officially hosted on Vercel.
 
-To achive this, you should connect a git repo of SymPy Beta to a Vercel project.
+To achieve this, you should connect a git repo of SymPy Beta to a Vercel project.
 
 As the server doesn't have `python` command available, and doesn't install `wheel` by default, you may also configure the `BUILD COMMAND` as
 ```sh

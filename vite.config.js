@@ -17,7 +17,7 @@ export default defineConfig({
     pluginRewriteAll(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['*.whl', '*.zip'],
+      includeAssets: ['*.whl', '*.zip', 'fonts/*.woff2'],
       manifest: {
         name: 'SymPy Beta',
         short_name: 'SymPy Beta',

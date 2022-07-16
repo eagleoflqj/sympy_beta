@@ -6,7 +6,7 @@ import terminal from 'jquery.terminal'
 import 'jquery.terminal/css/jquery.terminal.min.css'
 import preExec from '@/../kernel/gamma/pre_exec.py?raw'
 
-terminal(jQuery)
+terminal(window, jQuery)
 
 let term = null
 const ps1 = '>>> '

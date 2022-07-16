@@ -11,11 +11,13 @@ SymPy Beta is a fork of [SymPy Gamma](https://github.com/sympy/sympy_gamma). The
 Originally,  
 SymPy Beta = SymPy Gamma + (Pyodide - GAE - django) + (Vue + NaiveUI - jQuery)
 
-Since 0.5.0, the Pyodide Shell is added (and jQuery is back for using jQuery Terminal)
+But as development continues,
+it goes [far beyond](doc/changelog.md) SymPy **Gamma**,
+although still needs to learn much from the respected model Wolfram|**Alpha**.
 
-Since 0.6.0, extra functionalities are added to the kernel. See [kernel extension](kernel/extension)
+That's why I name it SymPy **Beta**.
 
-SymPy Beta is NOT an official SymPy project.
+SymPy Beta is **NOT** an official SymPy project.
 # Document
 See [doc](doc).
 # License
