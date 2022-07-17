@@ -1,6 +1,6 @@
 from sympy import Integer
 
-from api.data_type import ChineseNumeral
+from data_type import ChineseNumeral
 from extension.util import DICT, take_int_input
 from gamma.result_card import ResultCard
 

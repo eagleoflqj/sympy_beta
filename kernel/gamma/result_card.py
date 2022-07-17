@@ -2,7 +2,7 @@ from typing import Any, Callable
 
 import sympy
 
-from api.data_type import Dict
+from data_type import Dict
 from extension.util import DICT
 from gamma.evaluator import namespace
 from gamma.utils import latex, mathjax_latex

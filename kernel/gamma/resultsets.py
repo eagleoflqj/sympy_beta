@@ -10,7 +10,7 @@ from sympy.integrals.manualintegrate import manualintegrate
 
 import gamma.diffsteps
 import gamma.intsteps
-from api.data_type import Document, FactorDiagram, List, Plot, Reference, Table, TruthTable
+from data_type import Document, FactorDiagram, List, Plot, Reference, Table, TruthTable
 from extension.util import load_with_source, no_undefined_function
 from gamma.evaluator import eval_node
 from gamma.result_card import MultiResultCard, ResultCard

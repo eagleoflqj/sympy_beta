@@ -2,7 +2,7 @@ import pytest
 
 from api import eval_input
 
-cases = [
+python_cases = [
     ('242/33',
      [{'title': 'SymPy', 'input': '242/33', 'output': {'type': 'Tex', 'tex': '\\frac{22}{3}'}},
       {'name': 'float_approximation', 'title': 'Floating-point approximation',
@@ -207,9 +207,21 @@ cases = [
 ]
 
 
-@pytest.mark.parametrize('expression, expected', cases)
-def test(expression: str, expected: dict):
+@pytest.mark.parametrize('expression, expected', python_cases)
+def test_python(expression: str, expected: dict):
     actual = eval_input(expression)['result']
     assert len(actual) == len(expected)
     for a, e in zip(actual, expected):
         assert e is None or a == e
+
+
+nl_cases = [
+    ('Is 5 even', '(5).is_even'),  # shouldn't be Is*5*even
+    ('integrate x^2y with respect to y', 'integrate((x^2y), (y))'),
+]
+
+
+@pytest.mark.parametrize('nl, expected', nl_cases)
+def test_nl(nl: str, expected: str):
+    actual = eval_input(nl)['result']
+    assert actual == expected

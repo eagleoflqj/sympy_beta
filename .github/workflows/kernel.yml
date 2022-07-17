@@ -26,4 +26,4 @@ jobs:
           pyright
       - name: Run integration tests
         run: |
-          pytest --cov=gamma --cov=extension -n auto test
+          pytest --cov=gamma --cov=extension --cov=nlp -n auto test

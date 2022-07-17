@@ -83,11 +83,11 @@ function mathliveInputCallback (value) {
           @click="clickedPythonInput = true"
         >
           <n-icon :component="Python" />
-          Python input
+          Python / NL
         </n-radio-button>
         <n-radio-button value="LaTeX">
           <n-icon :component="Math" />
-          LaTeX input
+          LaTeX / Mathlive
         </n-radio-button>
       </n-radio-group>
       <beta-math-live

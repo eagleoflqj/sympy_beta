@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from sympy import Basic, Symbol
 from sympy.core.function import Function, UndefinedFunction
 
-from api.data_type import Svg, Tex, Text, _Tex
+from data_type import Svg, Tex, Text, _Tex
 
 if TYPE_CHECKING:
     from gamma.result_card import ResultCard

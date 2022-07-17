@@ -5,7 +5,7 @@ import sympy
 from sympy.core.function import FunctionClass
 from sympy.parsing.sympy_parser import eval_expr, stringify_expr
 
-from api.data_type import Tex
+from data_type import Tex
 from extension.util import DICT
 from gamma.dispatch import find_result_set
 from gamma.evaluator import namespace, transformations

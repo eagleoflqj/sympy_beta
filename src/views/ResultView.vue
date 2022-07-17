@@ -18,6 +18,7 @@ watchEffect(async () => {
     return
   }
   cards.splice(0)
+  let finalResult, finalError
   if (route.name === 'LaTeX') {
     const { result, error } = await evalLatexInput(routeExpr)
     if (error) {
@@ -25,14 +26,26 @@ watchEffect(async () => {
       return
     }
     expr.value = result
+    const ret = await evalInput(result, variableRef.value)
+    finalResult = ret.result
+    finalError = ret.error
   } else {
-    expr.value = routeExpr
+    const { result, error } = await evalInput(routeExpr, variableRef.value)
+    if (typeof result === 'string') { // translated nl
+      expr.value = result
+      const ret = await evalInput(result, variableRef.value)
+      finalResult = ret.result
+      finalError = ret.error
+    } else {
+      expr.value = routeExpr
+      finalResult = result
+      finalError = error
+    }
   }
-  const { result, error } = await evalInput(expr.value, variableRef.value)
-  if (result) {
-    cards.push(...result)
+  if (finalResult) {
+    cards.push(...finalResult)
   } else {
-    cards.push({ error })
+    cards.push({ error: finalError })
   }
 })
 

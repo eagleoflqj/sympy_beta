@@ -45,13 +45,21 @@ def synonyms(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT):
 
 vocabulary: set[str] = set(words.words())
 variable_pattern = re.compile(r'([A-Za-z][a-z]*)_?\d*')
+nl_hints = {
+    'is',
+    'to',
+    'with',
+}
 
 
 def token_splittable(token: str) -> bool:
     match = variable_pattern.fullmatch(token)
     if match:
         prefix = match.group(1)
-        if prefix.lower() in vocabulary:
+        lower = prefix.lower()
+        if lower in nl_hints:
+            raise SyntaxError  # seems natural language
+        if lower in vocabulary:
             return False
     return True
 

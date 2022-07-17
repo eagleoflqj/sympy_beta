@@ -1,4 +1,4 @@
-from api.data_type import Table
+from data_type import Table
 from extension.util import take_int_input
 from gamma.result_card import ResultCard
 

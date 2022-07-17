@@ -6,7 +6,7 @@ import sympy
 from sympy.core.relational import Relational
 from sympy.printing.latex import LatexPrinter
 
-from api.data_type import Tex
+from data_type import Tex
 from extension.util import sorted_free_symbols
 from gamma.evaluator import eval_node
 

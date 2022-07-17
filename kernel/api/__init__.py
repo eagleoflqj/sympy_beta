@@ -7,6 +7,7 @@ from sympy.parsing.latex import parse_latex
 
 from extension.util import DICT
 from gamma.logic import SymPyGamma
+from nlp import translate
 
 
 def catch(func: Callable) -> Callable:
@@ -20,7 +21,16 @@ def catch(func: Callable) -> Callable:
 
 @catch
 def eval_input(raw_input: str, variable: str | None = None):
-    return SymPyGamma(raw_input, variable).eval()
+    try:
+        return SymPyGamma(raw_input, variable).eval()
+    except SyntaxError:
+        try:
+            fl = translate(raw_input)
+            return {'result': fl}
+        except SyntaxError:
+            return {'error': "SymPy Beta can't understand your input."}
+        except ValueError:
+            return {'error': "This query probably doesn't make sense."}
 
 
 _braces_pattern = re.compile(r'(\w+)_\{(\d+)}')
