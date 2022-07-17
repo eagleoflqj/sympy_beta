@@ -23,7 +23,7 @@ defineProps({
   <n-table
     :single-line="false"
     striped
-    style="width: 0; margin: auto"
+    style="width: 0; margin: auto; word-break: keep-all"
   >
     <thead>
       <tr>
