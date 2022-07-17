@@ -18,6 +18,7 @@ ntheory_cases = [
 ]
 
 calculus_cases = [
+    ('integrate xy^2 for y', 'integrate((xy^2), (y))'),
     ('integrate xy^2 with respect to y', 'integrate((xy^2), (y))'),
     ('integrate x', 'integrate(x)'),
 ]
