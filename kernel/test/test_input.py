@@ -50,7 +50,7 @@ python_cases = [
                             'expression': '-2 - sqrt(177)*I', 'approximation': '-2.0 - 13.3041346956501 i'},
                            {'type': 'Tex', 'tex': '-2 + \\sqrt{177} i', 'numeric': True,
                             'expression': '-2 + sqrt(177)*I', 'approximation': '-2.0 + 13.3041346956501 i'}]}}]),
-    ('sin 2x',
+    ('sin(2x)',
      [{'title': 'SymPy', 'input': 'sin(2*x)', 'output': {'type': 'Tex', 'tex': '\\sin{\\left(2 x \\right)}'}},
       {'name': 'trig_alternate', 'variable': 'x', 'title': 'Alternate forms', 'pre_output': ''},
       {'name': 'plot', 'variable': 'x', 'title': 'Plot',
@@ -218,6 +218,7 @@ def test_python(expression: str, expected: dict):
 nl_cases = [
     ('Is 5 even', '(5).is_even'),  # shouldn't be Is*5*even
     ('integrate x^2y with respect to y', 'integrate((x^2y), (y))'),
+    ('integrate 1/x', 'integrate(1/x)'),
 ]
 
 

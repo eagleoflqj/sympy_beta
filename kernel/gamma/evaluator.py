@@ -6,8 +6,8 @@ from typing import Any, Literal
 import sympy
 from nltk.corpus import words
 from sympy.parsing.sympy_parser import (AppliedFunction, _apply_functions, _flatten, _group_parentheses,
-                                        _token_callable, convert_xor, function_exponentiation, implicit_application,
-                                        split_symbols_custom, standard_transformations)
+                                        _token_callable, convert_xor, function_exponentiation, split_symbols_custom,
+                                        standard_transformations)
 
 TOKEN = tuple[int, str]
 DICT = dict[str, Any]
@@ -143,7 +143,7 @@ def custom_implicit_transformation(result, local_dict, global_dict):
 
     - Functions can be exponentiated.
     """
-    for step in (split_symbols, implicit_multiplication, implicit_application, function_exponentiation):
+    for step in (split_symbols, implicit_multiplication, function_exponentiation):
         result = step(result, local_dict, global_dict)
 
     return result
