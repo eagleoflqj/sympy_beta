@@ -21,11 +21,12 @@ jobs:
           python-version: '3.10'
       - name: Install dependencies
         run: |
-          npm i
+          npm i -g pnpm
+          pnpm i
           pip install wheel
       - name: Run lint
         run: |
-          npm run lint
+          pnpm run lint
       - name: Build
         run: |
-          npm run build
+          pnpm run build

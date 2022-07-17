@@ -6,11 +6,12 @@ As long as you obey the AGPLv3+ license, you are free to host SymPy Beta w/o mod
 For deployment purpose, you don't need to install all Python packages inside `kernel/requirements.txt`. But you do need `wheel`, and all Node packages:
 ```sh
 pip install wheel
-npm i
+npm i -g pnpm
+pnpm i
 ```
 Then run
 ```sh
-npm run build
+pnpm run build
 ```
 and everything you need is in `dist` directory.
 ## Serve
@@ -20,7 +21,7 @@ python -m http.server -d dist
 ```
 and open http://localhost:8000, or run
 ```sh
-npm run serve
+pnpm run serve
 ```
 and open http://localhost:4173.
 ## Vercel

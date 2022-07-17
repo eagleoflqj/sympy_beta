@@ -19,7 +19,8 @@ You may need the following VSCodium extensions:
 
 # Install packages
 ```sh
-npm i  # rerun after dependencies in package.json change (usually along with minor version bumping)
+npm i -g pnpm  # no need to rerun
+pnpm i  # rerun after dependencies in package.json change (usually along with minor version bumping)
 pip install -r kernel/requirements.txt  # rerun after kernel/requirements.txt changes
 node scripts/download_vocabulary.mjs  # no need to rerun in near future
 node scripts/build_antlr.mjs  # rerun only after sympy upgrades antlr dependency

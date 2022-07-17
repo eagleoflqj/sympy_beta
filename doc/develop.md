@@ -1,6 +1,6 @@
 # Run locally
 ```sh
-npm run dev
+pnpm run dev
 ```
 Then open http://localhost:5173/.
 
