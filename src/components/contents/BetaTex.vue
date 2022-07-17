@@ -7,6 +7,10 @@ const props = defineProps({
   card: {
     type: Object,
     required: true
+  },
+  showCopyButton: {
+    type: Boolean,
+    default: () => true
   }
 })
 
@@ -16,7 +20,10 @@ const tex = computed(() => {
 </script>
 
 <template>
-  <div style="text-align: right">
+  <div
+    v-if="showCopyButton"
+    style="text-align: right"
+  >
     <beta-copy-latex-button :tex="tex" />
   </div>
   <n-scrollbar x-scrollable>

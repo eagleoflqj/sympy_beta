@@ -22,8 +22,11 @@ const markdownText = computed(() => {
   return markDownLines.join('\n')
 })
 
-function escape (text) {
-  return escapeMarkdown(text).replace(/\|/g, '\\|')
+function escape (textOrTex) {
+  if (typeof textOrTex === 'string') {
+    return escapeMarkdown(textOrTex).replace(/\|/g, '\\|')
+  }
+  return '$' + textOrTex.tex + '$'
 }
 
 function arrayToMarkdown (array) {

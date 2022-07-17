@@ -1,6 +1,6 @@
 <script setup>
 import { NTable, NScrollbar } from 'naive-ui'
-import BetaContainer from '@/components/BetaContainer.vue'
+import BetaTex from '@/components/contents/BetaTex.vue'
 import BetaCopyMarkdownButton from '@/components/BetaCopyMarkdownButton.vue'
 import { onMounted } from 'vue'
 
@@ -46,9 +46,10 @@ onMounted(() => {
       <tbody>
         <tr v-for="row in card.rows">
           <td v-for="cell in row">
-            <beta-container
+            <beta-tex
               v-if="typeof cell === 'object'"
               :card="cell"
+              :show-copy-button="false"
             />
             <template v-else>
               {{ cell }}
