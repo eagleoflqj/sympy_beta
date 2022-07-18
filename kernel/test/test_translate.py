@@ -18,6 +18,8 @@ ntheory_cases = [
 ]
 
 calculus_cases = [
+    ('derivative of x/y with respect to x', 'diff((x/y), (x))'),
+    ('differentiation of 1/x', 'diff(1/x)'),
     ('integrate xy^2 for y', 'integrate((xy^2), (y))'),
     ('integrate xy^2 with respect to y', 'integrate((xy^2), (y))'),
     ('integrate x', 'integrate(x)'),

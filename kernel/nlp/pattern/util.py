@@ -19,3 +19,7 @@ def is_expr(expr):
 
 def is_symbol(expr):
     return expr.is_Symbol
+
+
+def expr_and_symbol(expr, x):
+    return is_expr(expr) and is_symbol(x)
