@@ -8,7 +8,7 @@ console.log('Start build_wheel.mjs.')
 const { kernelName, kernelVersion } = JSON.parse(readFileSync('package.json'))
 chdir('kernel')
 
-ensure(spawnSync('python', ['setup.py', 'bdist_wheel'],
+ensure(spawnSync('python', ['-m', 'build', '--wheel'],
   { encoding, env: { ...process.env, SOURCE_DATE_EPOCH } }))
 
 const wheel = `${kernelName}-${kernelVersion}-py3-none-any.whl`
