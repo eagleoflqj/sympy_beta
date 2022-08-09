@@ -4,7 +4,7 @@ const kernelName = 'sympy_beta_kernel'
 const kernelVersion = '1.0.0'
 const useDevSymPy = false
 
-importScripts('https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js')
+importScripts('https://cdn.jsdelivr.net/pyodide/v0.21.0/full/pyodide.js')
 
 async function loadPyodideAndPackages () {
   let errorMsg

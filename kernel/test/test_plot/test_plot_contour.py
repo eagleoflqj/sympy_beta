@@ -5,7 +5,7 @@ import pytest
 from api import eval_card
 
 cases = [
-    ('x + y', b'\xffRz\t%\xc9{\xcf\x10q\xf4\xce\xd5\xa1HX'),
+    ('x + y', b'nr=6wJj9\x05\xa6\xd4O\x9chd\x91'),
 ]
 
 

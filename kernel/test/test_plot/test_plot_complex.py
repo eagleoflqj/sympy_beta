@@ -5,7 +5,7 @@ import pytest
 from api import eval_card
 
 cases = [
-    ('sin(z)', b'[\xb7\xbfav\x98u\xe7U\xe4]\xb1Q\xb1\x15\xc2'),
+    ('sin(z)', b'/Hlf\xe7\xda.@\xef \xca\xaag\xf6\xd7\xa4'),
 ]
 
 
