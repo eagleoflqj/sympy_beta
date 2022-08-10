@@ -7,9 +7,11 @@ let clearConsole = null
 
 async function loadPyodideAndPackages () {
   self.pyodide = await loadPyodide()
-  await self.pyodide.loadPackage(['micropip', 'sympy'])
+  await self.pyodide.loadPackage(['micropip'])
   const namespace = self.pyodide.globals.get('dict')()
   await self.pyodide.runPythonAsync(`
+    import micropip
+    await micropip.install('sympy==1.11')
     import sys
     from pyodide import to_js
     from pyodide.console import PyodideConsole, repr_shorten, BANNER

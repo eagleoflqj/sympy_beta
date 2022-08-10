@@ -1,7 +1,8 @@
 import sympy
-from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, ConstantRule, ConstantTimesRule, CyclicPartsRule,
-                                             DontKnowRule, ExpRule, PartsRule, PowerRule, RewriteRule, TrigRule,
-                                             TrigSubstitutionRule, URule, _manualintegrate, integral_steps)
+from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, CompleteSquareRule, ConstantRule,
+                                             ConstantTimesRule, CyclicPartsRule, DontKnowRule, ExpRule, PartsRule,
+                                             PowerRule, RewriteRule, TrigRule, TrigSubstitutionRule, URule,
+                                             _manualintegrate, integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
 from gamma.utils import DerivExpr, latex
@@ -55,6 +56,7 @@ class IntegralPrinter(JSONPrinter):
             DontKnowRule: self.print_DontKnow,
             RewriteRule: self.print_Rewrite,
             TrigSubstitutionRule: self.print_TrigSubstitution,
+            CompleteSquareRule: self.print_CompleteSquare,
         }
         handler = handlers.get(type(rule), self.print_simple)
         handler(rule)
@@ -225,6 +227,12 @@ class IntegralPrinter(JSONPrinter):
     def print_Rewrite(self, rule):
         with self.new_step():
             self.append(self.format_text("Rewrite the integrand:"))
+            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten, evaluate=False)))
+            self.print_rule(rule.substep)
+
+    def print_CompleteSquare(self, rule):
+        with self.new_step():
+            self.append(self.format_text("Complete the square:"))
             self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten, evaluate=False)))
             self.print_rule(rule.substep)
 

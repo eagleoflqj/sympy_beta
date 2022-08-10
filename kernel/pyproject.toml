@@ -1,3 +1,3 @@
 [tool.pyright]
-include = ["api", "extension", "gamma", "test"]
+include = ["api", "data_type", "extension", "gamma", "nlp", "test"]
 exclude = ["gamma/pre_exec.py", "gamma/diffsteps.py", "gamma/intsteps.py"]

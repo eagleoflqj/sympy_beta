@@ -20,7 +20,7 @@ def is_integral(input_evaluated):
 
 def is_real(input_evaluated):
     return isinstance(input_evaluated, sympy.Expr) and not input_evaluated.free_symbols and \
-        input_evaluated.is_real  # type: ignore
+        input_evaluated.is_real is True
 
 
 def is_numbersymbol(input_evaluated):

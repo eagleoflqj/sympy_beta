@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 import sympy
 from nltk.corpus import words
-from sympy.parsing.sympy_parser import (AppliedFunction, _apply_functions, _flatten, _group_parentheses,
+from sympy.parsing.sympy_parser import (TRANS, AppliedFunction, _apply_functions, _flatten, _group_parentheses,
                                         _token_callable, convert_xor, function_exponentiation, split_symbols_custom,
                                         standard_transformations)
 
@@ -245,10 +245,13 @@ def transform_function(tokens: list[TOKEN], local_dict: DICT, global_dict: DICT)
     return result
 
 
-transformations = [synonyms, *standard_transformations,
-                   transform_e_i,
-                   transform_function,
-                   convert_xor, custom_implicit_transformation]
+transformations: tuple[TRANS, ...] = (
+    synonyms, *standard_transformations,
+    transform_e_i,
+    transform_function,
+    convert_xor,
+    custom_implicit_transformation
+)
 
 
 def eval_node(node):

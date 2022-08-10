@@ -2,7 +2,7 @@ import re
 import traceback
 from typing import Callable
 
-from sympy import Basic, Symbol
+from sympy import Basic, Symbol, __version__
 from sympy.parsing.latex import parse_latex
 
 from extension.util import DICT
@@ -49,5 +49,4 @@ def eval_card(card_name: str, expression: str, variable: str | None, parameters:
 
 
 def get_sympy_version() -> str:
-    import sympy
-    return sympy.__version__  # type: ignore
+    return __version__
