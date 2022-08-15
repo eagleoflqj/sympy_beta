@@ -5,6 +5,9 @@ from api import eval_input, eval_latex_input
 cases = [
     (R'\frac{1}{3}', '1/3'),
     ('x_1', 'x_1'),
+    (R'\lim_{x\to0^+}{\frac{1}{x}}', "Limit(1/x, x, 0, dir='+')"),
+    (R'\lim_{x\to0^-}{\frac{1}{x}}', "Limit(1/x, x, 0, dir='-')"),
+    (R'\lim_{x\to0}{\frac{1}{x}}', "Limit(1/x, x, 0, dir='+-')"),
 ]
 
 
