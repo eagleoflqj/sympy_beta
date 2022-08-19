@@ -19,8 +19,7 @@ def test(expression: str, expected: str):
 
 e2e_cases = [
     (R'\int xdx',
-     [{'title': 'SymPy', 'input': 'integrate(x,x)',
-       'output': {'type': 'Tex', 'tex': '\\int x\\, dx'}},
+     [{'title': 'SymPy', 'input': 'integrate(x,x)', 'output': {'type': 'Tex', 'tex': R'\int x\, \mathrm{d}x'}},
       {'name': 'integral_alternate_fake', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''},
       {'name': 'intsteps', 'title': 'Integral Steps', 'input': 'integrate(x, x)', 'variable': 'x'}]),
 ]

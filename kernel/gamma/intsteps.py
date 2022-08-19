@@ -1,8 +1,8 @@
 import sympy
 from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, CompleteSquareRule, ConstantRule,
                                              ConstantTimesRule, CyclicPartsRule, DontKnowRule, ExpRule, PartsRule,
-                                             PowerRule, RewriteRule, TrigRule, TrigSubstitutionRule, URule,
-                                             _manualintegrate, integral_steps)
+                                             PowerRule, RewriteRule, SqrtQuadraticRule, TrigRule, TrigSubstitutionRule,
+                                             URule, _manualintegrate, integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
 from gamma.utils import DerivExpr, latex
@@ -57,6 +57,7 @@ class IntegralPrinter(JSONPrinter):
             RewriteRule: self.print_Rewrite,
             TrigSubstitutionRule: self.print_TrigSubstitution,
             CompleteSquareRule: self.print_CompleteSquare,
+            SqrtQuadraticRule: self.print_SqrtQuadratic,
         }
         handler = handlers.get(type(rule), self.print_simple)
         handler(rule)
@@ -275,6 +276,25 @@ class IntegralPrinter(JSONPrinter):
             self.append(self.format_math_display(sympy.Integral(rule.substep.context, rule.substep.symbol)))
             with self.new_level():
                 self.print_rule(rule.substep)
+
+    def print_SqrtQuadratic(self, rule):
+        a, b, c, x = rule.a, rule.b, rule.c, rule.symbol
+        with self.new_step():
+            self.append(self.format_text('Apply'))
+            self.append(self.format_math_display(R'''\begin{align}
+&\int\sqrt{a+bx+cx^2}\mathrm{d}x\\
+=&x\sqrt{a+bx+cx^2}-\int x\mathrm{d}\sqrt{a+bx+cx^2}\\
+=&x\sqrt{a+bx+cx^2}-\int\frac{x(b+2cx)}{2\sqrt{a+bx+cx^2}}\mathrm{d}x\\
+=&x\sqrt{a+bx+cx^2}-\int\frac{2(a+bx+cx^2)-2a-bx}{2\sqrt{a+bx+cx^2}}\mathrm{d}x\\
+=&x\sqrt{a+bx+cx^2}-\int\sqrt{a+bx+cx^2}\mathrm{d}x+\frac{1}{2}\int\frac{2a+bx}{\sqrt{a+bx+cx^2}}\mathrm{d}x\\
+=&\frac{1}{2}x\sqrt{a+bx+cx^2}+\frac{1}{4}\int\frac{2a+bx}{\sqrt{a+bx+cx^2}}\mathrm{d}x
+\end{align}'''))
+            self.append(self.format_text('where '), self.format_math(f'a={a},b={b},c={c}'))
+            integrand = (2*a+b*x)/sympy.sqrt(a+b*x+c*x**2)
+            self.append(self.format_text('We then calculate '), self.format_math(sympy.Integral(integrand, x)))
+            with self.new_level():
+                substep = integral_steps(integrand, x)
+                self.print_rule(substep)
 
     def format_math_constant(self, math):
         return self.format_math_display(latex(math) + R"+ \mathrm{C}")
