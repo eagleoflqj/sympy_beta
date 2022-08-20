@@ -1,8 +1,8 @@
 import sympy
 from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, CompleteSquareRule, ConstantRule,
                                              ConstantTimesRule, CyclicPartsRule, DontKnowRule, ExpRule, PartsRule,
-                                             PowerRule, RewriteRule, SqrtQuadraticRule, TrigRule, TrigSubstitutionRule,
-                                             URule, _manualintegrate, integral_steps)
+                                             PowerRule, RewriteRule, SqrtQuadraticDenomRule, SqrtQuadraticRule,
+                                             TrigRule, TrigSubstitutionRule, URule, _manualintegrate, integral_steps)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
 from gamma.utils import DerivExpr, latex
@@ -58,6 +58,7 @@ class IntegralPrinter(JSONPrinter):
             TrigSubstitutionRule: self.print_TrigSubstitution,
             CompleteSquareRule: self.print_CompleteSquare,
             SqrtQuadraticRule: self.print_SqrtQuadratic,
+            SqrtQuadraticDenomRule: self.print_SqrtQuadraticDenom,
         }
         handler = handlers.get(type(rule), self.print_simple)
         handler(rule)
@@ -291,6 +292,50 @@ class IntegralPrinter(JSONPrinter):
 \end{align}'''))
             self.append(self.format_text('where '), self.format_math(f'a={a},b={b},c={c}'))
             integrand = (2*a+b*x)/sympy.sqrt(a+b*x+c*x**2)
+            self.append(self.format_text('We then calculate '), self.format_math(sympy.Integral(integrand, x)))
+            with self.new_level():
+                substep = integral_steps(integrand, x)
+                self.print_rule(substep)
+
+    def print_SqrtQuadraticDenom(self, rule):
+        a, b, c, coeffs, x = rule.a, rule.b, rule.c, rule.coeffs.copy(), rule.symbol
+        N = len(rule.coeffs)
+        integral = sympy.Add(*(coeff * sympy.Symbol(f'I_{i}') for coeff, i in zip(coeffs, range(N - 1, -1, -1))))
+        result_coeffs = []
+        for i in range(N-2):
+            n = len(coeffs)-1-i
+            coeff = coeffs[i]/(c*n)
+            result_coeffs.append(coeff)
+            coeffs[i+1] -= (2*n-1)*b/2*coeff
+            coeffs[i+2] -= (n-1)*a*coeff
+        d, e = coeffs[-1], coeffs[-2]
+        s = sympy.sqrt(a+b*x+c*x**2)
+        poly = sympy.Add(*(coeff * x**i for coeff, i in zip(result_coeffs, range(N - 2, 0, -1))))*s
+        with self.new_step():
+            self.append(self.format_text('Let '), self.format_math(R'I_n=\int\frac{x^n}{\sqrt{a+bx+cx^2}}\mathrm{d}x'),
+                        self.format_text(' and '), self.format_math(R'J_n=\int x^n\sqrt{a+bx+cx^2}\mathrm{d}x'))
+            self.append(self.format_math(R'\forall n,'))
+            self.append(self.format_math_display(R'''\begin{align}
+I_n&=\frac{1}{c}\int\frac{x^{n-2}(a+bx+cx^2)-ax^{n-2}-bx^{n-1}}{\sqrt{a+bx+cx^2}}\mathrm{d}x\\
+&=\frac{1}{c}(\int x^{n-2}\sqrt{a+bx+cx^2}\mathrm{d}x-\int\frac{ax^{n-2}+bx^{n-1}}{\sqrt{a+bx+cx^2}}\mathrm{d}x)\\
+&=\frac{1}{c}(J_{n-2}-aI_{n-2}-bI_{n-1})
+\end{align}'''))
+            self.append(self.format_math(R'\forall n\neq-1,'))
+            self.append(self.format_math_display(R'''\begin{align}
+J_n&=\frac{1}{n+1}\int\sqrt{a+bx+cx^2}\mathrm{d}x^{n+1}\\
+&=\frac{1}{n+1}(x^{n+1}\sqrt{a+bx+cx^2}-\int\frac{x^{n+1}(b+2cx)}{2\sqrt{a+bx+cx^2}}\mathrm{d}x)\\
+&=\frac{1}{n+1}(x^{n+1}\sqrt{a+bx+cx^2}-\frac{b}{2}I_{n+1}-cI_{n+2})
+\end{align}'''))
+            self.append(self.format_text('So '), self.format_math(R'\forall n\geq2,'))
+            self.append(self.format_math_display(R'''\begin{align}
+I_n&=\frac{1}{c}(\frac{1}{n-1}(x^{n-1}\sqrt{a+bx+cx^2}-\frac{b}{2}I_{n-1}-cI_n)-aI_{n-2}-bI_{n-1})\\
+&=\frac{1}{c}(\frac{x^{n-1}}{n-1}\sqrt{a+bx+cx^2}-\frac{2n-1}{2(n-1)}bI_{n-1}-aI_{n-2})-\frac{1}{n-1}I_n\\
+&=\frac{1}{cn}x^{n-1}\sqrt{a+bx+cx^2}-\frac{2n-1}{2n}\frac{b}{c}I_{n-1}-\frac{n-1}{n}\frac{a}{c}I_{n-2}\\
+\end{align}'''))
+            self.append(self.format_text('By iteration, the integral '), self.format_math(integral),
+                        self.format_text(' equals '),
+                        self.format_math(poly + e * sympy.Symbol('I_1') + d * sympy.Symbol('I_0')))
+            integrand = (d+e*x)/s
             self.append(self.format_text('We then calculate '), self.format_math(sympy.Integral(integrand, x)))
             with self.new_level():
                 substep = integral_steps(integrand, x)
