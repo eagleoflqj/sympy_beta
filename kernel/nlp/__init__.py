@@ -8,10 +8,11 @@ from nlp.parser import parse
 def translate(nl: str) -> str:
     nl = cast(re.Match, re.fullmatch(r'(.*?)[\s.?]*', nl)).group(1)  # remove trailing .?
     terms = nl.split()  # remove extra space
-    entry = dispatch(terms)
-    if entry is None:
+    entries = dispatch(terms)
+    if not entries:
         raise SyntaxError
-    result = parse(entry, ' '.join(terms))
-    if result is None:
-        raise ValueError
-    return result
+    for entry in entries:
+        result = parse(entry, ' '.join(terms))
+        if result:
+            return result
+    raise ValueError

@@ -30,9 +30,10 @@ def rule_match(rule: list[int], ids: list[int]) -> bool:
     return True
 
 
-def dispatch(terms: list[str]) -> ENTRY | None:
+def dispatch(terms: list[str]) -> list[ENTRY]:
+    patterns = []
     ids = [lex_id_map.get(term.lower(), -1) for term in terms]
     for rule, pattern in zip(rules, entries):
         if rule_match(rule, ids):
-            return pattern
-    return None
+            patterns.append(pattern)
+    return patterns

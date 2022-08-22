@@ -1,5 +1,6 @@
 import re
 
+from .algebra import entries as algebra_entries
 from .calculus import entries as calculus_entries
 from .ntheory import entries as ntheory_entries
 from .util import ENTRY
@@ -19,5 +20,6 @@ def expand(entry: ENTRY) -> list[ENTRY]:
 
 entries: list[ENTRY] = [expanded_entry for entries in (
     ntheory_entries,
+    algebra_entries,
     calculus_entries
 ) for entry in entries for expanded_entry in expand(entry)]

@@ -10,11 +10,17 @@ corner_cases = [
 ]
 
 ntheory_cases = [
+    ('factorize 12', 'factorint(12)'),
     ('is 2 even', '(2).is_even'),
     ('is 3 odd', '(3).is_odd'),
     ('is 5 prime', 'isprime(5)'),
     ('is 5 a prime number', 'isprime(5)'),
     ('is 6 a multiple of 3', '(6) % (3) == 0'),
+]
+
+algebra_cases = [
+    ('expand (a+b)**2', 'expand((a+b)**2)'),
+    ('factorize a**2+2*a*b+b**2', 'factor(a**2+2*a*b+b**2)'),
 ]
 
 calculus_cases = [
@@ -27,6 +33,7 @@ calculus_cases = [
 
 cases = corner_cases \
     + ntheory_cases \
+    + algebra_cases \
     + calculus_cases
 
 
