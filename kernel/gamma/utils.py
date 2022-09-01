@@ -32,14 +32,15 @@ class LatexVisitor(ast.NodeVisitor):
 
         return formatter(node)
 
-    def visit_Call(self, node):
+    def visit_Call(self, node: ast.Call):
         buffer = []
         func = cast(ast.Name, node.func)
         fname = func.id
 
-        # Only apply to lowercase names (i.e. functions, not classes)
+        # Only apply to imperative functions
         if fname in self.__class__.EXCEPTIONS:
             func.id = self.__class__.EXCEPTIONS[fname].__name__
+            node.keywords.clear()  # remove manual=True from integrate as that's meaningless in latex
             self.latex = latex(eval_node(node))
         else:
             result = self.format(fname, node)

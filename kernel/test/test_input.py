@@ -204,6 +204,11 @@ python_cases = [
        'output': {'type': 'Tex', 'tex': R'\lim_{x \to \frac{\pi}{2}} \tan{\left(x \right)}'}},
       {'title': 'Simplification', 'input': 'zoo', 'output': {'type': 'Tex', 'tex': R'\tilde{\infty}'}},
       {'name': 'trig_alternate', 'title': 'Alternate forms', 'pre_output': ''}]),
+    ('integrate(x, manual=True)',
+     [{'title': 'SymPy', 'input': 'integrate(x,manual=True)',
+       'output': {'type': 'Tex', 'tex': R'\int x\, \mathrm{d}x'}},
+      {'name': 'integral_alternate_fake', 'title': 'Antiderivative forms', 'variable': 'x', 'pre_output': ''},
+      {'name': 'intsteps', 'title': 'Integral Steps', 'input': 'integrate(x, x)', 'variable': 'x'}]),
 ]
 
 
