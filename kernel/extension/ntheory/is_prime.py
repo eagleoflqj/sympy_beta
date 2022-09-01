@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Generator, cast
 
 from sympy import Integer, factorint, floor, latex, primerange, sqrt
 
@@ -43,7 +43,7 @@ def is_prime_step(n: int) -> str:
                 floor_of_sqrt = cast(Integer, floor(square_root))
                 L.a(latex(sqrt(n, evaluate=False)), R'\approx', square_root.round(3))\
                     .t(', so trying primes up to ').a(floor_of_sqrt).t(' suffices').n()
-                for p in primerange(floor_of_sqrt + 1):
+                for p in cast(Generator[int, None, None], primerange(floor_of_sqrt + 1)):
                     q, r = divmod(n, p)
                     L.a(n, '=', cross_mul(q, p))
                     if r == 0:

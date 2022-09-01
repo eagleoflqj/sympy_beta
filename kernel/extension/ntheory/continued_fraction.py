@@ -1,3 +1,5 @@
+from typing import Generator, cast
+
 from sympy import Integer, continued_fraction, continued_fraction_iterator
 
 from data_type import ContinuedFraction
@@ -24,7 +26,7 @@ def continued_frac(components: DICT, parameters=None) -> tuple[int, list[int], l
             finite = list(map(int, res[1:]))
             repeated = []
     except ValueError:  # non-periodic irrational
-        iterator = continued_fraction_iterator(num)
+        iterator = cast(Generator[int, None, None], continued_fraction_iterator(num))
         n = int(next(iterator))
         finite = [int(next(iterator)) for _ in range(9)]
         repeated = None

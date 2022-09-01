@@ -77,7 +77,7 @@ def eval_latex_input(raw_input: str):
 
     patch_latex()
     sp_obj: Basic = parse_latex(raw_input)  # type: ignore
-    sp_obj = sp_obj.replace(lambda x: x.is_Symbol, lambda x: Symbol(_braces_pattern.sub(R'\1_\2', x.name)))
+    sp_obj = sp_obj.replace(lambda x: x.is_Symbol, lambda x: Symbol(_braces_pattern.sub(R'\1_\2', x.name)))  # type: ignore
     result = str(sp_obj)
     unpatch_latex()
     return {'result': result}
