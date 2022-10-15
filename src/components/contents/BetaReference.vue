@@ -1,17 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { NA } from 'naive-ui'
 
-defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  }
-})
+defineProps<{
+  content: ReferenceContent
+}>()
 </script>
 
 <template>
   <ul>
-    <li v-for="link in card.links">
+    <li v-for="link in content.links">
       <n-a
         :href="link"
         target="_blank"

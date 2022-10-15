@@ -1,17 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { NIcon, NPopover, NButton, NA } from 'naive-ui'
 import { Image } from '@vicons/fa'
 
-defineProps({
-  img: {
-    type: HTMLImageElement,
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  }
-})
+defineProps<{
+  img: HTMLImageElement
+  name: string
+}>()
 </script>
 
 <template>

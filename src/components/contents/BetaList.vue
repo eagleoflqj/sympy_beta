@@ -1,18 +1,16 @@
-<script setup>
-import BetaContainer from '@/components/BetaContainer.vue'
+<script setup lang="ts">
+import BetaContainer from '../BetaContainer.vue'
 
-defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  }
-})
+defineProps<{
+  content: ListContent
+}>()
+
 </script>
 
 <template>
   <ul>
-    <li v-for="item in card.list">
-      <beta-container :card="item" />
+    <li v-for="item in content.list">
+      <beta-container :content="item" />
     </li>
   </ul>
 </template>

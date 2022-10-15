@@ -1,17 +1,14 @@
-<script setup>
-import BetaCopyTextButton from '@/components/BetaCopyTextButton.vue'
+<script setup lang="ts">
+import BetaCopyTextButton from '../BetaCopyTextButton.vue'
 
-defineProps({
-  card: {
-    type: Object,
-    required: true
-  }
-})
+defineProps<{
+  content: TextContent
+}>()
 </script>
 
 <template>
   <div style="text-align: right">
-    <beta-copy-text-button :text="card.text" />
+    <beta-copy-text-button :text="content.text" />
   </div>
-  {{ card.text }}
+  {{ content.text }}
 </template>

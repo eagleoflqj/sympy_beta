@@ -1,13 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { Math } from '@vicons/tabler'
-import BetaCopyButton from '@/components/BetaCopyButton.vue'
+import BetaCopyButton from './BetaCopyButton.vue'
 
-defineProps({
-  tex: {
-    type: String,
-    required: true
-  }
-})
+defineProps<{
+  tex: string
+}>()
 </script>
 
 <template>

@@ -1,5 +1,5 @@
-<script setup>
-import { register } from '@/js/workerAPI.js'
+<script setup lang="ts">
+import { register } from '../workerAPI'
 import { useNotification } from 'naive-ui'
 
 const notification = useNotification()
@@ -22,7 +22,7 @@ function notifyLoading () {
     }
   })
   return {
-    setContent: function (newContent) {
+    setContent: function (newContent: string) {
       baseContent = newContent
     },
     destroy: () => reactive.destroy()
@@ -39,7 +39,7 @@ function notifyLoaded () {
   })
 }
 
-function notifyError (errorMsg) {
+function notifyError (errorMsg: string) {
   notification.create({
     type: 'error',
     title: 'An error occurs',
@@ -65,7 +65,7 @@ register(({ stage, errorMsg }) => {
       break
     default:
       loadingNotification.destroy()
-      notifyError(errorMsg)
+      notifyError(errorMsg!)
   }
 })
 </script>

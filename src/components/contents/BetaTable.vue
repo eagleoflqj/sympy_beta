@@ -1,54 +1,50 @@
-<script setup>
+<script setup lang="ts">
 import { NTable, NScrollbar } from 'naive-ui'
-import BetaTex from '@/components/contents/BetaTex.vue'
-import BetaCopyMarkdownButton from '@/components/BetaCopyMarkdownButton.vue'
+import BetaTex from '../contents/BetaTex.vue'
+import BetaCopyMarkdownButton from '../BetaCopyMarkdownButton.vue'
 import { onMounted } from 'vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{
+  content: TableContent
+}>()
 
 const maxNRow = 10
 onMounted(() => {
-  const { card } = props
-  const nColumn = Math.ceil(card.rows.length / maxNRow)
-  card.titles.splice(0, card.titles.length, ...[].concat(...Array(nColumn).fill(card.titles)))
-  const remainingRows = card.rows.splice(maxNRow)
+  const { content } = props
+  const nColumn = Math.ceil(content.rows.length / maxNRow)
+  content.titles.splice(0, content.titles.length, ...[].concat(...Array(nColumn).fill(content.titles)))
+  const remainingRows = content.rows.splice(maxNRow)
   for (const i in remainingRows) {
-    const j = i % maxNRow
-    card.rows[j].splice(card.rows[j].length, 0, ...remainingRows[i])
+    const j = Number(i) % maxNRow
+    content.rows[j].splice(content.rows[j].length, 0, ...remainingRows[i])
   }
 })
 </script>
 
 <template>
   <div
-    style="
-  text-align: right"
+    style="text-align: right"
   >
     <beta-copy-markdown-button
-      :thead="card.titles"
-      :tbody="card.rows"
+      :thead="content.titles"
+      :tbody="content.rows"
     />
   </div>
   <n-scrollbar x-scrollable>
     <n-table style="width: 0; margin: auto; white-space: nowrap">
       <thead>
         <tr>
-          <th v-for="title in card.titles">
+          <th v-for="title in content.titles">
             {{ title }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in card.rows">
+        <tr v-for="row in content.rows">
           <td v-for="cell in row">
             <beta-tex
               v-if="typeof cell === 'object'"
-              :card="cell"
+              :content="cell"
               :show-copy-button="false"
             />
             <template v-else>

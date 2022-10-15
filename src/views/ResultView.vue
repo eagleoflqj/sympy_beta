@@ -1,24 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { NSpace, NSpin, NA } from 'naive-ui'
-import { evalInput, evalLatexInput } from '@/js/workerAPI.js'
-import BetaSearch from '@/components/BetaSearch.vue'
-import BetaCard from '@/components/BetaCard.vue'
-import { homepage } from '@/../package.json'
+import { evalInput, evalLatexInput } from '../workerAPI'
+import BetaSearch from '../components/BetaSearch.vue'
+import BetaCard from '../components/BetaCard.vue'
+import { homepage } from '../../package.json'
 
 const route = useRoute()
 const expr = ref('')
-const variableRef = ref(null)
-const cards = reactive([])
+const variableRef = ref<string>()
+
+const cards = reactive<InputResult[]>([])
 
 watchEffect(async () => {
-  const routeExpr = route.params.expr
+  const routeExpr = route.params.expr as string | undefined
   if (typeof routeExpr === 'undefined') {
     return
   }
   cards.splice(0)
-  let finalResult, finalError
+  let finalResult: InputResult[], finalError: string
   if (route.name === 'LaTeX') {
     const { result, error } = await evalLatexInput(routeExpr)
     if (error) {
@@ -45,11 +46,11 @@ watchEffect(async () => {
   if (finalResult) {
     cards.push(...finalResult)
   } else {
-    cards.push({ error: finalError })
+    cards.push({ error: finalError }) // flat error to an error card
   }
 })
 
-function chooseVariable (variable) {
+function chooseVariable (variable: string) {
   variableRef.value = variable
 }
 </script>

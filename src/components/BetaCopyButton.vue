@@ -1,20 +1,12 @@
-<script setup>
+<script setup lang="ts">
+import { Component } from 'vue'
 import { NIcon, NPopover, NButton, useMessage } from 'naive-ui'
 
-const props = defineProps({
-  copied: {
-    type: String,
-    required: true
-  },
-  iconComponent: {
-    type: Object,
-    required: true
-  },
-  popoverText: {
-    type: String,
-    default: () => ''
-  }
-})
+const props = defineProps<{
+  copied: string
+  iconComponent: Component
+  popoverText: string
+}>()
 
 const message = useMessage()
 

@@ -1,10 +1,7 @@
-<script setup>
-defineProps({
-  content: {
-    type: Object,
-    default: () => {}
-  }
-})
+<script setup lang="ts">
+defineProps<{
+  content: Step
+}>()
 </script>
 
 <template>

@@ -1,32 +1,70 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { NSkeleton } from 'naive-ui'
 import jQuery from 'jquery'
+// @ts-ignore
 import terminal from 'jquery.terminal'
 import 'jquery.terminal/css/jquery.terminal.min.css'
-import preExec from '@/../kernel/gamma/pre_exec.py?raw'
+import preExec from '../../kernel/gamma/pre_exec.py?raw'
 
 terminal(window, jQuery)
 
-let term = null
+let term: JQueryTerminal
 const ps1 = '>>> '
 const ps2 = '... '
-let unlock = null
+
+let unlock: () => void
+let res: () => void
+let termReady: Promise<any> | null
 
 async function lock () {
-  let res
-  const ready = term.ready
-  term.ready = new Promise(resolve => (res = resolve))
+  const ready = termReady
+  termReady = new Promise<void>(resolve => (res = resolve))
   await ready
   return res
 }
 
 const shellWorker = new Worker('/shell.js')
-let shellReadyResolve = null
-const shellReadyPromise = new Promise((resolve, reject) => (shellReadyResolve = resolve))
+let shellReadyResolve: (arg: string) => void
+const shellReadyPromise = new Promise(resolve => (shellReadyResolve = resolve))
 const loaded = ref(false)
 
-shellWorker.onmessage = msg => {
+async function interpreter (command: string) {
+  unlock = await lock()
+  shellWorker.postMessage({ type: 'exec', arg: command })
+  term.pause()
+}
+
+let completeResolve: ((arg: string[]) => void) | null = null
+
+function complete (command: string) {
+  return new Promise<string[]>((resolve, reject) => {
+    if (completeResolve !== null) {
+      reject(new Error())
+    }
+    completeResolve = resolve
+    shellWorker.postMessage({ type: 'complete', arg: command })
+  })
+}
+
+type Data = {
+  type: 'set_prompt'
+  arg: boolean
+} | {
+  type: 'error' | 'ready'
+  arg: string
+} | {
+  type: 'echo'
+  arg: string
+  option?: object
+} | {
+  type: 'resume'
+} | {
+  type: 'complete'
+  arg: string[]
+}
+
+shellWorker.onmessage = (msg: MessageEvent<Data>) => {
   const { data } = msg
   switch (data.type) {
     case 'set_prompt':
@@ -36,14 +74,14 @@ shellWorker.onmessage = msg => {
       term.error(data.arg)
       break
     case 'echo':
-      term.echo(...data.args)
+      term.echo(data.arg, data.option)
       break
     case 'resume':
       term.resume()
       unlock()
       break
     case 'complete':
-      completeResolve(data.arg)
+      completeResolve!(data.arg)
       completeResolve = null
       break
     case 'ready':
@@ -52,29 +90,11 @@ shellWorker.onmessage = msg => {
   }
 }
 
-async function interpreter (command) {
-  unlock = await lock()
-  shellWorker.postMessage({ type: 'exec', arg: command })
-  term.pause()
-}
-
-let completeResolve = null
-
-function complete (command) {
-  return new Promise((resolve, reject) => {
-    if (completeResolve !== null) {
-      reject(new Error())
-    }
-    completeResolve = resolve
-    shellWorker.postMessage({ type: 'complete', arg: command })
-  })
-}
-
-const container = ref(null)
+const container = ref<Element>()
 
 onMounted(async () => {
   const banner = await shellReadyPromise
-  term = jQuery(container.value).terminal(interpreter, {
+  term = jQuery(container.value!).terminal(interpreter, {
     greetings: `Welcome to the Pyodide terminal emulator 🐍\n${banner}`,
     prompt: ps1,
     completionEscape: false,
@@ -84,7 +104,7 @@ onMounted(async () => {
     keymap: {
       'CTRL+C': async () => {
         shellWorker.postMessage({ type: 'clear' })
-        term.enter()
+        term.enter('')
         term.echo('KeyboardInterrupt')
         term.set_command('')
         term.set_prompt(ps1)

@@ -75,7 +75,6 @@ class SymPyGamma:
 
         if any(get_card(c).is_multivariate() for c in cards):
             result[-1].update({
-                "num_variables": len(components['variables']),
                 "variables": list(map(repr, components['variables'])),
                 "variable": repr(components['variable'])
             })

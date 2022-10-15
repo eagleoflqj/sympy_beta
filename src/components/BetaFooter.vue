@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { NSpin, NA } from 'naive-ui'
-import { getPyodideVersion, getSymPyVersion } from '@/js/workerAPI.js'
-import { homepage } from '@/../package.json'
+import { getPyodideVersion, getSymPyVersion } from '../workerAPI'
+import { homepage } from '../../package.json'
 
-const pyodideVersion = ref(null)
+const pyodideVersion = ref<string>('')
 const sympyVersion = ref(null)
 const commit = '__COMMIT__'
 const commitURL = `${homepage}/commit/${commit}`

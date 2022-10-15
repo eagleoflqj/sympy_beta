@@ -1,13 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { NIcon, NPopover, NA } from 'naive-ui'
 import { WikipediaW } from '@vicons/fa'
 
-const props = defineProps({
-  wiki: {
-    type: String,
-    required: true
-  }
-})
+const props = defineProps<{
+  wiki: string
+}>()
 
 const link = `https://en.wikipedia.org/wiki/${props.wiki}`
 </script>

@@ -1,13 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { Copy } from '@vicons/tabler'
-import BetaCopyButton from '@/components/BetaCopyButton.vue'
+import BetaCopyButton from './BetaCopyButton.vue'
 
-defineProps({
-  text: {
-    type: String,
-    required: true
-  }
-})
+defineProps<{
+  text: string
+}>()
 </script>
 
 <template>

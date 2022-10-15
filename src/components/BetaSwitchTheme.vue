@@ -1,20 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { NSwitch, NIcon, NCheckbox, NSpace, darkTheme, useOsTheme } from 'naive-ui'
 import { Moon, Sun } from '@vicons/tabler'
-import { isMobile } from '@/js/util.js'
-import BetaShowMenu from '@/components/BetaShowMenu.vue'
+import { isMobile } from '../util'
+import BetaShowMenu from './BetaShowMenu.vue'
 
-const props = defineProps({
-  setTheme: {
-    type: Function,
-    required: true
-  }
-})
+const props = defineProps<{
+  setTheme: (theme: GlobalTheme) => void
+}>()
 
 const osThemeRef = useOsTheme()
 const followSystem = ref(true)
 const switchValueRef = ref()
+
+function updateTheme (theme: 'dark' | 'light' | null, isAuto?: boolean) {
+  if (!isAuto) {
+    props.setTheme(theme === 'dark' ? darkTheme : null)
+    followSystem.value = false
+  }
+  switchValueRef.value = theme
+}
 
 function followOSTheme () {
   props.setTheme(osThemeRef.value === 'dark' ? darkTheme : null)
@@ -26,14 +31,6 @@ followOSTheme()
 watch(followSystem, newValue => newValue && followOSTheme())
 
 watch(osThemeRef, () => followSystem.value && followOSTheme())
-
-function updateTheme (theme, isAuto) {
-  if (!isAuto) {
-    props.setTheme(theme === 'dark' ? darkTheme : null)
-    followSystem.value = false
-  }
-  switchValueRef.value = theme
-}
 </script>
 
 <template>

@@ -1,18 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { NSpace, NSwitch, NIcon } from 'naive-ui'
 import { AbcFilled, AttachMoneyFilled } from '@vicons/material'
-import BetaCopyTextButton from '@/components/BetaCopyTextButton.vue'
+import BetaCopyTextButton from '../BetaCopyTextButton.vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{
+  content: ChineseNumeralContent
+}>()
 
 const financial = ref(false)
-const text = computed(() => financial.value ? props.card.financial : props.card.normal)
+const text = computed(() => financial.value ? props.content.financial : props.content.normal)
 </script>
 
 <template>

@@ -1,16 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { NCard } from 'naive-ui'
 
-defineProps({
-  ambiguity: {
-    type: String,
-    default: () => ''
-  },
+defineProps<{
+  ambiguity: string
   description: {
-    type: Array,
-    default: () => []
-  }
-})
+    type: 'Expression' | 'Text'
+    value: string
+  }[]
+}>()
 </script>
 
 <template>

@@ -1,16 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { NButton } from 'naive-ui'
 
-defineProps({
-  name: {
-    type: String,
-    default: () => ''
-  },
-  callback: {
-    type: Function,
-    default: () => () => {}
-  }
-})
+defineProps<{
+  name: string
+  callback: () => void
+}>()
 </script>
 
 <template>

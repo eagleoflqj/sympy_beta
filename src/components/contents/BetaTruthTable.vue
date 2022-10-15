@@ -1,23 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { NTable, NText } from 'naive-ui'
-import BetaCopyMarkdownButton from '@/components/BetaCopyMarkdownButton.vue'
+import BetaCopyMarkdownButton from '../BetaCopyMarkdownButton.vue'
 
-defineProps({
-  card: {
-    type: Object,
-    required: true
-  }
-})
+defineProps<{
+  content: TruthTableContent
+}>()
 </script>
 
 <template>
   <div
-    style="
-  text-align: right"
+    style="text-align: right"
   >
     <beta-copy-markdown-button
-      :thead="card.titles"
-      :tbody="card.rows"
+      :thead="content.titles"
+      :tbody="content.rows"
     />
   </div>
   <n-table
@@ -27,13 +23,13 @@ defineProps({
   >
     <thead>
       <tr>
-        <th v-for="title in card.titles">
+        <th v-for="title in content.titles">
           {{ title }}
         </th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="row in card.rows">
+      <tr v-for="row in content.rows">
         <td v-for="cell in row">
           <n-text :type="cell === 'True' ? 'success' : 'error'">
             {{ cell }}

@@ -1,24 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { NCode } from 'naive-ui'
-import BetaContainer from '@/components/BetaContainer.vue'
+import BetaContainer from '../BetaContainer.vue'
 
-defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  }
-})
+defineProps<{
+  content: MultiResultContent
+}>()
 </script>
 
 <template>
   <ul>
-    <li v-for="result in card.results">
+    <li v-for="result in content.results">
       <n-code
         :code="result.input"
         language="python"
         inline
       />
-      <beta-container :card="result.output" />
+      <beta-container :content="result.output" />
     </li>
   </ul>
 </template>

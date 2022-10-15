@@ -1,15 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { NButton, NSpace, NA } from 'naive-ui'
-import BetaSearch from '@/components/BetaSearch.vue'
-import BetaCollapse from '@/components/BetaCollapse.vue'
-import categorys from '@/js/categorys.js'
+import BetaSearch from '../components/BetaSearch.vue'
+import BetaCollapse from '../components/BetaCollapse.vue'
+import categories from '../categories'
 
 const router = useRouter()
 
-const examples = []
-for (const category of categorys) {
-  for (const subCategory of category.sub_categorys) {
+const examples: string[] = []
+for (const category of categories) {
+  for (const subCategory of category.subCategories) {
     for (const example of subCategory.examples) {
       examples.push(example.expression)
     }
@@ -47,7 +47,7 @@ function randomExample () {
         Random Example
       </n-button>
       <beta-collapse
-        v-for="category in categorys"
+        v-for="category in categories"
         :category="category"
       />
     </n-space>

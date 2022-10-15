@@ -1,20 +1,36 @@
-<script setup>
+<script setup lang="ts">
 import { ref, toRaw, onMounted } from 'vue'
 import { NSpace, NButton, NCheckbox, NCheckboxGroup } from 'naive-ui'
+import { Plot2D } from '../../js/plot'
 
-const props = defineProps({
+type ResizeOption = {
+  reset?: boolean
+  width?: number
+  height?: number
+}
+
+const props = defineProps<{
   callback: {
-    type: Object,
-    default: () => {}
+    getPlot: (container: Element) => Plot2D
+    toggleFullscreen: (event: Event) => void
   }
-})
+}>()
 
 const { callback } = toRaw(props)
 
-onMounted(setupPlots)
+const container = ref<HTMLDivElement>()
+let plot: Plot2D
 
-const container = ref(null)
-let plot = null
+function resizeContainer (option: ResizeOption) {
+  if (option.reset) {
+    plot.reset()
+    container.value!.style.width = '60%'
+    container.value!.style.height = Math.round(plot.width() * 3 / 4) + 'px'
+    return
+  }
+  container.value!.style.width = option.width + 'px'
+  container.value!.style.height = option.height + 'px'
+}
 
 function reset () {
   plot.reset()
@@ -31,20 +47,9 @@ function squareViewport () {
   })
 }
 
-function resizeContainer (options) {
-  if (options.reset) {
-    plot.reset()
-    container.value.style.width = '60%'
-    container.value.style.height = Math.round(plot.width() * 3 / 4) + 'px'
-    return
-  }
-  container.value.style.width = options.width + 'px'
-  container.value.style.height = options.height + 'px'
-}
-
 const plotOption = ref(['grid', 'axes', 'path'])
 
-function changePlotOption (opt) {
+function changePlotOption () {
   plot.setOption(plotOption.value)
   plot.update()
 }
@@ -59,16 +64,18 @@ function exportSVG () {
 }
 
 function setupPlots () {
-  plot = callback.getPlot(container.value)
+  plot = callback.getPlot(container.value!)
   plot.show()
 
   const observer = new MutationObserver(function () {
     plot.resize()
   })
-  observer.observe(container.value, {
+  observer.observe(container.value!, {
     attributes: true
   })
 }
+
+onMounted(setupPlots)
 </script>
 
 <template>

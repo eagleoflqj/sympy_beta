@@ -1,14 +1,11 @@
-<script setup>
-defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  }
-})
+<script setup lang="ts">
+defineProps<{
+  content: DocumentContent
+}>()
 </script>
 
 <template>
-  <div v-html="card.html" />
+  <div v-html="content.html" />
 </template>
 
 <style>

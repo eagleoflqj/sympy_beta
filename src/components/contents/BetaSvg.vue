@@ -1,32 +1,29 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import BetaDownloadImageButton from '@/components/BetaDownloadImageButton.vue'
+import BetaDownloadImageButton from '../BetaDownloadImageButton.vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  }
-})
+const props = defineProps<{
+  content: SvgContent
+}>()
 
-const img = ref(null)
-const name = `${props.card.category}.svg`
+const img = ref<HTMLImageElement>()
+const name = `${props.content.category}.svg`
 
 onMounted(() => {
-  img.value.src = `data:image/svg+xml;base64,${props.card.svg}`
+  img.value!.src = `data:image/svg+xml;base64,${props.content.svg}`
 })
 </script>
 
 <template>
   <div style="text-align: right">
     <beta-download-image-button
-      :img="img"
+      :img="img!"
       :name="name"
     />
   </div>
   <img
     ref="img"
-    :class="card.category"
+    :class="content.category"
   >
 </template>
 

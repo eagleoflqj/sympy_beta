@@ -1,17 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, toRaw } from 'vue'
 import { NSpace, NSwitch, NIcon } from 'naive-ui'
 import { LinearScaleFilled, DivideFilled } from '@vicons/material'
-import BetaCopyLatexButton from '@/components/BetaCopyLatexButton.vue'
+import BetaCopyLatexButton from '../BetaCopyLatexButton.vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{
+  content: ContinuedFractionContent
+}>()
 
-const { n, finite, repeated } = toRaw(props.card)
+const { n, finite, repeated } = toRaw(props.content)
 
 function constructLinear () {
   let tail = !repeated ? '\\cdots' : repeated.length > 0 ? `\\overline{${repeated.join()}}` : ''
@@ -24,7 +21,7 @@ function constructLinear () {
 function constructFraction () {
   const middle = [...finite]
   let tail = !repeated || repeated.length ? '+\\cdots' : ''
-  if (repeated?.length > 0) {
+  if (repeated && repeated.length > 0) {
     middle.push(...repeated)
     if (repeated.length <= 5) {
       middle.push(...repeated)

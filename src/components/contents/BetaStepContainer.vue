@@ -1,20 +1,17 @@
-<script setup>
-import BetaStep from '@/components/contents/BetaStep.vue'
+<script setup lang="ts">
+import BetaStep from '../contents/BetaStep.vue'
 
-defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  }
-})
+defineProps<{
+  content: StepContainerContent
+}>()
 </script>
 
 <template>
   <div class="steps">
-    <beta-step :content="card.content" />
+    <beta-step :content="content.content" />
     <hr>
     <p>The answer is:</p>
-    <beta-step :content="card.answer" />
+    <beta-step :content="content.answer" />
   </div>
 </template>
 

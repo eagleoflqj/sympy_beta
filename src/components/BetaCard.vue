@@ -1,51 +1,33 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted, toRaw } from 'vue'
 import { NButton, NSpace, NSpin, NCard, NCode } from 'naive-ui'
 import { Eye, EyeSlash } from '@vicons/fa'
-import { evalCard } from '@/js/workerAPI.js'
-import { Plot2D } from '@/js/plot.js'
-import BetaAmbiguity from '@/components/BetaAmbiguity.vue'
-import BetaContainer from '@/components/BetaContainer.vue'
-import BetaOption from '@/components/BetaOption.vue'
-import BetaSourceButton from '@/components/BetaSourceButton.vue'
-import BetaWikiButton from '@/components/BetaWikiButton.vue'
+import { evalCard } from '../workerAPI'
+import { Plot2D } from '../js/plot.js'
+import BetaAmbiguity from './BetaAmbiguity.vue'
+import BetaContainer from './BetaContainer.vue'
+import BetaOption from './BetaOption.vue'
+import BetaSourceButton from './BetaSourceButton.vue'
+import BetaWikiButton from './BetaWikiButton.vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  },
-  input: {
-    type: String,
-    default: () => ''
-  },
-  chooseVariable: {
-    type: Function,
-    default: () => () => {}
-  }
-})
+const props = defineProps<{
+  card: InputResult
+  input: string
+  chooseVariable: (variable: string) => void
+}>()
 
 const { card, input } = toRaw(props)
 
-const cardResult = reactive({})
+const cardResult = reactive<CardResult | {}>({})
 
 let digits = 15
-const numericCallbacks = reactive([])
+const numericCallbacks = reactive<(() => void)[]>([])
 
 onMounted(async () => {
-  if (typeof card.name === 'undefined') {
-    if (card.ambiguity || card.error) {
-      return
-    }
-    const numerics = []
-    if (card.output.numeric) {
-      numerics.push(card.output)
-    } else if (card.output.list) {
-      card.output.list.forEach(item => item.numeric && numerics.push(item))
-    }
-    numerics.forEach(item => numericCallbacks.push(async () =>
-      Object.assign(item, await evalCard('approximator', item.expression, 'x', { digits }))))
-  } else {
+  if ('ambiguity' in card || 'error' in card) {
+    return
+  }
+  if ('name' in card) {
     const hasDigits = (card.parameters || []).indexOf('digits') >= 0
     const evaluate = async () => {
       const parameters = hasDigits ? { digits } : {}
@@ -55,6 +37,17 @@ onMounted(async () => {
     if (hasDigits) {
       numericCallbacks.push(evaluate)
     }
+  } else {
+    const numerics: TexContent[] = []
+    if ('output' in card) {
+      if ('numeric' in card.output) {
+        numerics.push(card.output)
+      } else if ('list' in card.output) {
+        card.output.list.forEach(item => 'numeric' in item && numerics.push(item))
+      }
+    }
+    numerics.forEach(item => numericCallbacks.push(async () =>
+      Object.assign(item, await evalCard('approximator', item.expression, 'x', { digits }))))
   }
 })
 
@@ -63,21 +56,22 @@ function moreDigits () {
   numericCallbacks.forEach(callback => callback())
 }
 
-let plot = null
+let plot: Plot2D | null = null
 const colors = d3.scale.category10()
 
-function getPlot (container) {
-  plot = new Plot2D(container, cardResult.graphs, async (parameters) => {
-    const { graphs } = await evalCard(card.name, input, card.variable, parameters)
+function getPlot (container: Element) {
+  plot = new Plot2D(container, (cardResult as PlotContent).graphs, async (parameters: { xmin: number, xmax: number }) => {
+    const { graphs } = await evalCard((card as ContentCard).name, input, (card as ContentCard).variable, parameters)
     return graphs
   })
   return plot
 }
 
-const visibility = ref({})
+const visibility = ref<{ [key: number]: boolean }>({})
 
-function toggleVisibility (index, event) {
+function toggleVisibility (index: number, event: MouseEvent) {
   if (plot !== null) {
+    // @ts-ignore
     const style = event.currentTarget.style
     if (visibility.value[index] === false) {
       visibility.value[index] = true
@@ -90,7 +84,7 @@ function toggleVisibility (index, event) {
   }
 }
 
-function highlight (index, highlight) {
+function highlight (index: number, highlight: boolean) {
   if (plot !== null) {
     plot.highlight(index, highlight)
   }
@@ -98,8 +92,8 @@ function highlight (index, highlight) {
 
 const isFullscreen = ref(false)
 
-function toggleFullscreen (event) {
-  if (event.type === 'keyup' && event.keyCode !== 27) {
+function toggleFullscreen (event: KeyboardEvent) {
+  if (event.type === 'keyup' && event.key !== 'Escape') {
     return
   }
   if (isFullscreen.value) {
@@ -111,18 +105,18 @@ function toggleFullscreen (event) {
   }
 }
 
-const step = ref(null)
+const step = ref<ResultCard>()
 
 async function seeSteps () {
-  if (card.name === 'diff') {
+  if ((card as ContentCard).name === 'diff') {
     step.value = {
       title: 'Derivative Steps',
-      output: await evalCard('diffsteps', input, card.variable, {})
+      output: await evalCard('diffsteps', input, (card as ContentCard).variable, {})
     }
-  } else if (card.name === 'integral_alternate') {
+  } else if ((card as ContentCard).name === 'integral_alternate') {
     step.value = {
       title: 'Integral Steps',
-      output: await evalCard('intsteps', input, card.variable, {})
+      output: await evalCard('intsteps', input, (card as ContentCard).variable, {})
     }
   }
 }
@@ -130,7 +124,7 @@ async function seeSteps () {
 
 <template>
   <beta-ambiguity
-    v-if="card.ambiguity"
+    v-if="'ambiguity' in card"
     :ambiguity="card.ambiguity"
     :description="card.description"
   />
@@ -138,22 +132,22 @@ async function seeSteps () {
     v-else
     :title="card.title"
     :class="['result_card', {
-      result_card_error: card.error || cardResult && cardResult.error,
+      result_card_error: 'error' in card || cardResult && 'error' in cardResult,
       fullscreen: isFullscreen
     }]"
     @keyup.esc="toggleFullscreen"
   >
     <template #header-extra>
       <beta-source-button
-        v-if="card.source"
+        v-if="'source' in card"
         :source="card.source"
       />
       <beta-wiki-button
-        v-if="card.wiki"
+        v-if="'wiki' in card"
         :wiki="card.wiki"
       />
     </template>
-    <div v-if="card.input">
+    <div v-if="'input' in card">
       <n-code
         v-if="typeof card.input === 'string'"
         :code="card.input"
@@ -184,12 +178,12 @@ async function seeSteps () {
 
     <div class="cell_output">
       <vue-mathjax
-        v-if="card.pre_output"
+        v-if="'pre_output' in card && card.pre_output"
         :formula="'$' + card.pre_output + ' = $'"
       />
-      <template v-if="card.output">
-        <beta-container :card="card.output" />
-        <div v-if="card.num_variables > 1">
+      <template v-if="'output' in card">
+        <beta-container :content="card.output" />
+        <div v-if="'variables' in card">
           Evaluate with respect to …
           <n-space>
             <n-button
@@ -204,16 +198,16 @@ async function seeSteps () {
           </n-space>
         </div>
       </template>
-      <template v-else-if="card.name">
+      <template v-else-if="'name' in card">
         <div
-          v-if="cardResult.error"
+          v-if="'error' in cardResult"
           class="cell_output_plain"
         >
           {{ cardResult.error }}
         </div>
         <beta-container
-          v-else-if="cardResult.type"
-          :card="cardResult"
+          v-else-if="'type' in cardResult"
+          :content="cardResult"
           :callback="{ getPlot, toggleFullscreen }"
         />
         <div
@@ -226,7 +220,7 @@ async function seeSteps () {
         </div>
       </template>
       <div
-        v-else-if="card.error"
+        v-else-if="'error' in card"
         class="cell_output_plain"
       >
         {{ card.error }}
@@ -238,15 +232,15 @@ async function seeSteps () {
       :callback="moreDigits"
     />
     <beta-option
-      v-if="(card.name === 'diff' || card.name === 'integral_alternate') && step === null"
+      v-if="'name' in card && (card.name === 'diff' || card.name === 'integral_alternate') && !step"
       name="See Steps"
       :callback="seeSteps"
     />
   </n-card>
   <beta-card
-    v-if="step !== null"
+    v-if="step"
     :card="step"
-    :input="card.input"
+    :input="(card as ContentCard).input"
   />
 </template>
 

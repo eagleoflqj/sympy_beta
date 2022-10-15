@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NInputGroup, NInput, NButton, NH1, NA, NPopover, NRadioGroup, NRadioButton, NIcon, NSpace } from 'naive-ui'
 import { Python } from '@vicons/fa'
 import { Math } from '@vicons/tabler'
-import BetaMathLive from '@/components/BetaMathLive.vue'
+import BetaMathLive from './BetaMathLive.vue'
 
-const input = ref()
+const input = ref<string>('')
 const defaultInputType = 'Python'
 const inputType = ref(defaultInputType)
 const clickedPythonInput = ref(false)
@@ -32,11 +32,11 @@ function checkSwitchToLaTeX () {
 
 const route = useRoute()
 watchEffect(() => {
-  input.value = route.params.expr || ''
+  input.value = route.params.expr as string || ''
   inputType.value = route.name === 'LaTeX' ? 'LaTeX' : defaultInputType
 })
 
-function mathliveInputCallback (value) {
+function mathliveInputCallback (value: string) {
   input.value = value
 }
 </script>
@@ -59,7 +59,7 @@ function mathliveInputCallback (value) {
         <n-input
           v-model:value="input"
           type="text"
-          placeholder
+          placeholder="Input expression or question"
           clearable
           style="font-family: 'Droid Sans Mono', monospace"
           @keyup.enter="submit"

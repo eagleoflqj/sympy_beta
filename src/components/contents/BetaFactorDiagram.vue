@@ -1,20 +1,15 @@
-<script setup>
-import { ref, toRaw, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { NA } from 'naive-ui'
-import { FactorDiagram } from '@/js/factordiagram.js'
+import { FactorDiagram } from '../../js/factordiagram'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    default: () => { }
-  }
-})
-
-const { card } = toRaw(props)
+const props = defineProps<{
+  content: FactorDiagramContent
+}>()
 
 const container = ref(null)
 
-onMounted(() => (new FactorDiagram(card.primes, container.value)).draw())
+onMounted(() => (new FactorDiagram(props.content.primes, container.value)).draw())
 </script>
 
 <template>

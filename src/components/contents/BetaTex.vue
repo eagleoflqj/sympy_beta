@@ -1,21 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { NScrollbar } from 'naive-ui'
-import BetaCopyLatexButton from '@/components/BetaCopyLatexButton.vue'
+import BetaCopyLatexButton from '../BetaCopyLatexButton.vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    required: true
-  },
-  showCopyButton: {
-    type: Boolean,
-    default: () => true
-  }
-})
+const props = defineProps<{
+  content: TexContent
+  showCopyButton?: boolean
+}>()
 
 const tex = computed(() => {
-  return props.card.tex + (props.card.numeric ? '\\approx' + props.card.approximation : '')
+  return props.content.tex + (props.content.numeric ? '\\approx' + props.content.approximation : '')
 })
 </script>
 

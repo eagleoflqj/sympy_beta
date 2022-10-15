@@ -1,26 +1,18 @@
-<script setup>
-import { computed, defineAsyncComponent, toRaw } from 'vue'
+<script setup lang="ts">
+import { computed, defineAsyncComponent } from 'vue'
 
-const props = defineProps({
-  card: {
-    type: Object,
-    default: () => {}
-  },
-  callback: {
-    type: Object,
-    default: () => {}
-  }
-})
+const props = defineProps<{
+  content: Content
+  callback?: {}
+}>()
 
-const { card, callback } = toRaw(props)
-
-const cardType = computed(() => defineAsyncComponent(() => import(`./contents/Beta${card.type}.vue`)))
+const cardType = computed(() => defineAsyncComponent(() => import(`./contents/Beta${props.content.type}.vue`)))
 </script>
 
 <template>
   <component
     :is="cardType"
-    :card="card"
+    :content="content"
     :callback="callback"
   />
 </template>

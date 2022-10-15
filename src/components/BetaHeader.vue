@@ -1,16 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { h, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { NMenu } from 'naive-ui'
 
-import BetaSwitchTheme from '@/components/BetaSwitchTheme.vue'
+import BetaSwitchTheme from './BetaSwitchTheme.vue'
 
-defineProps({
-  setTheme: {
-    type: Function,
-    required: true
-  }
-})
+defineProps<{
+  setTheme: (newTheme: GlobalTheme) => void
+}>()
 
 const route = useRoute()
 
@@ -34,7 +31,7 @@ const menuOptions = [
 ]
 
 const menuValue = computed(() => {
-  return route.name
+  return route.name as string
 })
 </script>
 

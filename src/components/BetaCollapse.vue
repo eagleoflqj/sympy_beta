@@ -1,12 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { NCard, NCollapse, NCollapseItem, NA } from 'naive-ui'
 
-defineProps({
-  category: {
-    type: Object,
-    default: () => {}
-  }
-})
+defineProps<{
+  category: Category
+}>()
 </script>
 
 <template>
@@ -14,12 +11,12 @@ defineProps({
     <n-collapse class="example-group">
       <n-collapse-item :title="category.name">
         <div style="padding: 0.5em">
-          <div v-for="sub_category in category.sub_categorys">
-            <h4 v-if="sub_category.name">
-              {{ sub_category.name }}
+          <div v-for="subCategory in category.subCategories">
+            <h4 v-if="subCategory.name">
+              {{ subCategory.name }}
             </h4>
             <ul>
-              <li v-for="example in sub_category.examples">
+              <li v-for="example in subCategory.examples">
                 <span
                   v-if="example.name && example.html"
                   v-html="example.name"

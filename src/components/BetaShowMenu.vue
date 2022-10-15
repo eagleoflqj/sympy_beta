@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { NIcon, NPopover } from 'naive-ui'
 import { Menu2 } from '@vicons/tabler'
 

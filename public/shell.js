@@ -30,7 +30,7 @@ async function loadPyodideAndPackages () {
   self.postMessage({ type: 'ready', arg: namespace.get('BANNER') })
   awaitFut = namespace.get('await_fut')
   pyconsole = namespace.get('pyconsole')
-  pyconsole.stdout_callback = s => self.postMessage({ type: 'echo', args: [s, { newline: false }] })
+  pyconsole.stdout_callback = s => self.postMessage({ type: 'echo', arg: s, option: { newline: false } })
   pyconsole.stderr_callback = s => self.postMessage({ type: 'error', arg: s.trimEnd() })
   clearConsole = namespace.get('clear_console')
   namespace.destroy()
@@ -63,9 +63,9 @@ self.onmessage = async event => {
           if (value !== undefined) {
             self.postMessage({
               type: 'echo',
-              args: [reprShorten.callKwargs(value, {
+              arg: reprShorten.callKwargs(value, {
                 separator: '\n[[;orange;]<long output truncated>]\n'
-              })]
+              })
             })
           }
           if (self.pyodide.isPyProxy(value)) {

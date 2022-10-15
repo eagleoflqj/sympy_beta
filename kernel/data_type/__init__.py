@@ -46,15 +46,20 @@ def Reference(links: list[str]):
 
 class _Table(Dict):
     titles: Sequence[str]
-    rows: list[list[str]]
+    rows: list[Sequence[str | _Tex]]
 
 
-def Table(titles: Sequence[str], rows: list[list[str]]):
+def Table(titles: Sequence[str], rows: list[Sequence[str | _Tex]]):
     return _Table(type='Table', titles=titles, rows=rows)
 
 
+class _TruthTable(Dict):
+    titles: Sequence[str]
+    rows: list[list[str]]
+
+
 def TruthTable(titles: Sequence[str], rows: list[list[str]]):
-    return _Table(type='TruthTable', titles=titles, rows=rows)
+    return _TruthTable(type='TruthTable', titles=titles, rows=rows)
 
 
 class _List(Dict):

@@ -1,22 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, watchEffect } from 'vue'
 import { NCard, NA, NScrollbar } from 'naive-ui'
-import { MathfieldElement } from 'mathlive'
+import { MathfieldElement, VirtualKeyboardKeycap, VirtualKeyboardLayer } from 'mathlive'
 
-const props = defineProps({
-  input: {
-    type: String,
-    required: true
-  },
-  inputCallback: {
-    type: Function,
-    required: true
-  },
-  enterCallback: {
-    type: Function,
-    required: true
-  }
-})
+const props = defineProps<{
+  input: string
+  inputCallback: (value: string) => void
+  enterCallback: () => void
+}>()
 
 // use it if subexpressions aren't automatically separate, eg: \frac{1}{2}
 // use #0 otherwise, eg: Gamma(x)
@@ -49,11 +40,11 @@ const backspaceKey = {
   command: ['performWithFeedback', 'deleteBackward']
 }
 
-function capitalize (s) {
+function capitalize (s: string) {
   return s[0].toUpperCase() + s.slice(1)
 }
 
-function addSpecialKeys (rows, upper, name) {
+function addSpecialKeys (rows: Partial<VirtualKeyboardKeycap>[][], upper: boolean, name: string) {
   const shiftKeyCopy = { ...shiftKey, layer: upper ? `beta-lower-${name}` : `beta-upper-${name}` }
   rows[2].splice(0, 0, shiftKeyCopy)
   rows[2].push(leftKey, rightKey)
@@ -61,7 +52,7 @@ function addSpecialKeys (rows, upper, name) {
   return { rows }
 }
 
-function betaEnglish (upper) {
+function betaEnglish (upper: boolean) {
   const letterLayout = [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
@@ -74,7 +65,7 @@ function betaEnglish (upper) {
   return addSpecialKeys(rows, upper, 'english')
 }
 
-function betaGreek (upper) {
+function betaGreek (upper: boolean) {
   const letterLayout = [
     ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota', 'kappa'],
     ['lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma', 'tau'],
@@ -87,18 +78,18 @@ function betaGreek (upper) {
   return addSpecialKeys(rows, upper, 'greek')
 }
 
-function key (latex) {
+function key (latex: string) {
   return { latex }
 }
 
-function trigKey (name) {
+function trigKey (name: string) {
   const trig = '\\' + name
   const variants = [{ latex: trig + '^' + ph, insert: trig + '^' + ph + ph, ...small }]
   if (name === 'sin' || name === 'cos' || name === 'tan') {
     const arc = '\\arc' + name
     variants.push({ latex: arc, insert: arc + ph, ...small })
   }
-  const result = {
+  const result: Partial<VirtualKeyboardKeycap> = {
     latex: trig,
     insert: trig + ph,
     variants
@@ -151,7 +142,7 @@ const gammaKey = { latex: '\\Gamma', insert: '\\Gamma\\left(#0\\right)' }
 const betaKey = { latex: '\\Beta', insert: '\\Beta\\left(#0, #0\\right)' }
 const xKey = { latex: 'x', variants: ['y', 'z', 'f'] }
 
-const betaKeyboardLayer = {
+const betaKeyboardLayer: { [key: string]: Partial<VirtualKeyboardLayer> } = {
   'beta-basic': {
     rows: [
       [key('7'), key('8'), key('9'), key('+'), key('-'), mulKey, key('e'), equalKey, parenthesisKey],
@@ -197,7 +188,7 @@ const betaKeyboard = {
   }
 }
 
-const mathlive = ref()
+const mathlive = ref<Element>()
 const mfe = new MathfieldElement({
   fontsDirectory: '/fonts',
   customVirtualKeyboardLayers: betaKeyboardLayer,
@@ -207,22 +198,21 @@ const mfe = new MathfieldElement({
 })
 
 onMounted(() => {
-  mfe.style = 'outline: transparent'
   const inlineShortcuts = mfe.getOption('inlineShortcuts')
   // disable non-standard LaTex shortcuts
   for (const key of ['dt', 'dx', 'dy', 'dz', 'ee']) {
     delete inlineShortcuts[key]
   }
   mfe.setOptions({ inlineShortcuts })
-  mfe.addEventListener('input', event => {
-    if (event.inputType === 'insertLineBreak') {
+  mfe.addEventListener('input', (event: Event) => {
+    if ((event as InputEvent).inputType === 'insertLineBreak') {
       mfe.blur()
       props.enterCallback()
     } else {
       props.inputCallback(mfe.value)
     }
   })
-  mathlive.value.appendChild(mfe)
+  mathlive.value!.appendChild(mfe)
 })
 
 watchEffect(() => {

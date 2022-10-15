@@ -1,19 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { NConfigProvider, NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop, NMessageProvider } from 'naive-ui'
-import { isMobile } from '@/js/util.js'
-import BetaHeader from '@/components/BetaHeader.vue'
-import BetaFooter from '@/components/BetaFooter.vue'
-import RuntimeLoader from '@/components/RuntimeLoader.vue'
-import ReloadPrompt from '@/components/ReloadPrompt.vue'
+import { isMobile } from './util'
+import BetaHeader from './components/BetaHeader.vue'
+import BetaFooter from './components/BetaFooter.vue'
+import RuntimeLoader from './components/RuntimeLoader.vue'
+import ReloadPrompt from './components/ReloadPrompt.vue'
 
 const route = useRoute()
-const showFooter = ref(true)
+const showFooter = ref<boolean>(true)
 
-const theme = ref(null)
+const theme = ref<GlobalTheme>(null)
 
-function setTheme (newTheme) {
+function setTheme (newTheme: GlobalTheme) {
   theme.value = newTheme
 }
 

@@ -1,4 +1,3 @@
-import { resolve } from 'path'
 import { execSync } from 'child_process'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -31,10 +30,5 @@ export default defineConfig({
         ]
       }
     })
-  ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
-    },
-  }
+  ]
 })

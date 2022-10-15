@@ -1,10 +1,11 @@
 const pyodideWorker = new Worker('/worker.js')
 
-const resolves = {}
+const resolves: { [key: number]: (arg: any) => void } = {}
 
-let stageCallback
+type StageCallback = (arg: { stage: string, errorMsg?: string }) => void
+let stageCallback: StageCallback
 
-const register = arg => {
+const register: (arg: StageCallback) => void = arg => {
   stageCallback = arg
 }
 
@@ -21,19 +22,25 @@ pyodideWorker.onmessage = msg => {
 
 const wrapper = (() => {
   let id = -1
-  return (func) => function (...args) {
+  return (func: string) => function (...args: any[]) {
     id = (id + 1) % Number.MAX_SAFE_INTEGER
-    return new Promise((resolve, reject) => {
+    return new Promise<any>(resolve => {
       resolves[id] = resolve
       pyodideWorker.postMessage({ id, func, args })
     })
   }
 })()
 
-const evalInput = wrapper('eval_input')
-const evalLatexInput = wrapper('eval_latex_input')
+const evalInput: (input: string, variable?: string) => Promise<{
+  result: InputResult[]
+  error: string
+}> = wrapper('eval_input')
+const evalLatexInput: (input: string) => Promise<{
+  result: string
+  error: string
+}> = wrapper('eval_latex_input')
 const evalCard = wrapper('eval_card')
-const getPyodideVersion = wrapper('getPyodideVersion')
+const getPyodideVersion: () => Promise<string> = wrapper('getPyodideVersion')
 const getSymPyVersion = wrapper('get_sympy_version')
 
 export { evalInput, evalLatexInput, evalCard, register, getPyodideVersion, getSymPyVersion }
