@@ -47,7 +47,7 @@ def is_prime_step(n: int) -> str:
                     q, r = divmod(n, p)
                     L.a(n, '=', cross_mul(q, p))
                     if r == 0:
-                        L.n().t('So ').a(n).t(' is a multiple of ').a(q)
+                        L.n().t('So ').a(n).t(' is a multiple of ').a(p)
                         break
                     else:
                         L.a('+', r).n()

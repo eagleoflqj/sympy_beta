@@ -19,7 +19,7 @@ card_cases = [
          R'77=25\times3+2\\\\\\'
          R'77=15\times5+2\\\\\\'
          R'77=11\times7\\\\\\'
-         R'\text{So }77\text{ is a multiple of }11'),
+         R'\text{So }77\text{ is a multiple of }7'),
     (399, R'\text{The sum of digits of }399\text{ is }3+9+9=21\\\\\\'
           R'\text{The sum of digits of }21\text{ is }2+1=3\text{, which is a multiple of 3}\\\\\\'
           R'\text{So }399\text{ is a multiple of 3}'),

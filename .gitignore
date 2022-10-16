@@ -22,3 +22,4 @@ antlr4-python3-runtime-*
 *.zip
 *.tar.gz
 *.woff2
+.vercel
