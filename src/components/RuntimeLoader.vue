@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { register } from '../workerAPI'
+import { registerStageCallback } from '../workerAPI'
 import { useNotification } from 'naive-ui'
 
 const notification = useNotification()
@@ -50,7 +50,7 @@ function notifyError (errorMsg: string) {
 
 const loadingNotification = notifyLoading()
 
-register(({ stage, errorMsg }) => {
+registerStageCallback(({ stage, errorMsg }) => {
   switch (stage) {
     case 'PYODIDE_DOWNLOADED':
       loadingNotification.setContent('Downloading packages')
