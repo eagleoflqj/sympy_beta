@@ -2,7 +2,6 @@ import { exit } from 'process'
 import { execSync } from 'child_process'
 import os from 'os'
 
-
 const SOURCE_DATE_EPOCH = 315532800
 
 const encoding = 'utf-8'
@@ -20,20 +19,19 @@ function ensure (result, message) {
 }
 
 // copy from https://github.com/antfu/ni/blob/main/src/utils.ts#L17
-function cmdExists(cmd) {
+function cmdExists (cmd) {
   try {
     execSync(
       os.platform() === 'win32'
         ? `cmd /c "(help ${cmd} > nul || exit 0) && where ${cmd} > nul 2> nul"`
-        : `command -v ${cmd}`,
+        : `command -v ${cmd}`
     )
     return true
-  }
-  catch {
+  } catch {
     return false
   }
 }
 
-const python = cmdExists("python3") ? "python3" : "python"
+const python = cmdExists('python3') ? 'python3' : 'python'
 
 export { SOURCE_DATE_EPOCH, encoding, ensure, cmdExists, python }
