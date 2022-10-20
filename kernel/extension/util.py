@@ -1,4 +1,5 @@
 import base64
+from contextlib import contextmanager
 import importlib
 import io
 from typing import TYPE_CHECKING, Any, Callable, Iterable, cast
@@ -6,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Iterable, cast
 import matplotlib
 from matplotlib.figure import Figure
 from sympy import Basic, Symbol
+import sympy
 from sympy.core.function import Function, UndefinedFunction
 
 from data_type import Svg, Tex, Text, _Tex
@@ -103,3 +105,40 @@ def no_undefined_function(components: DICT) -> bool:
 
 def sorted_free_symbols(obj: Basic) -> list[Symbol]:
     return sorted(cast(set[Symbol], obj.free_symbols), key=lambda s: s.name)
+
+@contextmanager
+def patch_latex():
+
+    def handle_limit(func):
+        sub = func.limit_sub()
+        if sub.LETTER():
+            var = Symbol(sub.LETTER().getText())
+        elif sub.SYMBOL():
+            var = Symbol(sub.SYMBOL().getText()[1:])
+        else:
+            var = Symbol('x')
+        if sub.SUB():
+            direction = "-"
+        elif sub.ADD():
+            direction = "+"
+        else:
+            direction = "+-"
+        approaching = sympy.parsing.latex._parse_latex_antlr.convert_expr(sub.expr())
+        content = sympy.parsing.latex._parse_latex_antlr.convert_mp(func.mp())
+
+        return sympy.Limit(content, var, approaching, direction)
+
+    def _print_Limit(self, expr):
+        e, z, z0, dir = expr.args
+        return "Limit(%s, %s, %s, dir='%s')" % tuple(map(self._print, (e, z, z0, dir)))
+        
+    handle_limit_orig = sympy.parsing.latex._parse_latex_antlr.handle_limit
+    _print_Limit_orig = sympy.StrPrinter._print_Limit
+
+    try:
+        sympy.parsing.latex._parse_latex_antlr.handle_limit = handle_limit
+        sympy.StrPrinter._print_Limit = _print_Limit
+        yield
+    finally:
+        sympy.parsing.latex._parse_latex_antlr.handle_limit = handle_limit_orig
+        sympy.StrPrinter._print_Limit = _print_Limit_orig
