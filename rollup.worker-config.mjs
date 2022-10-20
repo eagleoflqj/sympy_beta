@@ -4,8 +4,8 @@ import json from '@rollup/plugin-json'
 
 const sourceMap = process.env.NODE_ENV !== 'production'
 
-export default {
-  input: 'src/pyodideWorker.ts',
+export default ['src/pyodideWorker.ts', 'src/shellWorker.ts'].map(input => ({
+  input,
   output: {
     dir: 'public',
     sourcemap: sourceMap,
@@ -20,4 +20,4 @@ export default {
     }),
     json()
   ]
-}
+}))

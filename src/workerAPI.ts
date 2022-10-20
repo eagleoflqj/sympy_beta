@@ -22,6 +22,6 @@ const evalCard = pyodideWorker.register('evalCard')
 
 const getPyodideVersion: () => Promise<string> = pyodideWorker.register('getPyodideVersion')
 
-const getSymPyVersion = pyodideWorker.register('getSymPyVersion')
+const getSymPyVersion: () => Promise<string> = pyodideWorker.register('getSymPyVersion')
 
 export { evalInput, evalLatexInput, evalCard, getPyodideVersion, getSymPyVersion, registerStageCallback }

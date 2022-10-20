@@ -4,8 +4,8 @@ import { NSpin, NA } from 'naive-ui'
 import { getPyodideVersion, getSymPyVersion } from '../workerAPI'
 import { homepage } from '../../package.json'
 
-const pyodideVersion = ref<string>('')
-const sympyVersion = ref(null)
+const pyodideVersion = ref<string>()
+const sympyVersion = ref<string>()
 const commit = '__COMMIT__'
 const commitURL = `${homepage}/commit/${commit}`
 const buildDate = '__BUILD_DATE__'

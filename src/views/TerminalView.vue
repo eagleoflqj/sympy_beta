@@ -5,6 +5,7 @@ import jQuery from 'jquery'
 // @ts-ignore
 import terminal from 'jquery.terminal'
 import 'jquery.terminal/css/jquery.terminal.min.css'
+import { LambdaWorker } from '@libreservice/my-worker'
 import preExec from '../../kernel/gamma/pre_exec.py?raw'
 
 terminal(window, jQuery)
@@ -13,81 +14,34 @@ let term: JQueryTerminal
 const ps1 = '>>> '
 const ps2 = '... '
 
-let unlock: () => void
-let res: () => void
-let termReady: Promise<any> | null
+const shellWorker = new LambdaWorker('/shellWorker.js')
+const execute: (command: string) => Promise<void> = shellWorker.register('execute')
+const complete: (arg: string) => Promise<string[]> = shellWorker.register('complete')
+const keyboardInterrupt: () => Promise<void> = shellWorker.register('keyboardInterrupt')
 
-async function lock () {
-  const ready = termReady
-  termReady = new Promise<void>(resolve => (res = resolve))
-  await ready
-  return res
-}
-
-const shellWorker = new Worker('/shell.js')
-let shellReadyResolve: (arg: string) => void
-const shellReadyPromise = new Promise(resolve => (shellReadyResolve = resolve))
+const shellReadyPromise = new Promise(resolve => shellWorker.control('stage', resolve))
 const loaded = ref(false)
 
+shellWorker.control('setPrompt', (incomplete: boolean) => term.set_prompt(incomplete ? ps2 : ps1))
+shellWorker.control('echo', (arg: string, option?: { newline: boolean }) => term.echo(arg, option))
+shellWorker.control('error', (arg: string) => term.error(arg))
+
 async function interpreter (command: string) {
-  unlock = await lock()
-  shellWorker.postMessage({ type: 'exec', arg: command })
   term.pause()
-}
-
-let completeResolve: ((arg: string[]) => void) | null = null
-
-function complete (command: string) {
-  return new Promise<string[]>((resolve, reject) => {
-    if (completeResolve !== null) {
-      reject(new Error())
-    }
-    completeResolve = resolve
-    shellWorker.postMessage({ type: 'complete', arg: command })
+  await execute(command).catch((e: Error) => {
+    term.error(e.message)
   })
+  term.resume()
 }
 
-type Data = {
-  type: 'set_prompt'
-  arg: boolean
-} | {
-  type: 'error' | 'ready'
-  arg: string
-} | {
-  type: 'echo'
-  arg: string
-  option?: object
-} | {
-  type: 'resume'
-} | {
-  type: 'complete'
-  arg: string[]
-}
+let pendingComplete = false
 
-shellWorker.onmessage = (msg: MessageEvent<Data>) => {
-  const { data } = msg
-  switch (data.type) {
-    case 'set_prompt':
-      term.set_prompt(data.arg ? ps2 : ps1)
-      break
-    case 'error':
-      term.error(data.arg)
-      break
-    case 'echo':
-      term.echo(data.arg, data.option)
-      break
-    case 'resume':
-      term.resume()
-      unlock()
-      break
-    case 'complete':
-      completeResolve!(data.arg)
-      completeResolve = null
-      break
-    case 'ready':
-      shellReadyResolve(data.arg)
-      break
+async function tabComplete (command: string) {
+  if (pendingComplete) {
+    throw Error()
   }
+  pendingComplete = true
+  return complete(command)
 }
 
 const container = ref<Element>()
@@ -99,12 +53,16 @@ onMounted(async () => {
     prompt: ps1,
     completionEscape: false,
     completion: (command, callback) => {
-      complete(command).then(callback).catch(() => {})
+      tabComplete(command).then(arg => {
+        callback(arg)
+        pendingComplete = false
+      }).catch(() => {})
     },
     keymap: {
       'CTRL+C': async () => {
-        shellWorker.postMessage({ type: 'clear' })
-        term.enter('')
+        keyboardInterrupt()
+        // @ts-ignore
+        term.enter()
         term.echo('KeyboardInterrupt')
         term.set_command('')
         term.set_prompt(ps1)

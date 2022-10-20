@@ -62,9 +62,9 @@ function wrapper (name: string) {
 const evalInput = wrapper('eval_input')
 const evalLatexInput = wrapper('eval_latex_input')
 const evalCard = wrapper('eval_card')
-const getSymPyVersion = wrapper('get_sympy_version')
+const getSymPyVersion: () => Promise<string> = wrapper('get_sympy_version')
 
-function getPyodideVersion () {
+function getPyodideVersion (): string {
   return pyodide.version
 }
 
