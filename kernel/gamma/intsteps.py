@@ -36,11 +36,6 @@ def filter_unknown_alternatives(rule):
 
 
 class IntegralPrinter(JSONPrinter):
-    def __init__(self, rule):
-        super().__init__(rule)
-        self.u_name = 'u'
-        self.u = self.du = None
-
     def print_rule(self, rule):
         handlers = {
             ConstantRule: self.print_Constant,
@@ -115,10 +110,11 @@ class IntegralPrinter(JSONPrinter):
                         self.format_text(', then '),
                         self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx, evaluate=False)))
             self.append(self.format_text("Substitute:"))
-            self.append(self.format_math_display(sympy.Integral(rule.substep.context, u)))
+            substep = replace_u_var(rule.substep, rule.u_var, u)
+            self.append(self.format_math_display(sympy.Integral(substep.context, u)))
 
             with self.new_level():
-                self.print_rule(replace_u_var(rule.substep, rule.symbol.name, u))
+                self.print_rule(substep)
 
             self.append(self.format_text("Now substitute "),
                         self.format_math(u),

@@ -1,24 +1,10 @@
 import abc
-import collections
+import re
 from contextlib import contextmanager
 
 import sympy
 
 from gamma.utils import DerivExpr, latex
-
-
-def Rule(name, props=""):
-    # GOTCHA: namedtuple class name not considered!
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and tuple.__eq__(self, other)
-
-    def __neq__(self, other):
-        return not __eq__(self, other)
-
-    cls = collections.namedtuple(name, props + " context symbol")
-    cls.__eq__ = __eq__
-    cls.__ne__ = __neq__
-    return cls
 
 
 def functionnames(numterms):
@@ -30,7 +16,7 @@ def functionnames(numterms):
         return ["f_{}".format(i) for i in range(numterms)]
 
 
-def replace_u_var(rule, old_u, new_u):
+def replace_u_var(rule, old_u: sympy.Symbol, new_u: sympy.Symbol):
     d = rule._asdict()
     for field, val in d.items():
         if isinstance(val, sympy.Basic):
@@ -50,11 +36,25 @@ def replace_u_var(rule, old_u, new_u):
     return rule.__class__(**d)
 
 
+u_index_re = re.compile(r'^u_?([1-9]\d*|0)$')
+
+
+def u_index(symbol: sympy.Symbol) -> int:
+    if symbol.name == 'u':
+        return 0
+    match = u_index_re.match(symbol.name)
+    if match:
+        return int(match.group(1))
+    return -1
+
+
 class JSONPrinter:
     def __init__(self, rule):
         self.alternative_functions_printed = set()
         self.rule = rule
         self.stack = []
+        # avoid duplicated symbol u when doing substitution
+        self.u_max = max((u_index(symbol) for symbol in rule.context.free_symbols), default=-1)
         self.print_rule(rule)
 
     @abc.abstractmethod
@@ -97,8 +97,13 @@ class JSONPrinter:
 
     @contextmanager
     def new_u_vars(self):
-        self.u, self.du = sympy.Symbol('u'), DerivExpr('u')
-        yield self.u, self.du
+        self.u_max += 1
+        if self.u_max == 0:
+            u = 'u'
+        else:
+            u = f'u_{self.u_max}'
+        yield sympy.Symbol(u), DerivExpr(u)
+        self.u_max -= 1
 
     def append(self, *contents):
         self.stack.append({'p': contents})
