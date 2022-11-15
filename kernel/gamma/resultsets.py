@@ -7,6 +7,7 @@ import docutils.core
 import sympy
 from sympy.core.symbol import Symbol
 from sympy.integrals.manualintegrate import manualintegrate
+from sympy.plotting.plot import MatplotlibBackend
 
 import gamma.diffsteps
 import gamma.intsteps
@@ -214,7 +215,7 @@ def eval_plot(components, parameters=None):
             else:
                 graph_range = (variable, parameters.get('tmin', 0), parameters.get('tmax', 2 * sympy.pi))
             series = LineOver1DRangeSeries(func, graph_range, nb_of_points=150)
-        series = list(series.get_segments())  # returns a list of [[x,y], [next_x, next_y]] pairs
+        segments = list(MatplotlibBackend.get_segments(*series.get_points()))  # [[x,y], [next_x, next_y]] pairs
 
         xvalues = []
         yvalues = []
@@ -228,8 +229,8 @@ def eval_plot(components, parameters=None):
             return y
 
         x_transform, y_transform = graph_handler[graph_type]
-        series.append([series[-1][1], None])
-        for point in series:
+        segments.append([segments[-1][1], None])
+        for point in segments:
             if point[0][1] is None:
                 continue
             x = point[0][0]
