@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, toRaw } from 'vue'
-import { NButton, NSpace, NSpin, NCard, NCode } from 'naive-ui'
+import { NButton, NSpace, NSpin, NCard, NCode, NEquation } from 'naive-ui'
 import { Eye, EyeSlash } from '@vicons/fa'
 import { evalCard } from '../workerAPI'
 import { Plot2D } from '../js/plot.js'
@@ -177,9 +177,9 @@ async function seeSteps () {
     </div>
 
     <div class="cell_output">
-      <vue-mathjax
+      <n-equation
         v-if="'pre_output' in card && card.pre_output"
-        :formula="'$' + card.pre_output + ' = $'"
+        :value="card.pre_output + ' ='"
       />
       <template v-if="'output' in card">
         <beta-container :content="card.output" />

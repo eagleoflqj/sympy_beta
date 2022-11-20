@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { NScrollbar } from 'naive-ui'
+import { NScrollbar, NEquation } from 'naive-ui'
 import BetaCopyLatexButton from '../BetaCopyLatexButton.vue'
 
 interface Props {
@@ -25,8 +25,9 @@ const tex = computed(() => {
     <beta-copy-latex-button :tex="tex" />
   </div>
   <n-scrollbar x-scrollable>
-    <vue-mathjax
-      :formula="'$$' + tex + '$$'"
+    <n-equation
+      :value="tex"
+      :katex-options="{displayMode: true}"
     />
   </n-scrollbar>
 </template>

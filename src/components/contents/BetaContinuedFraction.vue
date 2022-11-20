@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, toRaw } from 'vue'
-import { NSpace, NSwitch, NIcon } from 'naive-ui'
+import { NSpace, NSwitch, NIcon, NEquation } from 'naive-ui'
 import { LinearScaleFilled, DivideFilled } from '@vicons/material'
 import BetaCopyLatexButton from '../BetaCopyLatexButton.vue'
 
@@ -60,8 +60,8 @@ const tex = computed(() => fraction.value ? fractionForm : linearForm)
       </n-switch>
       <beta-copy-latex-button :tex="tex" />
     </div>
-    <vue-mathjax
-      :formula="'$' + tex + '$'"
+    <n-equation
+      :value="tex"
     />
   </n-space>
 </template>

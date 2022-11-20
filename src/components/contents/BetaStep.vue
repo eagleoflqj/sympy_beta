@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NEquation } from 'naive-ui'
+
 defineProps<{
   content: Step
 }>()
@@ -35,13 +37,14 @@ defineProps<{
   <template v-else-if="content.text">
     {{ content.text }}
   </template>
-  <vue-mathjax
+  <n-equation
     v-else-if="content.inline"
-    :formula="'$' + content.inline + '$'"
+    :value="content.inline"
   />
-  <vue-mathjax
+  <n-equation
     v-else-if="content.block"
-    :formula="'$$' + content.block + '$$'"
+    :value="content.block"
+    :katex-options="{displayMode: true}"
   />
   <h2 v-else-if="content.header">
     {{ content.header }}

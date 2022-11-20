@@ -2,6 +2,8 @@
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { NConfigProvider, NNotificationProvider, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NBackTop, NMessageProvider } from 'naive-ui'
+import katex from 'katex'
+import 'katex/dist/katex.css'
 import { isMobile } from './util'
 import BetaHeader from './components/BetaHeader.vue'
 import BetaFooter from './components/BetaFooter.vue'
@@ -23,7 +25,10 @@ watchEffect(() => {
 </script>
 
 <template>
-  <n-config-provider :theme="theme">
+  <n-config-provider
+    :theme="theme"
+    :katex="katex"
+  >
     <n-notification-provider :placement="isMobile ? 'top' : 'top-right'">
       <reload-prompt />
       <runtime-loader />
