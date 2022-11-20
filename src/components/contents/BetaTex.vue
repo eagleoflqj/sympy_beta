@@ -3,10 +3,14 @@ import { computed } from 'vue'
 import { NScrollbar } from 'naive-ui'
 import BetaCopyLatexButton from '../BetaCopyLatexButton.vue'
 
-const props = defineProps<{
+interface Props {
   content: TexContent
   showCopyButton?: boolean
-}>()
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showCopyButton: true
+})
 
 const tex = computed(() => {
   return props.content.tex + (props.content.numeric ? '\\approx' + props.content.approximation : '')
