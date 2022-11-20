@@ -16,6 +16,9 @@ const plugins = [
   pluginRewriteAll(),
   VitePWA({
     registerType: 'autoUpdate',
+    workbox: {
+      maximumFileSizeToCacheInBytes: 10000000
+    },
     includeAssets: ['*.whl', '*.zip', 'fonts/*.woff2'],
     manifest: {
       name: 'SymPy Beta',
