@@ -189,4 +189,8 @@ p {
     width: 700px;
   }
 }
+
+.n-a {
+  display: inline-block;
+}
 </style>

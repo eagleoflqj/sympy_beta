@@ -241,6 +241,7 @@ async function seeSteps () {
     v-if="step"
     :card="step"
     :input="(card as ContentCard).input"
+    :choose-variable="chooseVariable"
   />
 </template>
 

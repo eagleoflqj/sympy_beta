@@ -61,7 +61,6 @@ onMounted(async () => {
     keymap: {
       'CTRL+C': async () => {
         keyboardInterrupt()
-        // @ts-ignore
         term.enter()
         term.echo('KeyboardInterrupt')
         term.set_command('')

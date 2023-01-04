@@ -3,7 +3,7 @@ SymPy Beta can be developed on Linux, macOS and Windows, with 100% Open Source t
 
 Software|Version|Reason|Ubuntu|macOS|Windows x64|Windows arm64
 -|-|-|-|-|-|-
-Python|3.10|Pyodide 0.20.0|conda|conda|choco|WSL
+Python|3.10|Pyodide 0.22.0|conda|conda|choco|WSL
 Node|>=16|Vercel|nvm|nvm|choco|[Unofficial build](https://unofficial-builds.nodejs.org/download/release/v17.5.0/)
 VSCodium|latest|-|[GitHub Release](https://github.com/VSCodium/vscodium/releases)|brew|choco|[GitHub Release](https://github.com/VSCodium/vscodium/releases)
 PyCharm CE|latest|-|Ubuntu Software|brew|choco|-
