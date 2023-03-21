@@ -1,8 +1,5 @@
 # SymPy Beta
 ![](https://img.shields.io/github/license/eagleoflqj/sympy_beta)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/eagleoflqj/sympy_beta.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/eagleoflqj/sympy_beta/alerts/)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/eagleoflqj/sympy_beta.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/eagleoflqj/sympy_beta/context:javascript)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/eagleoflqj/sympy_beta.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/eagleoflqj/sympy_beta/context:python)
 
 Try me at https://sympy-beta.vercel.app!
 
