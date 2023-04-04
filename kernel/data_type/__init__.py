@@ -1,7 +1,5 @@
 # todo: merge _Class and Class when https://github.com/python/mypy/issues/6131 is resolved
-from typing import Sequence, TypedDict
-
-from typing_extensions import NotRequired
+from typing import NotRequired, Sequence, TypedDict
 
 
 class Dict(TypedDict):

@@ -24,7 +24,7 @@ async function loadPyodideAndPackages () {
     import micropip
     await micropip.install('sympy==1.11')
     import sys
-    from pyodide import to_js
+    from pyodide.ffi import to_js
     from pyodide.console import PyodideConsole, repr_shorten, BANNER
     import __main__
     pyconsole = PyodideConsole(__main__.__dict__)
