@@ -21,8 +21,7 @@ jobs:
           python -c 'import nltk; nltk.download("words")'
       - name: Check code quality
         run: |
-          isort -c .
-          flake8 .
+          ruff .
           pyright
       - name: Run integration tests
         run: |

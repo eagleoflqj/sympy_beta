@@ -5,9 +5,18 @@ from typing import Any, Literal
 
 import sympy
 from nltk.corpus import words
-from sympy.parsing.sympy_parser import (TRANS, AppliedFunction, _apply_functions, _flatten, _group_parentheses,
-                                        _token_callable, convert_xor, function_exponentiation, split_symbols_custom,
-                                        standard_transformations)
+from sympy.parsing.sympy_parser import (
+    TRANS,
+    AppliedFunction,
+    _apply_functions,
+    _flatten,
+    _group_parentheses,
+    _token_callable,
+    convert_xor,
+    function_exponentiation,
+    split_symbols_custom,
+    standard_transformations,
+)
 
 TOKEN = tuple[int, str]
 DICT = dict[str, Any]

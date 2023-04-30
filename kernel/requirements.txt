@@ -10,8 +10,7 @@ scipy==1.9.3
 sympy==1.11
 
 # dev
-flake8
-isort
+ruff
 pyright
 pytest
 pytest-cov

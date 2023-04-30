@@ -1,8 +1,24 @@
 import sympy
-from sympy.integrals.manualintegrate import (AddRule, AlternativeRule, CompleteSquareRule, ConstantRule,
-                                             ConstantTimesRule, CyclicPartsRule, DontKnowRule, ExpRule, PartsRule,
-                                             PowerRule, RewriteRule, SqrtQuadraticDenomRule, SqrtQuadraticRule,
-                                             TrigRule, TrigSubstitutionRule, URule, _manualintegrate, integral_steps)
+from sympy.integrals.manualintegrate import (
+    AddRule,
+    AlternativeRule,
+    CompleteSquareRule,
+    ConstantRule,
+    ConstantTimesRule,
+    CyclicPartsRule,
+    DontKnowRule,
+    ExpRule,
+    PartsRule,
+    PowerRule,
+    RewriteRule,
+    SqrtQuadraticDenomRule,
+    SqrtQuadraticRule,
+    TrigRule,
+    TrigSubstitutionRule,
+    URule,
+    _manualintegrate,
+    integral_steps,
+)
 
 from gamma.stepprinter import JSONPrinter, replace_u_var
 from gamma.utils import DerivExpr, latex
