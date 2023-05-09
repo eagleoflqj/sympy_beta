@@ -42,7 +42,7 @@
     "jquery.terminal": "^2.35.3",
     "katex": "^0.16.4",
     "markdown-escape": "^2.0.0",
-    "mathlive": "0.89.4",
+    "mathlive": "^0.93.0",
     "naive-ui": "^2.34.3",
     "rimraf": "^4.4.0",
     "rollup": "^3.20.0",

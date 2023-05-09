@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect } from 'vue'
 import { NCard, NA, NScrollbar } from 'naive-ui'
-import { MathfieldElement, VirtualKeyboardKeycap, VirtualKeyboardLayer } from 'mathlive'
+import { MathfieldElement, VirtualKeyboardKeycap } from 'mathlive'
 
 const props = defineProps<{
   input: string
@@ -21,23 +21,18 @@ const parenthesisKey = {
 }
 const shiftKey = {
   class: 'action font-glyph modifier',
-  label: "<svg><use xlink:href='#svg-shift' /></svg>",
-  command: ['performWithFeedback']
+  label: "<svg><use xlink:href='#svg-shift' /></svg>"
 }
 const leftKey = {
-  class: 'action',
-  label: "<svg><use xlink:href='#svg-arrow-left' /></svg>",
-  command: ['performWithFeedback', 'moveToPreviousChar']
+  label: '[left]'
 }
 const rightKey = {
-  class: 'action',
-  label: "<svg><use xlink:href='#svg-arrow-right' /></svg>",
-  command: ['performWithFeedback', 'moveToNextChar']
+  label: '[right]'
 }
 const backspaceKey = {
   class: 'action font-glyph',
   label: '&#x232b;',
-  command: ['performWithFeedback', 'deleteBackward']
+  command: ['deleteBackward']
 }
 
 function capitalize (s: string) {
@@ -45,11 +40,13 @@ function capitalize (s: string) {
 }
 
 function addSpecialKeys (rows: Partial<VirtualKeyboardKeycap>[][], upper: boolean, name: string) {
-  const shiftKeyCopy = { ...shiftKey, layer: upper ? `beta-lower-${name}` : `beta-upper-${name}` }
+  const id = `${name}-${upper ? 'upper' : 'lower'}`
+  const counterId = `${name}-${upper ? 'lower' : 'upper'}`
+  const shiftKeyCopy = { ...shiftKey, command: ['switchKeyboardLayer', counterId] }
   rows[2].splice(0, 0, shiftKeyCopy)
   rows[2].push(leftKey, rightKey)
   rows[name === 'english' ? 1 : 2].push(backspaceKey)
-  return { rows }
+  return { rows, id }
 }
 
 function betaEnglish (upper: boolean) {
@@ -142,76 +139,61 @@ const gammaKey = { latex: '\\Gamma', insert: '\\Gamma\\left(#0\\right)' }
 const betaKey = { latex: '\\Beta', insert: '\\Beta\\left(#0, #0\\right)' }
 const xKey = { latex: 'x', variants: ['y', 'z', 'f'] }
 
-const betaKeyboardLayer: { [key: string]: Partial<VirtualKeyboardLayer> } = {
-  'beta-basic': {
+const mathlive = ref<Element>()
+window.mathVirtualKeyboard.layouts = [
+  {
+    label: '123',
     rows: [
       [key('7'), key('8'), key('9'), key('+'), key('-'), mulKey, key('e'), equalKey, parenthesisKey],
       [key('4'), key('5'), key('6'), divKey, fracKey, powKey, key('i'), key('!'), backspaceKey],
       [key('1'), key('2'), key('3'), key('0'), key('.'), sqrtKey, key('\\pi'), leftKey, rightKey]
     ]
   },
-  'beta-math': {
+  {
+    label: 'f(x)',
     rows: [
       [trigKey('sin'), trigKey('cos'), trigKey('tan'), limKey, key('\\to'), dirKey, key('\\infty'), parenthesisKey],
       [trigKey('csc'), trigKey('sec'), trigKey('cot'), expKey, lnKey, derivKey, intKey, backspaceKey],
       [trigKey('sinh'), trigKey('cosh'), trigKey('tanh'), gammaKey, betaKey, xKey, leftKey, rightKey]
     ]
   },
-  'beta-lower-english': betaEnglish(false),
-  'beta-upper-english': betaEnglish(true),
-  'beta-lower-greek': betaGreek(false),
-  'beta-upper-greek': betaGreek(true)
-}
-
-const betaKeyboard = {
-  'beta-basic': {
-    label: '123',
-    classes: 'tex-math',
-    layer: 'beta-basic'
-  },
-  'beta-math': {
-    label: 'f(x)',
-    classes: 'tex-math',
-    layer: 'beta-math'
-  },
-  'beta-english': {
+  {
     label: 'abc',
-    classes: 'tex-math',
-    layer: 'beta-lower-english',
-    layers: ['beta-lower-english', 'beta-upper-english']
+    layers: [
+      betaEnglish(false),
+      betaEnglish(true)
+    ]
   },
-  'beta-greek': {
+  {
     label: '&alpha;&beta;&gamma;',
-    classes: 'tex-math',
-    layer: 'beta-lower-greek',
-    layers: ['beta-lower-greek', 'beta-upper-greek']
+    layers: [
+      betaGreek(false),
+      betaGreek(true)
+    ]
   }
-}
+]
 
-const mathlive = ref<Element>()
-const mfe = new MathfieldElement({
-  fontsDirectory: '/fonts',
-  customVirtualKeyboardLayers: betaKeyboardLayer,
-  customVirtualKeyboards: betaKeyboard,
-  virtualKeyboards: 'beta-basic beta-math beta-english beta-greek',
-  virtualKeyboardMode: 'onfocus'
+const mfe = new MathfieldElement()
+const style = mfe.shadowRoot!.querySelector('style')!
+// remove :host style
+style.innerHTML = style.innerHTML.split('\n').slice(12).join('\n')
+mfe.mathVirtualKeyboardPolicy = 'manual'
+// disable non-standard LaTex shortcuts
+for (const key of ['dt', 'dx', 'dy', 'dz', 'ee']) {
+  delete mfe.inlineShortcuts[key]
+}
+mfe.addEventListener('input', (event: Event) => {
+  if ((event as InputEvent).inputType === 'insertLineBreak') {
+    mfe.blur()
+    props.enterCallback()
+  } else {
+    props.inputCallback(mfe.value)
+  }
 })
 
+mfe.addEventListener('focusin', () => window.mathVirtualKeyboard.show())
+
 onMounted(() => {
-  const inlineShortcuts = mfe.getOption('inlineShortcuts')
-  // disable non-standard LaTex shortcuts
-  for (const key of ['dt', 'dx', 'dy', 'dz', 'ee']) {
-    delete inlineShortcuts[key]
-  }
-  mfe.setOptions({ inlineShortcuts })
-  mfe.addEventListener('input', (event: Event) => {
-    if ((event as InputEvent).inputType === 'insertLineBreak') {
-      mfe.blur()
-      props.enterCallback()
-    } else {
-      props.inputCallback(mfe.value)
-    }
-  })
   mathlive.value!.appendChild(mfe)
 })
 
@@ -239,3 +221,9 @@ watchEffect(() => {
     </n-scrollbar>
   </n-card>
 </template>
+
+<style>
+math-field {
+  width: 100%;
+}
+</style>
