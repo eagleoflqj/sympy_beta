@@ -1,3 +1,5 @@
+from typing import cast
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.figure import Figure
@@ -13,7 +15,7 @@ def plot_contour(components: DICT, parameters=None) -> tuple[Figure, str]:
     z = lambdify((x, y), func, 'numpy')
     X, Y = np.meshgrid(np.arange(-10, 10, 0.1), np.arange(-10, 10, 0.1))
     Z = z(X, Y)
-    fig, axe = plt.subplots()
+    fig, axe = cast(tuple[Figure, plt.Subplot], plt.subplots())
     cset = axe.contourf(X, Y, Z)
     axe.clabel(axe.contour(X, Y, Z, cset.levels, colors='k'))
     axe.set(xlabel=x.name, ylabel=y.name)
