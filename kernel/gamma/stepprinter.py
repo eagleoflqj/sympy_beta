@@ -1,13 +1,15 @@
 import abc
+import dataclasses
 import re
 from contextlib import contextmanager
+from typing import cast
 
 import sympy
 
 from gamma.utils import DerivExpr, latex
 
 
-def functionnames(numterms):
+def functionnames(numterms: int):
     if numterms == 2:
         return ["f", "g"]
     elif numterms == 3:
@@ -17,18 +19,18 @@ def functionnames(numterms):
 
 
 def replace_u_var(rule, old_u: sympy.Symbol, new_u: sympy.Symbol):
-    d = rule._asdict()
+    d = dict((field.name, getattr(rule, field.name)) for field in dataclasses.fields(rule))
     for field, val in d.items():
         if isinstance(val, sympy.Basic):
             d[field] = val.subs(old_u, new_u)
-        elif isinstance(val, tuple):
+        elif dataclasses.is_dataclass(val):
             d[field] = replace_u_var(val, old_u, new_u)
         elif isinstance(val, list):
             result = []
             for item in val:
                 if type(item) is tuple:
                     result.append((replace_u_var(item[0], old_u, new_u), item[1]))
-                elif isinstance(item, tuple):
+                elif dataclasses.is_dataclass(item):
                     result.append(replace_u_var(item, old_u, new_u))
                 else:
                     result.append(item)
@@ -53,8 +55,9 @@ class JSONPrinter:
         self.alternative_functions_printed = set()
         self.rule = rule
         self.stack = []
+        expr = getattr(rule, 'integrand', getattr(rule, 'function', None))
         # avoid duplicated symbol u when doing substitution
-        self.u_max = max((u_index(symbol) for symbol in rule.context.free_symbols), default=-1)
+        self.u_max = max((u_index(cast(sympy.Symbol, symbol)) for symbol in expr.free_symbols), default=-1)
         self.print_rule(rule)
 
     @abc.abstractmethod

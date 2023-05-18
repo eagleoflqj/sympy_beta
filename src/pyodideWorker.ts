@@ -1,5 +1,5 @@
 import { expose, control } from '@libreservice/my-worker'
-import { pyodideURL, kernelName, kernelVersion } from '../package.json'
+import { pyodideURL, kernelName, kernelVersion, sympyVersion, antlrVersion } from '../package.json'
 
 const useDevSymPy = false
 
@@ -19,17 +19,17 @@ async function loadPyodideAndPackages () {
     self.close()
   })
   stage({ stage: 'PKG_DOWNLOADED' })
-  const config = { kernelName, kernelVersion, useDevSymPy }
+  const config = { kernelName, kernelVersion, useDevSymPy, sympyVersion, antlrVersion }
   pyodide.registerJsModule('config', config)
   await pyodide.runPythonAsync(`
     from pathlib import Path
-    from config import kernelName, kernelVersion, useDevSymPy
+    from config import kernelName, kernelVersion, useDevSymPy, sympyVersion, antlrVersion
     import micropip
     from pyodide.http import pyfetch
     if useDevSymPy:
         await micropip.install('/sympy-1.11.dev0-py3-none-any.whl')
     else:
-        await micropip.install('sympy==1.11')
+        await micropip.install(f'sympy=={sympyVersion}')
     words_res = await pyfetch('/words.zip')
     path = Path('/home/pyodide/nltk_data/corpora')
     path.mkdir(parents=True)
@@ -37,7 +37,7 @@ async function loadPyodideAndPackages () {
         f.write(await words_res.bytes())
     await micropip.install([f'/{kernelName}-{kernelVersion}-py3-none-any.whl',
         'cplot',
-        '/antlr4_python3_runtime-4.10-py3-none-any.whl'])
+        f'antlr4-python3-runtime=={antlrVersion}'])
     from api import eval_input, eval_latex_input, eval_card as eval_card_inner, get_sympy_version
     def eval_card(card_name, expression, variable, parameters):
         return eval_card_inner(card_name, expression, variable, parameters.to_py())

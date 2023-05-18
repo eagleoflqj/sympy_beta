@@ -16,7 +16,6 @@ pnpm-lock.yaml
 *.egg-info
 .coverage
 build
-antlr4-python3-runtime-*
 
 # resource
 *.zip

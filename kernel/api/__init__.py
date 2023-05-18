@@ -38,49 +38,10 @@ _braces_pattern = re.compile(r'(\w+)_\{(\d+)}')
 
 @catch
 def eval_latex_input(raw_input: str):
-    import sympy
-    import sympy.parsing.latex._parse_latex_antlr
-
-    handle_limit_orig = sympy.parsing.latex._parse_latex_antlr.handle_limit
-    _print_Limit_orig = sympy.StrPrinter._print_Limit
-
-    def handle_limit(func):
-        sub = func.limit_sub()
-        if sub.LETTER():
-            var = sympy.Symbol(sub.LETTER().getText())
-        elif sub.SYMBOL():
-            var = sympy.Symbol(sub.SYMBOL().getText()[1:])
-        else:
-            var = sympy.Symbol('x')
-        if sub.SUB():
-            direction = "-"
-        elif sub.ADD():
-            direction = "+"
-        else:
-            direction = "+-"
-        approaching = sympy.parsing.latex._parse_latex_antlr.convert_expr(sub.expr())
-        content = sympy.parsing.latex._parse_latex_antlr.convert_mp(func.mp())
-
-        return sympy.Limit(content, var, approaching, direction)
-
-    def _print_Limit(self, expr):
-        e, z, z0, dir = expr.args
-        return "Limit(%s, %s, %s, dir='%s')" % tuple(map(self._print, (e, z, z0, dir)))
-
-    def patch_latex():
-        sympy.parsing.latex._parse_latex_antlr.handle_limit = handle_limit
-        sympy.StrPrinter._print_Limit = _print_Limit
-
-    def unpatch_latex():
-        sympy.parsing.latex._parse_latex_antlr.handle_limit = handle_limit_orig
-        sympy.StrPrinter._print_Limit = _print_Limit_orig
-
-    patch_latex()
     sp_obj: Basic = parse_latex(raw_input)  # type: ignore
     sp_obj = sp_obj.replace(lambda x: x.is_Symbol,
                             lambda x: Symbol(_braces_pattern.sub(R'\1_\2', x.name)))  # type: ignore
     result = str(sp_obj)
-    unpatch_latex()
     return {'result': result}
 
 

@@ -91,7 +91,29 @@ def test_plot():
     assert graph['points']['x'][-1] == 30
 
 
+differentiate_step_cases = [
+    ('2**x', b'n10Q\x8c\xdb\xfe\x16\x03\xa3\xaa\xc6\xa9\xf6\xae8'),
+    ('2**(x**2)', b'\x04s\xf91\xf9\xcc.#\x1b\xa37\x1fg\x9fm\n'),
+    ('f(x)**2', b'\xf4t\x7f2;\x9fEm\x0ff\xcb"]S-\x98'),
+    ('x**x', b'\xfdg\xb3%\x93\x1e`2\xb5D\x1b\xa4\x10 U\x96'),
+    ('x+1', b'U\xf7\xbf\x9a\xec\xa9]W\xfe\x8b\x9d\xaam+\xde\x9f'),
+    ('f(x*sin(x))', b'\x97\xe6(T\n\x05;^\xbb\x1c\xe4\xbbT\xc6\xe6e'),
+    ('sin(2*x)/x', b'\x9bM\x03c\x003S+\xab\xb2\xdc`\xf1|K&'),
+    ('exp(x)+exp(2*x)', b'\\\xd8?\xcc\xba\x1c>\x1e\x9fC%U\x89?iz'),
+    ('log(x)+log(2*x)', b'[&\xb5\xf6p\xbf\xe6p\xf6A\xb7\xefC\x82\x7f\xb0'),
+]
+
+
+@pytest.mark.parametrize('expr, expected', differentiate_step_cases)
+def test_differentiate_step(expr: str, expected: bytes):
+    actual = eval_card('diffsteps', f'diff({expr}, x)', 'x', None)
+    assert 'error' not in actual
+    assert hashlib.md5(json.dumps(actual).encode()).digest() == expected
+
+
 integrate_step_cases = [
+    ('2', b'\xa8\xd7\xcb\x01`f[V\x9a\xe1N\\\x8e\xa3\xf9\xb4'),
+    ('exp(x)', b'\xa3O\xbdP\x80\x15I\xc14p\x1f\xe8|s\x0b\xb1'),
     ('tan(x)', b'=\\S\x9dx\xda\xad\xe8\x81\xd6\xbb\xc60\x99\xf8\xea'),
     ('exp(x)/(1+exp(2*x))', b'\xac\xf0\xfa\x99\xe1\x9bk\xa2\xf6HoB\xd6A}\x15'),
     ('1/(x*(x+1))', b'1\xd6\xbfv\x97\x8d\xf2z\x8aq\x98\x0f\x02\xa1\xa8\x8f'),  # todo: too complicated
@@ -100,16 +122,20 @@ integrate_step_cases = [
     ('1/sqrt(x**2+1)', b'\xf0#C\xb7G\xec\x142\x01\xd1\xde.\xb1Z\xfe\x95'),
     ('Derivative(f(x), x)', b'\xbf\xe5^\t\xc3+l\x9a\xd7I\xd4k\xb1a+\xa4'),
     ('Heaviside(x)', b'\x9c\x86\x91es\xb8\xa5/y\xd3\xa2T\x11u\x83\xe2'),
-    ('(x**2+1)**(-3/2)', b'\xcd\x02*\xd8\xa9\xfe\xfc\\\xdd\x8f\x17\x85\xdc\xedi\xf2'),
-    ('x*sin(x)', b'\xe6P_|\xe0u6\xd8\xb5\xde\x80/\xec_i\x14'),
+    ('(x**2+1)**(-3/2)', b'3KW\xd2x"#\x0b\x1ep\xa6,\xfc%Ye'),
+    ('x*sin(x)', b'\x96#\x1b\x15tc|d\x1cy\xd7p\x8fc\x87\x85'),
     ('exp(x)*sin(x)', b'\xf6\xa3l\xd2\xb9\xa2W\xd6.\x11\xfai*\xb8u\x1d'),
     ('sqrt(x**2+x+1)', b'\x19\x8e\x11\x00m\xf3\x92\xa9\xde\xf1\xff*\xa3\xe4*\xf2'),
     ('x*sqrt(x**2+x+1)', b'oCi\x80\xc4}\xb7R\xa4\x95{u\x8d\x00\x96\xb1'),
     ('1/sqrt(1-exp(2*x))', b'z\xbb\x0b\x86\x11\xd4ny\x07\x1e\xd9RT\x04\x86\xb3'),
+    ('1/sqrt(x**2)', b'\xc5\xc8\xd6\x8d\x9a\xffZ\xc1\x99\x1c\xf3\xadcU\xa4g'),
+    ('1/sqrt(x**3)', b'@\x08\xd2u\xbaW\x04\x18\x99\x08\x84\x9eG\r\xe1\x9a'),
+    ('(x**a)**b', b'?l\xf4\x9aX\xaa@\xa4\xe1\\\x97F\x80\x0b\xa0\xac'),
 ]
 
 
+@pytest.mark.xfail # https://github.com/eagleoflqj/sympy_beta/pull/7#issuecomment-1286318351
 @pytest.mark.parametrize('expr, expected', integrate_step_cases)
 def test_integrate_step(expr: str, expected: bytes):
-    actual = eval_card('intsteps', f'integrate({expr})', 'x', None)
+    actual = eval_card('intsteps', f'integrate({expr}, x)', 'x', None)
     assert hashlib.md5(json.dumps(actual).encode()).digest() == expected

@@ -46,5 +46,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default defineConfig({
-  plugins
+  plugins,
+  server: {
+    watch: {
+      ignored: ['**/kernel/**'],
+    },
+  }
 })

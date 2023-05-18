@@ -3,6 +3,8 @@
   "version": "0.10.0",
   "kernelName": "sympy_beta_kernel",
   "kernelVersion": "1.0.0",
+  "sympyVersion": "1.12",
+  "antlrVersion": "4.11.0",
   "pyodideURL": "https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js",
   "homepage": "https://github.com/eagleoflqj/sympy_beta",
   "author": {
@@ -17,7 +19,7 @@
     "lint": "eslint --ext .ts,.mjs,.js,.vue scripts src",
     "lint:fix": "eslint --ext .ts,.mjs,.js,.vue --fix scripts src",
     "check": "vue-tsc --noEmit",
-    "build": "pnpm run check && node scripts/download_vocabulary.mjs && node scripts/build_antlr.mjs && node scripts/build_wheel.mjs && cp -r node_modules/mathlive/dist/fonts public && rimraf dist public/pyodideWorker.js public/pyodideWorker.js.map && NODE_ENV=production pnpm run worker && vite build",
+    "build": "pnpm run check && node scripts/download_vocabulary.mjs && node scripts/build_wheel.mjs && cp -r node_modules/mathlive/dist/fonts public && rimraf dist public/pyodideWorker.js public/pyodideWorker.js.map && NODE_ENV=production pnpm run worker && vite build",
     "serve": "vite preview --host"
   },
   "devDependencies": {

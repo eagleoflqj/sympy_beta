@@ -1,3 +1,5 @@
+from typing import cast, overload
+
 import sympy
 from sympy.integrals.manualintegrate import (
     AddRule,
@@ -8,15 +10,15 @@ from sympy.integrals.manualintegrate import (
     CyclicPartsRule,
     DontKnowRule,
     ExpRule,
+    NestedPowRule,
     PartsRule,
     PowerRule,
     RewriteRule,
+    Rule,
     SqrtQuadraticDenomRule,
     SqrtQuadraticRule,
-    TrigRule,
     TrigSubstitutionRule,
     URule,
-    _manualintegrate,
     integral_steps,
 )
 
@@ -24,44 +26,31 @@ from gamma.stepprinter import JSONPrinter, replace_u_var
 from gamma.utils import DerivExpr, latex
 
 
-def contains_dont_know(rule):
-    if isinstance(rule, DontKnowRule):
-        return True
-    for val in rule._asdict().values():
-        if isinstance(val, tuple):
-            if contains_dont_know(val):
-                return True
-        elif isinstance(val, list):
-            for item in val:
-                if type(item) is tuple:  # PiecewiseRule
-                    sub_rule = item[0]
-                else:  # AlternativeRule
-                    sub_rule = item
-                if contains_dont_know(sub_rule):
-                    return True
-    return False
+@overload
+def filter_unknown_alternatives(rule: AlternativeRule) -> AlternativeRule: ...
+@overload
+def filter_unknown_alternatives(rule: Rule) -> Rule: ...
 
-
-def filter_unknown_alternatives(rule):
+def filter_unknown_alternatives(rule: Rule):
     if isinstance(rule, AlternativeRule):
-        alternatives = list([r for r in rule.alternatives if not contains_dont_know(r)])
+        alternatives = list([r for r in rule.alternatives if not r.contains_dont_know()])
         if not alternatives:
             alternatives = rule.alternatives
-        return AlternativeRule(alternatives, rule.context, rule.symbol)
+        return AlternativeRule(rule.integrand, rule.variable, alternatives)
     return rule
 
 
 class IntegralPrinter(JSONPrinter):
-    def print_rule(self, rule):
+    def print_rule(self, rule: Rule):
         handlers = {
             ConstantRule: self.print_Constant,
             ConstantTimesRule: self.print_ConstantTimes,
             PowerRule: self.print_Power,
+            NestedPowRule: self.print_NestedPower,
             AddRule: self.print_Add,
             URule: self.print_U,
             PartsRule: self.print_Parts,
             CyclicPartsRule: self.print_CyclicParts,
-            TrigRule: self.print_Trig,
             ExpRule: self.print_Exp,
             AlternativeRule: self.print_Alternative,
             DontKnowRule: self.print_DontKnow,
@@ -71,63 +60,95 @@ class IntegralPrinter(JSONPrinter):
             SqrtQuadraticRule: self.print_SqrtQuadratic,
             SqrtQuadraticDenomRule: self.print_SqrtQuadraticDenom,
         }
-        handler = handlers.get(type(rule), self.print_simple)
+        handler = handlers.get(type(rule), self.print_simple)  # type: ignore
         handler(rule)
 
-    def print_Constant(self, rule):
+    def print_Constant(self, rule: ConstantRule):
         with self.new_step():
             self.append(self.format_text("The integral of a constant is the constant "
                                          "times the variable of integration:"))
-            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.constant, rule.symbol),
-                                                          _manualintegrate(rule),
+            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.integrand, rule.variable),
+                                                          rule.eval(),
                                                           evaluate=False)))
 
-    def print_ConstantTimes(self, rule):
+    def print_ConstantTimes(self, rule: ConstantTimesRule):
         with self.new_step():
             self.append(self.format_text("The integral of a constant times a function "
                                          "is the constant times the integral of the function:"))
-            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          rule.constant * sympy.Integral(rule.other, rule.symbol),
+            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.integrand, rule.variable),
+                                                          rule.constant * sympy.Integral(rule.other, rule.variable),
                                                           evaluate=False)))
 
             with self.new_level():
                 self.print_rule(rule.substep)
             self.append(self.format_text("So, the result is: "),
-                        self.format_math(_manualintegrate(rule)))
+                        self.format_math(rule.eval()))
 
-    def print_Power(self, rule):
+    def print_Power(self, rule: PowerRule):
         with self.new_step():
             self.append(self.format_text("The integral of "),
-                        self.format_math(rule.symbol ** sympy.Symbol('n')),
+                        self.format_math(rule.variable ** sympy.Symbol('n')),
                         self.format_text(" is "),
-                        self.format_math((rule.symbol ** (1 + sympy.Symbol('n'))) / (1 + sympy.Symbol('n'))),
+                        self.format_math((rule.variable ** (1 + sympy.Symbol('n'))) / (1 + sympy.Symbol('n'))),
                         self.format_text(" when "),
                         self.format_math(sympy.Ne(sympy.Symbol('n'), -1)),
                         self.format_text(":"))
-            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          _manualintegrate(rule),
+            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.integrand, rule.variable),
+                                                          rule.eval(),
                                                           evaluate=False)))
 
-    def print_Add(self, rule):
+    def print_NestedPower(self, rule: NestedPowRule):
+        if rule.exp.is_Number:
+            result = rule.eval()
+            with self.new_step():
+                if rule.exp == -1:
+                    self.append(
+                        self.format_text("The nominal exponent is "),
+                        self.format_math(-1),
+                        self.format_text(", so we multiply integrand by "),
+                        self.format_math(rule.base * sympy.log(rule.base)),
+                        self.format_text(":")
+                    )
+                else:
+                    self.append(
+                        self.format_text("The nominal exponent "),
+                        self.format_math(rule.exp),
+                        self.format_text(" is not "),
+                        self.format_math(-1),
+                        self.format_text(", so we multiply integrand by "),
+                        self.format_math(sympy.Mul(
+                            rule.base,
+                            sympy.Pow(
+                                sympy.Add(rule.exp, 1, evaluate=False),
+                                -1,
+                                evaluate=False),
+                            evaluate=False)),
+                        self.format_text(":")
+                    )
+                self.append(self.format_math_display(result))
+        else:
+            self.print_simple(rule)
+
+    def print_Add(self, rule: AddRule):
         with self.new_step():
             self.append(self.format_text("Integrate term-by-term:"))
             for substep in rule.substeps:
                 with self.new_level():
                     self.print_rule(substep)
             self.append(self.format_text("The result is: "),
-                        self.format_math(_manualintegrate(rule)))
+                        self.format_math(rule.eval()))
 
-    def print_U(self, rule):
+    def print_U(self, rule: URule):
         with self.new_step(), self.new_u_vars() as (u, du):
             # commutative always puts the symbol at the end when printed
-            dx = DerivExpr(rule.symbol.name)
+            dx = DerivExpr(rule.variable.name)
             self.append(self.format_text("Let "),
                         self.format_math(sympy.Eq(u, rule.u_func, evaluate=False)),
                         self.format_text(', then '),
-                        self.format_math(sympy.Eq(du, rule.u_func.diff(rule.symbol) * dx, evaluate=False)))
+                        self.format_math(sympy.Eq(du, rule.u_func.diff(rule.variable) * dx, evaluate=False)))
             self.append(self.format_text("Substitute:"))
             substep = replace_u_var(rule.substep, rule.u_var, u)
-            self.append(self.format_math_display(sympy.Integral(substep.context, u)))
+            self.append(self.format_math_display(sympy.Integral(substep.integrand, u)))
 
             with self.new_level():
                 self.print_rule(substep)
@@ -136,12 +157,12 @@ class IntegralPrinter(JSONPrinter):
                         self.format_math(u),
                         self.format_text(" back in:"))
 
-            self.append(self.format_math_display(_manualintegrate(rule)))
+            self.append(self.format_math_display(rule.eval()))
 
-    def print_Parts(self, rule):
+    def print_Parts(self, rule: PartsRule):
         with self.new_step():
             self.append(self.format_text("Use integration by parts:"))
-            u, v = sympy.Function('u')(rule.symbol), sympy.Function('v')(rule.symbol)
+            u, v = sympy.Function('u')(rule.variable), sympy.Function('v')(rule.variable)
             du, dv, dx = DerivExpr('u'), DerivExpr('v'), DerivExpr('x')
             self.append(self.format_math_display(R"\int u \mathrm{d}v = uv - \int v \mathrm{d}u"))
 
@@ -150,7 +171,7 @@ class IntegralPrinter(JSONPrinter):
                         self.format_text(" and "),
                         self.format_math(sympy.Eq(dv, rule.dv * dx, evaluate=False)))
             self.append(self.format_text("Then "),
-                        self.format_math(sympy.Eq(du, rule.u.diff(rule.symbol) * dx, evaluate=False)))
+                        self.format_math(sympy.Eq(du, rule.u.diff(rule.variable) * dx, evaluate=False)))
 
             self.append(self.format_text("To find "),
                         self.format_math(v),
@@ -160,15 +181,16 @@ class IntegralPrinter(JSONPrinter):
                 self.print_rule(rule.v_step)
 
             self.append(self.format_text("Now evaluate the sub-integral."))
-            self.print_rule(rule.second_step)
+            self.print_rule(rule.second_step) # type: ignore
 
-    def print_CyclicParts(self, rule):
+    def print_CyclicParts(self, rule: CyclicPartsRule):
+        integrand, variable = rule.integrand, rule.variable
         with self.new_step():
             self.append(self.format_text("Use integration by parts, noting that the integrand"
                                          " eventually repeats itself."))
-            u = sympy.Function('u')(rule.symbol)
+            u = sympy.Function('u')(rule.variable)
             dv, dx = DerivExpr('v'), DerivExpr('x')
-            current_integrand = rule.context
+            current_integrand = integrand
             total_result = sympy.S.Zero
             with self.new_level():
                 sign = 1
@@ -182,81 +204,70 @@ class IntegralPrinter(JSONPrinter):
                                     self.format_text(" and "),
                                     self.format_math(sympy.Eq(dv, rl.dv * dx, evaluate=False)))
 
-                        v_f, du_f = _manualintegrate(rl.v_step), rl.u.diff(rule.symbol)
+                        v_f, du_f = rl.v_step.eval(), rl.u.diff(variable)
 
                         total_result += sign * rl.u * v_f
                         current_integrand = v_f * du_f
 
-                        self.append(self.format_text("Then "),
-                                    self.format_math(
-                                        sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                 total_result - sign * sympy.Integral(current_integrand, rule.symbol),
-                                                 evaluate=False)))
+                        self.append(
+                            self.format_text("Then "),
+                            self.format_math(
+                                sympy.Eq(
+                                    sympy.Integral(integrand, variable),
+                                    total_result - sign * sympy.Integral(current_integrand, variable), # type: ignore
+                                    evaluate=False
+                                )
+                            )
+                        )
                         sign *= -1
                 with self.new_step():
                     self.append(self.format_text("Notice that the integrand has repeated itself, so "
                                                  "move it to one side:"))
                     self.append(self.format_math_display(
-                        sympy.Eq((1 - rule.coefficient) * sympy.Integral(rule.context, rule.symbol), total_result,
+                        sympy.Eq((1 - rule.coefficient) * sympy.Integral(rule.integrand, rule.variable), total_result,
                                  evaluate=False)))
                     self.append(self.format_text("Therefore,"))
-                    self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                                  _manualintegrate(rule),
+                    self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.integrand, rule.variable),
+                                                                  rule.eval(),
                                                                   evaluate=False)))
 
-    def print_Trig(self, rule):
-        with self.new_step():
-            text = {
-                'sin': "The integral of sine is negative cosine:",
-                'cos': "The integral of cosine is sine:",
-                'sec*tan': "The integral of secant times tangent is secant:",
-                'csc*cot': "The integral of cosecant times cotangent is cosecant:",
-            }.get(rule.func)
-
-            if text:
-                self.append(self.format_text(text))
-
-            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          _manualintegrate(rule),
-                                                          evaluate=False)))
-
-    def print_Exp(self, rule):
+    def print_Exp(self, rule: ExpRule):
         with self.new_step():
             if rule.base == sympy.E:
                 self.append(self.format_text("The integral of the exponential function is itself."))
             else:
                 self.append(self.format_text("The integral of an exponential function is itself"
                                              " divided by the natural logarithm of the base."))
-            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.context, rule.symbol),
-                                                          _manualintegrate(rule),
+            self.append(self.format_math_display(sympy.Eq(sympy.Integral(rule.integrand, rule.variable),
+                                                          rule.eval(),
                                                           evaluate=False)))
 
-    def print_simple(self, rule):
+    def print_simple(self, rule: Rule):
         with self.new_step():
             self.append(self.format_text("The integral of "),
-                        self.format_math(rule.context),
+                        self.format_math(rule.integrand),
                         self.format_text(" is "),
-                        self.format_math(_manualintegrate(rule)))
+                        self.format_math(rule.eval()))
 
-    def print_Rewrite(self, rule):
+    def print_Rewrite(self, rule: RewriteRule):
         with self.new_step():
             self.append(self.format_text("Rewrite the integrand:"))
-            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten, evaluate=False)))
+            self.append(self.format_math_display(sympy.Eq(rule.integrand, rule.rewritten, evaluate=False)))
             self.print_rule(rule.substep)
 
-    def print_CompleteSquare(self, rule):
+    def print_CompleteSquare(self, rule: CompleteSquareRule):
         with self.new_step():
             self.append(self.format_text("Complete the square:"))
-            self.append(self.format_math_display(sympy.Eq(rule.context, rule.rewritten, evaluate=False)))
+            self.append(self.format_math_display(sympy.Eq(rule.integrand, rule.rewritten, evaluate=False)))
             self.print_rule(rule.substep)
 
-    def print_DontKnow(self, rule):
+    def print_DontKnow(self, rule: DontKnowRule):
         with self.new_step():
             self.append(self.format_text("Don't know the steps in finding this integral."))
             self.append(self.format_text("But the integral is"))
-            self.append(self.format_math_display(sympy.integrate(rule.context, rule.symbol)))
+            self.append(self.format_math_display(sympy.integrate(rule.integrand, rule.variable)))
 
-    def print_Alternative(self, rule):
+    def print_Alternative(self, rule: AlternativeRule):
         # TODO: make more robust
         rule = filter_unknown_alternatives(rule)
 
@@ -264,10 +275,10 @@ class IntegralPrinter(JSONPrinter):
             self.print_rule(rule.alternatives[0])
             return
 
-        if rule.context.func in self.alternative_functions_printed:
+        if rule.integrand.func in self.alternative_functions_printed:
             self.print_rule(rule.alternatives[0])
         else:
-            self.alternative_functions_printed.add(rule.context.func)
+            self.alternative_functions_printed.add(rule.integrand.func)
             with self.new_step():
                 self.append(self.format_text("There are multiple ways to do this integral."))
                 for index, r in enumerate(rule.alternatives):
@@ -276,22 +287,22 @@ class IntegralPrinter(JSONPrinter):
                         with self.new_level():
                             self.print_rule(r)
 
-    def print_TrigSubstitution(self, rule):
+    def print_TrigSubstitution(self, rule: TrigSubstitutionRule):
         with self.new_step():
-            d_x = DerivExpr(rule.symbol.name)
-            d_theta = DerivExpr(rule.theta.name)
+            d_x = DerivExpr(rule.variable.name)
+            d_theta = DerivExpr(rule.theta.name) # type: ignore
             deriv = sympy.diff(rule.func, rule.theta)
             self.append(self.format_text("Let "),
-                        self.format_math(sympy.Eq(rule.symbol, rule.func, evaluate=False)),
+                        self.format_math(sympy.Eq(rule.variable, rule.func, evaluate=False)),
                         self.format_text(', then '),
                         self.format_math(sympy.Eq(d_x, deriv*d_theta, evaluate=False)))
             self.append(self.format_text('Substitute:'))
-            self.append(self.format_math_display(sympy.Integral(rule.substep.context, rule.substep.symbol)))
+            self.append(self.format_math_display(sympy.Integral(rule.substep.integrand, rule.substep.variable)))
             with self.new_level():
                 self.print_rule(rule.substep)
 
-    def print_SqrtQuadratic(self, rule):
-        a, b, c, x = rule.a, rule.b, rule.c, rule.symbol
+    def print_SqrtQuadratic(self, rule: SqrtQuadraticRule):
+        a, b, c, x = rule.a, rule.b, rule.c, rule.variable
         with self.new_step():
             self.append(self.format_text('Apply'))
             self.append(self.format_math_display(R'''\begin{align}
@@ -307,10 +318,10 @@ class IntegralPrinter(JSONPrinter):
             self.append(self.format_text('We then calculate '), self.format_math(sympy.Integral(integrand, x)))
             with self.new_level():
                 substep = integral_steps(integrand, x)
-                self.print_rule(substep)
+                self.print_rule(substep)  # type: ignore
 
-    def print_SqrtQuadraticDenom(self, rule):
-        a, b, c, coeffs, x = rule.a, rule.b, rule.c, rule.coeffs.copy(), rule.symbol
+    def print_SqrtQuadraticDenom(self, rule: SqrtQuadraticDenomRule):
+        a, b, c, coeffs, x = rule.a, rule.b, rule.c, rule.coeffs.copy(), rule.variable
         N = len(rule.coeffs)
         integral = sympy.Add(*(coeff * sympy.Symbol(f'I_{i}') for coeff, i in zip(coeffs, range(N - 1, -1, -1))))
         result_coeffs = []
@@ -351,14 +362,14 @@ I_n&=\frac{1}{c}(\frac{1}{n-1}(x^{n-1}\sqrt{a+bx+cx^2}-\frac{b}{2}I_{n-1}-cI_n)-
             self.append(self.format_text('We then calculate '), self.format_math(sympy.Integral(integrand, x)))
             with self.new_level():
                 substep = integral_steps(integrand, x)
-                self.print_rule(substep)
+                self.print_rule(substep)  # type: ignore
 
     def format_math_constant(self, math):
         return self.format_math_display(latex(math) + R"+ \mathrm{C}")
 
     def finalize(self):
         rule = filter_unknown_alternatives(self.rule)
-        result = _manualintegrate(rule)
+        result = rule.eval()
         if result:
             simp = sympy.simplify(sympy.trigsimp(result))
             if simp != result:
@@ -380,7 +391,7 @@ I_n&=\frac{1}{c}(\frac{1}{n-1}(x^{n-1}\sqrt{a+bx+cx^2}-\frac{b}{2}I_{n-1}-cI_n)-
 
 
 def print_json_steps(function, symbol):
-    rule = integral_steps(function, symbol)
+    rule = cast(Rule, integral_steps(function, symbol))
     if isinstance(rule, DontKnowRule):
         raise ValueError("Cannot evaluate integral")
     a = IntegralPrinter(rule)
