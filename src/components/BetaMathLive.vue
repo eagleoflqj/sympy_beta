@@ -174,9 +174,8 @@ window.mathVirtualKeyboard.layouts = [
 ]
 
 const mfe = new MathfieldElement()
-const style = mfe.shadowRoot!.querySelector('style')!
 // remove :host style
-style.innerHTML = style.innerHTML.split('\n').slice(12).join('\n')
+mfe.shadowRoot?.adoptedStyleSheets.splice(2, 1)
 mfe.mathVirtualKeyboardPolicy = 'manual'
 // disable non-standard LaTex shortcuts
 for (const key of ['dt', 'dx', 'dy', 'dz', 'ee']) {

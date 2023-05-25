@@ -1,4 +1,8 @@
 # What's new in each minor version
+## 0.11.0
+* Simple NLP support.
+* Accelerate LaTeX rendering.
+* Major dependencies upgraded.
 ## 0.10.0
 * [Mathlive](https://cortexjs.io/mathlive/) integration that allows you to edit math formula in a WYSIWYG way.
 * 1 more kernel extension.

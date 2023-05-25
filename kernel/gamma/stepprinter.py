@@ -55,7 +55,7 @@ class JSONPrinter:
         self.alternative_functions_printed = set()
         self.rule = rule
         self.stack = []
-        expr = getattr(rule, 'integrand', getattr(rule, 'function', None))
+        expr = cast(sympy.Expr, getattr(rule, 'integrand', getattr(rule, 'function', None)))
         # avoid duplicated symbol u when doing substitution
         self.u_max = max((u_index(cast(sympy.Symbol, symbol)) for symbol in expr.free_symbols), default=-1)
         self.print_rule(rule)

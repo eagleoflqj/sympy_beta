@@ -21,7 +21,7 @@ python -m http.server -d dist
 ```
 and open http://localhost:8000, or run
 ```sh
-pnpm run serve
+pnpm run preview
 ```
 and open http://localhost:4173.
 ## Vercel

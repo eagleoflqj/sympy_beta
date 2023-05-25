@@ -29,6 +29,7 @@ module.exports = {
     "@typescript-eslint/no-use-before-define": "error",
     'vue/require-v-for-key': 0,
     'vue/valid-v-for': 0,
+    'vue/no-dupe-keys': 0, // https://github.com/vuejs/eslint-plugin-vue/issues/2096
     'vue/no-v-html': 0
   }
 }
