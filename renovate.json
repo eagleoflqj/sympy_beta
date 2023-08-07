@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "platform": "github",
+  "repositories": ["eagleoflqj/sympy_beta"],
+  "packageRules": [
+    {
+      "groupName": "all minor dependencies",
+      "groupSlug": "all-minor",
+      "matchManagers": [
+        "npm",
+        "github-actions"
+      ]
+    }
+  ]
+}
