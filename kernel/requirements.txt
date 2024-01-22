@@ -6,7 +6,7 @@ docutils==0.19
 matplotlib==3.5.2
 nltk==3.8.1
 numpy==1.24.2
-scipy==1.9.3
+scipy==1.12.0
 sympy==1.12
 
 # dev
